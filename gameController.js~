@@ -67,7 +67,7 @@ function startGame() {
     
     loadPosition(starterPosition, starterPlayer);
 
-} // startGame()
+}
 
 function loadPosition(position, playerToMove) {
     curBoard = position;
@@ -86,7 +86,7 @@ function loadPosition(position, playerToMove) {
             }
         }
     }
-} // loadPosition(position, playerToMove)
+}
 
 function inRack1(position) { // returns true if the position is within the p1rack
     let x = position[1];
@@ -97,7 +97,7 @@ function inRack1(position) { // returns true if the position is within the p1rac
     } else {
         return false;
     }
-} // inRack1(position)
+}
 
 // console.log( 'inRack1(0,0):', inRack1( [0, 0] ) );
 // console.log( 'inRack1(0,1):', inRack1( [0, 1] ) );
@@ -115,7 +115,7 @@ function inRack2(position) { // true if the position's coordinates are ithin the
     } else {
         return false;
     }
-} // inRack2(position)
+}
 
 // console.log( 'inRack2(3,10):', inRack2( [3, 10] ) );
 // console.log( 'inRack2(4,9):', inRack2( [4, 9] ) );
@@ -137,7 +137,7 @@ function onBoard(position) { // returns false if the position is off the board
     } else {
         return false;
     }
-} // onBoard(position)
+}
 
 // console.log( 'onBoard(0,0):', onBoard( [0, 0] ) );
 // console.log( 'onBoard(0,1):', onBoard( [0, 1] ) );
@@ -230,7 +230,7 @@ console.log( 'curPlayer:', curPlayer, 'p1rack:', p1rack, 'ctr:', i, 'dot:', dotc
         p1rack[i].piece = getPieceImageSource(p1rack[i]);
 
     }
-} // rePopRack1()
+}
 
 function rePopRack2() { // repopulate the p2rack
 
@@ -266,7 +266,7 @@ console.log( 'rePopRack2():' );
 console.log( 'curPlayer:', curPlayer, 'p2rack:', p2rack, 'ctr:', i, 'dot:', dotcnt, 'rnd:', j, 'index:', k, 'tiles:', tiles );
 
     }
-} // rePopRack2()
+}
 
 function loadPiece(piece, position) {
     const squareElement = document.getElementById(`${position[0]}${position[1]}`);
@@ -278,7 +278,7 @@ function loadPiece(piece, position) {
     pieceElement.src = getPieceImageSource(piece);
 
     squareElement.appendChild(pieceElement);
-} // loadPiece(piece, position)
+}
 
 function loadRack(piece, position) { // position = coordinates
     const squareElement = document.getElementById(`${position[0]}${position[1]}`);
@@ -296,7 +296,7 @@ console.log( 'pieceElement:', pieceElement );
 
     squareElement.appendChild(pieceElement);
 
-} // loadRack(piece, position)
+}
 
 function getPieceImageSource(piece) {
     switch (piece) {
@@ -331,7 +331,7 @@ function getPieceImageSource(piece) {
         case ' ': return 'assets/BLANK.png';
         case 'R': return 'assets/pink-rose.png';
     }
-} // getPieceImageSource(piece)
+}
 
 /* movement functions */
 
@@ -442,7 +442,7 @@ console.log( 'p1rack:', p1rack );
     // if ( p2rack.filter(x => x === '.').length >= 3 ) {
     //     switchPlayer();
     // }
-} // movePiece_white(piece, startingPosition, endingPosition)
+}
 
 function movePiece_black(piece, startingPosition, endingPosition) {
     if (curPlayer == 'black') {
@@ -471,7 +471,6 @@ console.log( 'p2rack:', p2rack );
         switchPlayer();
     }
 }
-} // movePiece_black(piece, startingPosition, endingPosition)
 
 function switchPlayer() { // score, redraw and then switch players
     
@@ -488,7 +487,7 @@ function switchPlayer() { // score, redraw and then switch players
 console.log( '' );
 console.log( 'switchPlayer():' );
 
-} // switchPlayer()
+}
 
 function validateWhiteMovement(startingPosition, endingPosition) {
     const boardPiece = curBoard[startingPosition[0]][startingPosition[1]];
@@ -533,7 +532,7 @@ console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
                       return false;
                   }
     }
-} // validateWhiteMovement(startingPosition, endingPosition)
+}
 
 function validateBlackMovement(startingPosition, endingPosition) {
     const boardPiece = curBoard[startingPosition[0]][startingPosition[1]];
@@ -580,7 +579,7 @@ console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
                   }
 
     }
-} // validateBlackMovement(startingPosition, endingPosition)
+}
 
 startGame();
 setPieceHoldEvents();
