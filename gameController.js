@@ -1,4 +1,5 @@
 /* globals */
+// "use strict";
 
 let curBoard;
 let curPlayer;
@@ -106,7 +107,7 @@ function inRack1(position) { // returns true if the position is within the p1rac
 // console.log( 'inRack1(1,0):', inRack1( [1, 0] ) );
 // console.log( 'inRack1(1,1):', inRack1( [1, 1] ) );
 
-function inRack2(position) { // true if the position's coordinates are ithin the p2rack
+function inRack2(position) { // true if the position's coordinates are within the p2rack
     let x = position[1];
     let y = position[0]; // change position into x/y coordinates
 
@@ -388,8 +389,12 @@ function setPieceHoldEvents() {
                     const xPosition = Math.floor((mousePositionOnBoardX - boardBorderSize) / document.getElementsByClassName('square')[0].offsetWidth*1.0);
                     const yPosition = Math.floor((mousePositionOnBoardY - boardBorderSize) / document.getElementsByClassName('square')[0].offsetHeight*0.77); // was 0.666, then 0.75
     
-// console.log( 'X:', (mousePositionOnBoardX - boardBorderSize) / document.getElementsByClassName('square')[0].offsetWidth*1.0 );
-// console.log( 'Y:', (mousePositionOnBoardY - boardBorderSize) / document.getElementsByClassName('square')[0].offsetHeight*0.77 );
+
+console.log( '' );
+console.log( 'setPieceHoldEvents():' );
+console.log( 'X:', (mousePositionOnBoardX - boardBorderSize) / document.getElementsByClassName('square')[0].offsetWidth*1.0 );
+console.log( 'Y:', (mousePositionOnBoardY - boardBorderSize) / document.getElementsByClassName('square')[0].offsetHeight*0.77 );
+console.log( 'curPlayer:', curPlayer, 'yPosition:', yPosition, 'xPosition:', xPosition );
 
                     const pieceReleasePosition = [yPosition, xPosition];
 
@@ -434,6 +439,7 @@ console.log( '' );
 console.log( 'movePiece_white():' );
 console.log( 'curPlayer:', curPlayer, 'moves a:"', piece.id, '" from startingPosition[', startingPosition[0], ',', startingPosition[1], '], endingPosition[', endingPosition[0], ',', endingPosition[1], ']' );
 console.log( 'p1rack:', p1rack );
+console.log( 'p1rack:', p1rack, 'p1rack.dot_count:', p1rack.filter(x => x === '.').length );
 
     // artificially switch players after 3 tile moves
     if ( p1rack.filter(x => x === '.').length >= 3 ) {
@@ -461,7 +467,7 @@ function movePiece_black(piece, startingPosition, endingPosition) {
 console.log( '' );
 console.log( 'movePiece_black():' );
 console.log( 'curPlayer:', curPlayer, 'moves a:"', piece.id, '" from startingPosition[', startingPosition[0], ',', startingPosition[1], '], endingPosition[', endingPosition[0], ',', endingPosition[1], ']' );
-console.log( 'p2rack:', p2rack );
+console.log( 'p2rack:', p2rack, 'p2rack.dot_count:', p2rack.filter(x => x === '.').length );
 
     // artificially switch players after 3 tile moves
     // if ( p1rack.filter(x => x === '.').length >= 3 ) {
@@ -470,7 +476,6 @@ console.log( 'p2rack:', p2rack );
     if ( p2rack.filter(x => x === '.').length >= 3 ) {
         switchPlayer();
     }
-}
 } // movePiece_black(piece, startingPosition, endingPosition)
 
 function switchPlayer() { // score, redraw and then switch players
@@ -567,8 +572,12 @@ function validateBlackMovement(startingPosition, endingPosition) {
         case ' ':
         case 'R':
                   if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                  // if ( onBoard(endingPosition) ) {
                       // if the startingPosition is in p2rack and the endingPosition is on the board, return true 
+
+console.log( 'validateBlackMovement() success:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], '], endingPosition[', endingPosition[0], ',', endingPosition[1], ']' );
+console.log( 'inRack2(startingPosition):', inRack2(startingPosition) );
+console.log( 'onBoard(endingPosition):', onBoard(endingPosition) );
+
                       return true;
                   } else {
 
@@ -578,7 +587,6 @@ console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
 
                       return false;
                   }
-
     }
 } // validateBlackMovement(startingPosition, endingPosition)
 
