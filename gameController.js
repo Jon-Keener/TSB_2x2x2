@@ -388,7 +388,17 @@ function setPieceHoldEvents() {
 
                     const xPosition = Math.floor((mousePositionOnBoardX - boardBorderSize) / document.getElementsByClassName('square')[0].offsetWidth*1.0);
                     const yPosition = Math.floor((mousePositionOnBoardY - boardBorderSize) / document.getElementsByClassName('square')[0].offsetHeight*0.77); // was 0.666, then 0.75
-    
+                     
+                    // Even columns are indented, so the Y coordinate needs to be compensated iff its an even column.
+//                  if ( xPosition % 2 == 0 ) { // an even column
+// document.write('Number is even!');
+// console.log( 'an even column:' );
+//                         let newmousePositionOnBoardY = mousePositionOnBoardY - 0.5; // This vertical indentation may need adjustment.
+// 
+//                         const yPosition = Math.floor((newmousePositionOnBoardY - boardBorderSize) / document.getElementsByClassName('square')[0].offsetHeight*0.77); // was 0.666, then 0.75
+//                     } else {
+//                         const yPosition = Math.floor((mousePositionOnBoardY - boardBorderSize) / document.getElementsByClassName('square')[0].offsetHeight*0.77); // was 0.666, then 0.75
+//                     }
 
 console.log( '' );
 console.log( 'setPieceHoldEvents():' );
@@ -426,7 +436,12 @@ function movePiece_white(piece, startingPosition, endingPosition) {
         const boardPiece = curBoard[startingPosition[0]][startingPosition[1]];
         if (boardPiece != '.') {
             curBoard[startingPosition[0]][startingPosition[1]] = '.'; // clear the startingPosition
-            p1rack[ startingPosition[0]*4 + startingPosition[1] ] = '.'; // clear the tile from the rack, this formula only works for the p1rack
+            if ( startingPosition[0] == 0 && startingPosition[1] == 0 ) { p1rack[0] = '.'; } // clear the tile from the p1rack
+            if ( startingPosition[0] == 0 && startingPosition[1] == 1 ) { p1rack[1] = '.'; }
+            if ( startingPosition[0] == 0 && startingPosition[1] == 2 ) { p1rack[2] = '.'; }
+            if ( startingPosition[0] == 0 && startingPosition[1] == 3 ) { p1rack[3] = '.'; }
+            if ( startingPosition[1] == 1 && startingPosition[1] == 0 ) { p1rack[4] = '.'; }
+            if ( startingPosition[1] == 1 && startingPosition[1] == 1 ) { p1rack[5] = '.'; }
             curBoard[endingPosition[0]][endingPosition[1]] = boardPiece; // move the boardPiece to the endingPosition
 
             const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}`);
@@ -438,16 +453,13 @@ function movePiece_white(piece, startingPosition, endingPosition) {
 console.log( '' );
 console.log( 'movePiece_white():' );
 console.log( 'curPlayer:', curPlayer, 'moves a:"', piece.id, '" from startingPosition[', startingPosition[0], ',', startingPosition[1], '], endingPosition[', endingPosition[0], ',', endingPosition[1], ']' );
-console.log( 'p1rack:', p1rack );
 console.log( 'p1rack:', p1rack, 'p1rack.dot_count:', p1rack.filter(x => x === '.').length );
 
-    // artificially switch players after 3 tile moves
+    // artificially switch players after 3 white tile moves
     if ( p1rack.filter(x => x === '.').length >= 3 ) {
         switchPlayer();
     }
-    // if ( p2rack.filter(x => x === '.').length >= 3 ) {
-    //     switchPlayer();
-    // }
+
 } // movePiece_white(piece, startingPosition, endingPosition)
 
 function movePiece_black(piece, startingPosition, endingPosition) {
@@ -455,7 +467,12 @@ function movePiece_black(piece, startingPosition, endingPosition) {
         const boardPiece = curBoard[startingPosition[0]][startingPosition[1]];
         if (boardPiece != '.') {
             curBoard[startingPosition[0]][startingPosition[1]] = '.'; // clear the startingPosition
-            p1rack[ startingPosition[0]*4 + startingPosition[1] ] = '.'; // clear the tile from the rack, this formula only works for the p1rack
+            if ( startingPosition[0] == 3 && startingPosition[1] == 10 ) { p2rack[0] = '.'; } // clear the tile from the p2rack
+            if ( startingPosition[0] == 4 && startingPosition[1] == 9 ) { p2rack[1] = '.'; }
+            if ( startingPosition[0] == 3 && startingPosition[1] == 8 ) { p2rack[2] = '.'; }
+            if ( startingPosition[0] == 4 && startingPosition[1] == 7 ) { p2rack[3] = '.'; }
+            if ( startingPosition[1] == 2 && startingPosition[1] == 10 ) { p2rack[4] = '.'; }
+            if ( startingPosition[1] == 3 && startingPosition[1] == 9 ) { p2rack[5] = '.'; }
             curBoard[endingPosition[0]][endingPosition[1]] = boardPiece; // move the boardPiece to the endingPosition
 
             const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}`);
@@ -469,13 +486,11 @@ console.log( 'movePiece_black():' );
 console.log( 'curPlayer:', curPlayer, 'moves a:"', piece.id, '" from startingPosition[', startingPosition[0], ',', startingPosition[1], '], endingPosition[', endingPosition[0], ',', endingPosition[1], ']' );
 console.log( 'p2rack:', p2rack, 'p2rack.dot_count:', p2rack.filter(x => x === '.').length );
 
-    // artificially switch players after 3 tile moves
-    // if ( p1rack.filter(x => x === '.').length >= 3 ) {
-    //     switchPlayer();
-    // }
+    // artificially switch players after 3 black tile moves
     if ( p2rack.filter(x => x === '.').length >= 3 ) {
         switchPlayer();
     }
+
 } // movePiece_black(piece, startingPosition, endingPosition)
 
 function switchPlayer() { // score, redraw and then switch players
