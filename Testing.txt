@@ -1,53 +1,147 @@
 
-Test moving from [0, 3] to [1, 4]:
+New Testing 20220811:
 
-  endingPosition: (2) [2, 4]   # off by 1
-  startingPosition: (2) [0, 3]
+Test moving to [0, 1, 5] top-center:
+expect Y: 1.low, X: 5.5
 
-Test moving from [0, 3] to [1, 5]:
+  Even/odd column: 1
+  gameController.js:490 X: 5.42
+  gameController.js:491 Y: 1.1396
 
-  endingPosition: (2) [1, 5]
-  startingPosition: (2) [0, 3] # success
+  Even/odd column: 1
+  gameController.js:490 X: 5.5
+  gameController.js:491 Y: 1.1396
 
-Test moving from [0, 3] to [0, 6]:
+Test moving to [0, 1, 5] bottom-center:
+expect Y: 1.high, X: 5.5
 
-  endingPosition: (2) [1, 6]   # off by 1
-  startingPosition: (2) [0, 3]
+  Even/odd column: 1
+  gameController.js:490 X: 5.46
+  gameController.js:491 Y: 1.7864
 
-Test moving from [0, 3] to [0, 7]:
+  Even/odd column: 1
+  gameController.js:490 X: 5.44
+  gameController.js:491 Y: 1.7555999999999998
 
-  endingPosition: (2) [0, 7]
-  startingPosition: (2) [0, 3] # success
+================================================================================
 
-Test moving from [0, 3] to [0, 8]:
+Now test moving to [0, 1, 4] top-center:
+expect Y: 1.low, X: 4.5
 
-  boardPiece: undefined
-  endingPosition: (2) [1, 8]   # off by 1
-  startingPosition: (2) [0, 3]
+  Even/odd column: 0
+  gameController.js:490 X: 4.46
+  gameController.js:491 Y: 1.6247 (this should be more like 1.1247)
 
-Test moving from [0, 3] to [1, 9]:
+  Even/odd column: 0
+  gameController.js:490 X: 4.48
+  gameController.js:491 Y: 1.6093 (this should be more like 1.1093)
 
-  endingPosition: (2) [1, 9]
-  startingPosition: (2) [0, 3] # success
+And test moving to [0, 1, 4] bottom-center:
+expect Y: 1.high, X: 4.5
 
-Test moving from [0, 3] to [1, 10]:
+  Even/odd column: 0
+  gameController.js:490 X: 4.46
+  gameController.js:491 Y: 2.2253000000000003 (this should be more like 1.7253) // wrong position!
 
-  endingPosition: (2) [2, 10]  # off by 1
-  startingPosition: (2) [0, 3]
+  Even/odd column: 0
+  gameController.js:490 X: 4.46
+  gameController.js:491 Y: 2.2715 (this should be more like 1.7715) // wrong position!
 
-Test moving from [0, 3] to [2, 11]:
+================================================================================
 
-  endingPosition: (2) [3, 11]  # off by 1
-  startingPosition: (2) [0, 3]
+Subtracting .5 from yPosition doesn't seem to be working...
 
-Test moving from [0, 3] to [2, 12]:
+Test moving to [0, 1, 4] bottom-center:
 
-  endingPosition: (2) [3, 12]  # off by 1
-  startingPosition: (2) [0, 3]
+  Even/odd column: 0
+  gameController.js:492 X: 4.44   // correct
+  gameController.js:493 Y: 2.2561 // incorrect!
+
+gameController.js:452 Even (indented) column:
+gameController.js:453 event.clientY: 189
+gameController.js:454 boardElement.offsetTop: 32
+gameController.js:455 window.scrollY: 0
+gameController.js:456 mousePositionOnBoardY: 157
+gameController.js:457 boardBorderSize: 10
+gameController.js:458 document.getElementsByClassName(square)[0].offsetHeight: 50
+gameController.js:463 xPosition: 4 yPosition: 2 // incorrect!  this needs to be 1
+
+================================================================================
+
+var mousePositionOnBoardY = event.clientY - boardElement.offsetTop + window.scrollY;
+var mousePositionOnBoardY = 189           - 32                     + 0;
+var mousePositionOnBoardY = 157;
+
+const yPosition = Math.floor((mousePositionOnBoardY - boardBorderSize) / document.getElementsByClassName('square')[0].offsetHeight*0.77); 
+const yPosition = Math.floor((157 - 10) / 50 * 0.77); 
+const yPosition = Math.floor((147) / 50 * 0.77); 
+const yPosition = Math.floor( 147 / 50 * 0.77 ); 
+const yPosition = Math.floor( 2.2638 ); 
+
+--> Instead of making mousePositionOnBoardY a variable,
+--> try making yPosition a variable and adjusting it accordingly...
+
+================================================================================
+
+Test moving to [0, 1, 4] bottom-center:
+
+  Even/odd column: 0
+  gameController.js:500 X: 4.5 // expected
+  gameController.js:501 Y: 2.2792 // subtract 0.5 before doing floor
+  gameController.js:502 curPlayer: white yPosition: 1 xPosition: 4 // correct x and y Positions now!
 
 
 
 
--- seems to be off by 1 on every other column
+gameController.js:452 Even (indented) column:
+gameController.js:453 event.clientY: 189
+gameController.js:454 boardElement.offsetTop: 32
+gameController.js:455 window.scrollY: 0
+gameController.js:456 mousePositionOnBoardY: 157
+gameController.js:457 boardBorderSize: 10
+gameController.js:458 document.getElementsByClassName(square)[0].offsetHeight: 50
+gameController.js:460 mousePositionOnBoardY: 152.5
 
-Test moving from [1, 0] to [1, 4]:
+Even/odd column: 0
+gameController.js:497 X: 4.46
+gameController.js:498 Y: 2.1945
+
+
+var mousePositionOnBoardY = event.clientY - boardElement.offsetTop + window.scrollY;
+var mousePositionOnBoardY = 185           - 32                     + 0;
+var mousePositionOnBoardY = 153;
+
+
+const yPosition = Math.floor((mousePositionOnBoardY - boardBorderSize) / document.getElementsByClassName('square')[0].offsetHeight*0.77); 
+const yPosition = Math.floor((153                   - 10             ) / 50                                                       *0.77); 
+const yPosition = Math.floor(143                                       / 38.5                                                          ); 
+const yPosition = Math.floor(3.714); 
+const yPosition = 3;
+
+--> changing mousePositionOnBoardY from 153 to 152.5 had no effect on yPosition.
+
+
+
+
+
+
+  Even/odd column: 0
+  gameController.js:495 X: 4.46
+  gameController.js:496 Y: 2.2253000000000003
+
+var mousePositionOnBoardY = event.clientY - boardElement.offsetTop + window.scrollY;
+var mousePositionOnBoardY = 187           - 32                     + 0;
+var mousePositionOnBoardY = 155;
+
+gameController.js:456 mousePositionOnBoardY: 155
+(anonymous) @ gameController.js:456
+gameController.js:458 mousePositionOnBoardY: 154.5
+
+
+const yPosition = Math.floor((mousePositionOnBoardY - boardBorderSize) / document.getElementsByClassName('square')[0].offsetHeight*0.77);
+const yPosition = Math.floor((154.5                 - 10             ) / 50                                                       *0.77);
+const yPosition = Math.floor((144.5                                  ) / 38.5                                                          );
+const yPosition = Math.floor(3.753                                                                                                     );
+const yPosition = 3;
+
+
