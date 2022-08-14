@@ -168,12 +168,12 @@ function inRack1(position) { // returns true if the position is within the p1rac
     }
 } // inRack1(position)
 
-// console.log( 'inRack1(0,0,0):', inRack1( [0, 0, 0] ) );
-// console.log( 'inRack1(0,0,1):', inRack1( [0, 0, 1] ) );
-// console.log( 'inRack1(0,0,2):', inRack1( [0, 0, 2] ) );
-// console.log( 'inRack1(0,0,3):', inRack1( [0, 0, 3] ) );
-// console.log( 'inRack1(0,1,0):', inRack1( [0, 1, 0] ) );
-// console.log( 'inRack1(0,1,1):', inRack1( [0, 1, 1] ) );
+// console.log( 'inRack1([0,0,0]):', inRack1([0,0,0]) );
+// console.log( 'inRack1([0,0,1]):', inRack1([0,0,1]) );
+// console.log( 'inRack1([0,0,2]):', inRack1([0,0,2]) );
+// console.log( 'inRack1([0,0,3]):', inRack1([0,0,3]) );
+// console.log( 'inRack1([0,1,0]):', inRack1([0,1,0]) );
+// console.log( 'inRack1([0,1,1]):', inRack1([0,1,1]) );
 
 function inRack2(position) { // true if the position's coordinates are within the p2rack
     let x = position[2];
@@ -187,18 +187,18 @@ function inRack2(position) { // true if the position's coordinates are within th
     }
 } // inRack2(position)
 
-// console.log( 'inRack2(0,3,10):', inRack2( [0, 3, 10] ) );
-// console.log( 'inRack2(0,4,9):', inRack2( [0, 4, 9] ) );
-// console.log( 'inRack2(0,3,8):', inRack2( [0, 3, 8] ) );
-// console.log( 'inRack2(0,4,7):', inRack2( [0, 4, 7] ) );
-// console.log( 'inRack2(0,2,10):', inRack2( [0, 2, 10] ) );
-// console.log( 'inRack2(0,3,9):', inRack2( [0, 3, 9] ) );
+// console.log( 'inRack2([0,3,10]):', inRack2([0,3,10]) );
+// console.log( 'inRack2([0,4,9]):', inRack2([0,4,9]) );
+// console.log( 'inRack2([0,3,8]):', inRack2([0,3,8]) );
+// console.log( 'inRack2([0,4,7]):', inRack2([0,4,7]) );
+// console.log( 'inRack2([0,2,10]):', inRack2([0,2,10]) );
+// console.log( 'inRack2([0,3,9]):', inRack2([0,3,9]) );
 
 function onBoard(position) { // returns false if the position is off the board
     let x = position[2];
     let y = position[1];
     let z = position[0];
-
+    
     if ( (y===1 && x===4) || (y===1 && x===5) || (y===1 && x===6) || (y===2 && x===4) || (y===2 && x===5) || (y===2 && x===6) || (y===3 && x===5) ) { // board
         return true;
     } else {
@@ -206,61 +206,85 @@ function onBoard(position) { // returns false if the position is off the board
     }
 } // onBoard(position)
 
-// console.log( 'onBoard(0,0,0):', onBoard( [0, 0, 0] ) );
-// console.log( 'onBoard(0,0,1):', onBoard( [0, 0, 1] ) );
-// console.log( 'onBoard(0,0,2):', onBoard( [0, 0, 2] ) );
-// console.log( 'onBoard(0,0,3):', onBoard( [0, 0, 3] ) );
-// console.log( 'onBoard(0,0,4):', onBoard( [0, 0, 4] ) );
-// console.log( 'onBoard(0,0,5):', onBoard( [0, 0, 5] ) );
-// console.log( 'onBoard(0,0,6):', onBoard( [0, 0, 6] ) );
-// console.log( 'onBoard(0,0,7):', onBoard( [0, 0, 7] ) );
-// console.log( 'onBoard(0,0,8):', onBoard( [0, 0, 8] ) );
-// console.log( 'onBoard(0,0,9):', onBoard( [0, 0, 9] ) );
-// console.log( 'onBoard(0,0,10):', onBoard( [0, 0, 10] ) );
-// console.log( 'onBoard(0,1,0):', onBoard( [0, 1, 0] ) );
-// console.log( 'onBoard(0,1,1):', onBoard( [0, 1, 1] ) );
-// console.log( 'onBoard(0,1,2):', onBoard( [0, 1, 2] ) );
-// console.log( 'onBoard(0,1,3):', onBoard( [0, 1, 3] ) );
-// console.log( 'onBoard(0,1,4):', onBoard( [0, 1, 4] ) );
-// console.log( 'onBoard(0,1,5):', onBoard( [0, 1, 5] ) );
-// console.log( 'onBoard(0,1,6):', onBoard( [0, 1, 6] ) );
-// console.log( 'onBoard(0,1,7):', onBoard( [0, 1, 7] ) );
-// console.log( 'onBoard(0,1,8):', onBoard( [0, 1, 8] ) );
-// console.log( 'onBoard(0,1,9):', onBoard( [0, 1, 9] ) );
-// console.log( 'onBoard(0,1,10):', onBoard( [0, 1, 10] ) );
-// console.log( 'onBoard(0,2,0):', onBoard( [0, 2, 0] ) );
-// console.log( 'onBoard(0,2,1):', onBoard( [0, 2, 1] ) );
-// console.log( 'onBoard(0,2,2):', onBoard( [0, 2, 2] ) );
-// console.log( 'onBoard(0,2,3):', onBoard( [0, 2, 3] ) );
-// console.log( 'onBoard(0,2,4):', onBoard( [0, 2, 4] ) );
-// console.log( 'onBoard(0,2,5):', onBoard( [0, 2, 5] ) );
-// console.log( 'onBoard(0,2,6):', onBoard( [0, 2, 6] ) );
-// console.log( 'onBoard(0,2,7):', onBoard( [0, 2, 7] ) );
-// console.log( 'onBoard(0,2,8):', onBoard( [0, 2, 8] ) );
-// console.log( 'onBoard(0,2,9):', onBoard( [0, 2, 9] ) );
-// console.log( 'onBoard(0,2,10):', onBoard( [0, 2, 10] ) );
-// console.log( 'onBoard(0,3,0):', onBoard( [0, 3, 0] ) );
-// console.log( 'onBoard(0,3,1):', onBoard( [0, 3, 1] ) );
-// console.log( 'onBoard(0,3,2):', onBoard( [0, 3, 2] ) );
-// console.log( 'onBoard(0,3,3):', onBoard( [0, 3, 3] ) );
-// console.log( 'onBoard(0,3,4):', onBoard( [0, 3, 4] ) );
-// console.log( 'onBoard(0,3,5):', onBoard( [0, 3, 5] ) );
-// console.log( 'onBoard(0,3,6):', onBoard( [0, 3, 6] ) );
-// console.log( 'onBoard(0,3,7):', onBoard( [0, 3, 7] ) );
-// console.log( 'onBoard(0,3,8):', onBoard( [0, 3, 8] ) );
-// console.log( 'onBoard(0,3,9):', onBoard( [0, 3, 9] ) );
-// console.log( 'onBoard(0,3,10):', onBoard( [0, 3, 10] ) );
-// console.log( 'onBoard(0,4,0):', onBoard( [0, 4, 0] ) );
-// console.log( 'onBoard(0,4,1):', onBoard( [0, 4, 1] ) );
-// console.log( 'onBoard(0,4,2):', onBoard( [0, 4, 2] ) );
-// console.log( 'onBoard(0,4,3):', onBoard( [0, 4, 3] ) );
-// console.log( 'onBoard(0,4,4):', onBoard( [0, 4, 4] ) );
-// console.log( 'onBoard(0,4,5):', onBoard( [0, 4, 5] ) );
-// console.log( 'onBoard(0,4,6):', onBoard( [0, 4, 6] ) );
-// console.log( 'onBoard(0,4,7):', onBoard( [0, 4, 7] ) );
-// console.log( 'onBoard(0,4,8):', onBoard( [0, 4, 8] ) );
-// console.log( 'onBoard(0,4,9):', onBoard( [0, 4, 9] ) );
-// console.log( 'onBoard(0,4,10):', onBoard( [0, 4, 10] ) );
+// console.log( 'onBoard([0,0,0]):', onBoard([0,0,0] ) );
+// console.log( 'onBoard([0,0,1]):', onBoard([0,0,1] ) );
+// console.log( 'onBoard([0,0,2]):', onBoard([0,0,2] ) );
+// console.log( 'onBoard([0,0,3]):', onBoard([0,0,3] ) );
+// console.log( 'onBoard([0,0,4]):', onBoard([0,0,4] ) );
+// console.log( 'onBoard([0,0,5]):', onBoard([0,0,5] ) );
+// console.log( 'onBoard([0,0,6]):', onBoard([0,0,6] ) );
+// console.log( 'onBoard([0,0,7]):', onBoard([0,0,7] ) );
+// console.log( 'onBoard([0,0,8]):', onBoard([0,0,8] ) );
+// console.log( 'onBoard([0,0,9]):', onBoard([0,0,9] ) );
+// console.log( 'onBoard([0,0,10]):', onBoard([0,0,10] ) );
+// console.log( 'onBoard([0,1,0]):', onBoard([0,1,0] ) );
+// console.log( 'onBoard([0,1,1]):', onBoard([0,1,1] ) );
+// console.log( 'onBoard([0,1,2]):', onBoard([0,1,2] ) );
+// console.log( 'onBoard([0,1,3]):', onBoard([0,1,3] ) );
+// console.log( 'onBoard([0,1,4]):', onBoard([0,1,4] ) );
+// console.log( 'onBoard([0,1,5]):', onBoard([0,1,5] ) );
+// console.log( 'onBoard([0,1,6]):', onBoard([0,1,6] ) );
+// console.log( 'onBoard([0,1,7]):', onBoard([0,1,7] ) );
+// console.log( 'onBoard([0,1,8]):', onBoard([0,1,8] ) );
+// console.log( 'onBoard([0,1,9]):', onBoard([0,1,9] ) );
+// console.log( 'onBoard([0,1,10]):', onBoard([0,1,10] ) );
+// console.log( 'onBoard([0,2,0]):', onBoard([0,2,0] ) );
+// console.log( 'onBoard([0,2,1]):', onBoard([0,2,1] ) );
+// console.log( 'onBoard([0,2,2]):', onBoard([0,2,2] ) );
+// console.log( 'onBoard([0,2,3]):', onBoard([0,2,3] ) );
+// console.log( 'onBoard([0,2,4]):', onBoard([0,2,4] ) );
+// console.log( 'onBoard([0,2,5]):', onBoard([0,2,5] ) );
+// console.log( 'onBoard([0,2,6]):', onBoard([0,2,6] ) );
+// console.log( 'onBoard([0,2,7]):', onBoard([0,2,7] ) );
+// console.log( 'onBoard([0,2,8]):', onBoard([0,2,8] ) );
+// console.log( 'onBoard([0,2,9]):', onBoard([0,2,9] ) );
+// console.log( 'onBoard([0,2,10]):', onBoard([0,2,10] ) );
+// console.log( 'onBoard([0,3,0]):', onBoard([0,3,0] ) );
+// console.log( 'onBoard([0,3,1]):', onBoard([0,3,1] ) );
+// console.log( 'onBoard([0,3,2]):', onBoard([0,3,2] ) );
+// console.log( 'onBoard([0,3,3]):', onBoard([0,3,3] ) );
+// console.log( 'onBoard([0,3,4]):', onBoard([0,3,4] ) );
+// console.log( 'onBoard([0,3,5]):', onBoard([0,3,5] ) );
+// console.log( 'onBoard([0,3,6]):', onBoard([0,3,6] ) );
+// console.log( 'onBoard([0,3,7]):', onBoard([0,3,7] ) );
+// console.log( 'onBoard([0,3,8]):', onBoard([0,3,8] ) );
+// console.log( 'onBoard([0,3,9]):', onBoard([0,3,9] ) );
+// console.log( 'onBoard([0,3,10]):', onBoard([0,3,10] ) );
+// console.log( 'onBoard([0,4,0]):', onBoard([0,4,0] ) );
+// console.log( 'onBoard([0,4,1]):', onBoard([0,4,1] ) );
+// console.log( 'onBoard([0,4,2]):', onBoard([0,4,2] ) );
+// console.log( 'onBoard([0,4,3]):', onBoard([0,4,3] ) );
+// console.log( 'onBoard([0,4,4]):', onBoard([0,4,4] ) );
+// console.log( 'onBoard([0,4,5]):', onBoard([0,4,5] ) );
+// console.log( 'onBoard([0,4,6]):', onBoard([0,4,6] ) );
+// console.log( 'onBoard([0,4,7]):', onBoard([0,4,7] ) );
+// console.log( 'onBoard([0,4,8]):', onBoard([0,4,8] ) );
+// console.log( 'onBoard([0,4,9]):', onBoard([0,4,9] ) );
+// console.log( 'onBoard([0,4,10]):', onBoard([0,4,10]) );
+
+function openStack(position) { // returns true if the top position is empty
+    let x = position[2];
+    let y = position[1];
+    let z = position[0];
+    
+console.log( 'x:', x );
+console.log( 'y:', y );
+console.log( 'z:', z );
+console.log( 'position:', position );
+
+    if ( starterBoard[[5],[y],[x]] === '.' ) { // empty
+    // if ( curBoard[5][position[1]][position[2]].includes(".") ) { // empty
+
+    // if ( position[z][y][x] === '.' ) { // empty
+        return true;
+    } else {
+        return false;
+    }
+} // openStack(position)
+
+// console.log( 'openStack([0,4,8]):', openStack([0,4,8]) );
+// console.log( 'openStack([0,4,9]):', openStack([0,4,9]) );
+// console.log( 'openStack([0,4,10]):', openStack([0,4,10]) );
 
 // function sleep(ms) {
 //     return new Promise(resolve => setTimeout(resolve, ms));
@@ -327,7 +351,9 @@ function setPieceHoldEvents() {
                 const curHeldPieceStringPosition = piece.parentElement.id.split('');
     
                 if (isNaN(parseInt(curHeldPieceStringPosition[3],10))) { // If the 4th digit is NaN then don't use it.
-                    curHeldPieceStartingPosition = [ parseInt(curHeldPieceStringPosition[0],10)-1, parseInt(curHeldPieceStringPosition[1],10)-1, parseInt(curHeldPieceStringPosition[2],10)-1 ];
+                    curHeldPieceStartingPosition = [ parseInt(curHeldPieceStringPosition[0],10)-1,
+			                             parseInt(curHeldPieceStringPosition[1],10)-1,
+			                             parseInt(curHeldPieceStringPosition[2],10)-1 ];
                 } else {
                     curHeldPieceStartingPosition = [ parseInt(curHeldPieceStringPosition[0],10)-1,
                                                      parseInt(curHeldPieceStringPosition[1],10)-1, 
@@ -411,8 +437,10 @@ console.log( 'curPlayer:', curPlayer, 'yPosition:', yPosition, 'xPosition:', xPo
 function movePiece(piece, startingPosition, endingPosition) {
     const boardPiece = curBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
     if (boardPiece != '.') {
+    
         // move the piece
         curBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]] = '.'; // clear the startingPosition
+    
         if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 0 ) { p1rack[0] = '.'; } // clear the tile from the p1rack
         if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 1 ) { p1rack[1] = '.'; }
         if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 2 ) { p1rack[2] = '.'; }
@@ -425,7 +453,40 @@ function movePiece(piece, startingPosition, endingPosition) {
         if ( startingPosition[0] === 0 && startingPosition[1] === 4 && startingPosition[2] === 7 ) { p2rack[3] = '.'; }
         if ( startingPosition[0] === 0 && startingPosition[1] === 2 && startingPosition[2] === 10 ) { p2rack[4] = '.'; }
         if ( startingPosition[0] === 0 && startingPosition[1] === 3 && startingPosition[2] === 9 ) { p2rack[5] = '.'; }
-        curBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition
+    
+        if (!( curBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
+	    // level 0 is not empty, check next level
+            if (!( curBoard[endingPosition[0]+1][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
+	        // level 1 is not empty, check next level
+                if (!( curBoard[endingPosition[0]+2][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
+	            // level 2 is not empty, check next level
+                    if (!( curBoard[endingPosition[0]+3][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
+	                // level 3 is not empty, check next level
+                        if (!( curBoard[endingPosition[0]+4][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
+	                    // level 4 is not empty, check next level
+                            if (!( curBoard[endingPosition[0]+5][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
+	                        // level 5 is not empty, no more levels, this needs to be prevented
+    
+console.error("No more levels");
+    
+	                    } else {
+                                curBoard[endingPosition[0]+5][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 5
+	                    }
+	                } else {
+                            curBoard[endingPosition[0]+4][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 4
+	                }
+	            } else {
+                        curBoard[endingPosition[0]+3][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 3
+	            }
+	        } else {
+                    curBoard[endingPosition[0]+2][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 2
+	        }
+	    } else {
+                curBoard[endingPosition[0]+1][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 1
+	    }
+	} else {
+            curBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 0
+	}
     
         const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
         destinationSquare.textContent = '';
@@ -470,22 +531,22 @@ function rePopRack1() {
         p1rack[k] = tiles[j]; // Assign to the p1rack.
         // Update p1rack[] and starterPosition[][][] based on the index of the empty.
         switch(k) { // p1rack order
-            case 0: loadRack(p1rack[k], [1, 1, 1]); // returns [Z,Y,X] ids
+            case 0: loadRack(p1rack[k], [1,1,1]); // returns [Z,Y,X] ids
                     starterPosition[0][0][0] = p1rack[0];
                     break;
-            case 1: loadRack(p1rack[k], [1, 1, 2]);
+            case 1: loadRack(p1rack[k], [1,1,2]);
                     starterPosition[0][0][1] = p1rack[1];
                     break;
-            case 2: loadRack(p1rack[k], [1, 1, 3]);
+            case 2: loadRack(p1rack[k], [1,1,3]);
                     starterPosition[0][0][2] = p1rack[2];
                     break;
-            case 3: loadRack(p1rack[k], [1, 1, 4]);
+            case 3: loadRack(p1rack[k], [1,1,4]);
                     starterPosition[0][0][3] = p1rack[3];
                     break;
-            case 4: loadRack(p1rack[k], [1, 2, 1]);
+            case 4: loadRack(p1rack[k], [1,2,1]);
                     starterPosition[0][1][0] = p1rack[4];
                     break;
-            case 5: loadRack(p1rack[k], [1, 2, 2]);
+            case 5: loadRack(p1rack[k], [1,2,2]);
                     starterPosition[0][1][1] = p1rack[5];
                     break;
         }
@@ -507,22 +568,22 @@ function rePopRack2() {
         p2rack[k] = tiles[j]; // Assign to the p2rack.
         // Update p2rack[] and starterPosition[][][] based on the index of the empty.
         switch(k) { // p2rack order
-            case 0: loadRack(p2rack[k], [1, 4, 11]); // [Z,Y,X] ids
+            case 0: loadRack(p2rack[k], [1,4,11]); // [Z,Y,X] ids
                     starterPosition[0][3][10] = p2rack[0];
                     break;
-            case 1: loadRack(p2rack[k], [1, 5, 10]);
+            case 1: loadRack(p2rack[k], [1,5,10]);
                     starterPosition[0][4][9] = p2rack[1];
                     break;
-            case 2: loadRack(p2rack[k], [1, 4, 9]);
+            case 2: loadRack(p2rack[k], [1,4,9]);
                     starterPosition[0][3][8] = p2rack[2];
                     break;
-            case 3: loadRack(p2rack[k], [1, 5, 8]);
+            case 3: loadRack(p2rack[k], [1,5,8]);
                     starterPosition[0][4][7] = p2rack[3];
                     break;
-            case 4: loadRack(p2rack[k], [1, 3, 11]);
+            case 4: loadRack(p2rack[k], [1,3,11]);
                     starterPosition[0][2][10] = p2rack[4];
                     break;
-            case 5: loadRack(p2rack[k], [1, 4, 10]);
+            case 5: loadRack(p2rack[k], [1,4,10]);
                     starterPosition[0][3][9] = p2rack[5];
                     break;
         }
@@ -566,8 +627,9 @@ function validateWhiteMovement(startingPosition, endingPosition) {
         case 'z':
         case ' ':
         case 'R':
+                  // if ( inRack1(startingPosition) && onBoard(endingPosition) && openStack(endingPosition) ) {
                   if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                      // if the startingPosition is in p1rack and the endingPosition is on the board, return true 
+                      // if the startingPosition is in p1rack and the endingPosition is on the board, and the endingPosition is open, return true 
 console.log( 'validateWhiteMovement() success:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                  'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.log( 'inRack1(startingPosition):', inRack1(startingPosition) );
