@@ -60,18 +60,23 @@ var p2score = 0;
 /* game functions */
 
 function startGame() {
-    // Draw letter tiles for the player racks by alternating.
+    
+    // Draw letter tiles for the players by alternating.
     for (let i = 0; i < p1rack.length; i++) {
+	      
         let j = Math.floor(Math.random() * tiles.length); // Random draw of the remaining tiles.
         p1rack[i] = tiles[j]; // Assign to the p1rack.
         p1rack[i].piece = getPieceImageSource(p1rack[i]);
         tiles.splice(j, 1); // Delete from tiles.
+    
         j = Math.floor(Math.random() * tiles.length); // Random draw of the remaining tiles.
         p2rack[i] = tiles[j]; // Assign to the p2rack.
         p2rack[i].piece = getPieceImageSource(p2rack[i]);
         tiles.splice(j, 1); // Delete from tiles.
+	      
         // await sleep(500); // sleep half a second after each tile draw
     }
+    
 // console.log( 'p1rack:', p1rack.sort() ); A side-effect is that this sorts the racks.
 // console.log( 'p2rack:', p2rack.sort() );
 // console.log( 'tiles:', tiles.sort() );
@@ -154,13 +159,48 @@ console.log( 'piece:', piece, 'position:', position, 'pieceElement:', pieceEleme
 
 } // loadPiece(piece, position)
 
+function getPieceImageSource(piece) {
+    switch (piece) {
+        case '.': return '';
+        case 'null': return '';
+        case 'a': return 'assets/A.png';
+        case 'b': return 'assets/B.png';
+        case 'c': return 'assets/C.png';
+        case 'd': return 'assets/D.png';
+        case 'e': return 'assets/E.png';
+        case 'f': return 'assets/F.png';
+        case 'g': return 'assets/G.png';
+        case 'h': return 'assets/H.png';
+        case 'i': return 'assets/I.png';
+        case 'j': return 'assets/J.png';
+        case 'k': return 'assets/K.png';
+        case 'l': return 'assets/L.png';
+        case 'm': return 'assets/M.png';
+        case 'n': return 'assets/N.png';
+        case 'o': return 'assets/O.png';
+        case 'p': return 'assets/P.png';
+        case 'q': return 'assets/Q.png';
+        case 'r': return 'assets/R.png';
+        case 's': return 'assets/S.png';
+        case 't': return 'assets/T.png';
+        case 'u': return 'assets/U.png';
+        case 'v': return 'assets/V.png';
+        case 'w': return 'assets/W.png';
+        case 'x': return 'assets/X.png';
+        case 'y': return 'assets/Y.png';
+        case 'z': return 'assets/Z.png';
+        case ' ': return 'assets/BLANK.png';
+        case 'R': return 'assets/pink-rose.png';
+    }
+} // getPieceImageSource(piece)
+
 /* test functions */
 
 function inRack1(position) { // returns true if the position is within the p1rack
     let x = position[2];
     let y = position[1];
     let z = position[0];
-
+    
     if ( (z===0 && y===0 && x===0) || (z===0 && y===0 && x===1) || (z===0 && y===0 && x===2) || (z===0 && y===0 && x===3) || (z===0 && y===1 && x===0) || (z===0 && y===1 && x===1) ) { // p1rack
         return true;
     } else {
@@ -179,7 +219,7 @@ function inRack2(position) { // true if the position's coordinates are within th
     let x = position[2];
     let y = position[1];
     let z = position[0];
-
+    
     if ( (z===0 && y===3 && x===10) || (z===0 && y===4 && x===9) || (z===0 && y===3 && x===8) || (z===0 && y===4 && x===7) || (z===0 && y===2 && x===10) || (z===0 && y===3 && x===9) ) { // p2rack
         return true;
     } else {
@@ -194,7 +234,7 @@ function inRack2(position) { // true if the position's coordinates are within th
 // console.log( 'inRack2([0,2,10]):', inRack2([0,2,10]) );
 // console.log( 'inRack2([0,3,9]):', inRack2([0,3,9]) );
 
-function onBoard(position) { // returns false if the position is off the board
+function onBoard(position) { // true if the position is on the board
     let x = position[2];
     let y = position[1];
     let z = position[0];
@@ -271,7 +311,7 @@ console.log( 'x:', x );
 console.log( 'y:', y );
 console.log( 'z:', z );
 console.log( 'position:', position );
-
+    
     if ( onBoard(position) ) {
 
 console.log( 'gameBoard[[5],[y],[x]]:', gameBoard[[5],[y],[x]] );
@@ -301,41 +341,6 @@ console.log( 'openStack([0,3,5]):', openStack([0,3,5]) ); // Expect true
 // function sleep(ms) {
 //     return new Promise(resolve => setTimeout(resolve, ms));
 // }
-
-function getPieceImageSource(piece) {
-    switch (piece) {
-        case '.': return '';
-        case 'null': return '';
-        case 'a': return 'assets/A.png';
-        case 'b': return 'assets/B.png';
-        case 'c': return 'assets/C.png';
-        case 'd': return 'assets/D.png';
-        case 'e': return 'assets/E.png';
-        case 'f': return 'assets/F.png';
-        case 'g': return 'assets/G.png';
-        case 'h': return 'assets/H.png';
-        case 'i': return 'assets/I.png';
-        case 'j': return 'assets/J.png';
-        case 'k': return 'assets/K.png';
-        case 'l': return 'assets/L.png';
-        case 'm': return 'assets/M.png';
-        case 'n': return 'assets/N.png';
-        case 'o': return 'assets/O.png';
-        case 'p': return 'assets/P.png';
-        case 'q': return 'assets/Q.png';
-        case 'r': return 'assets/R.png';
-        case 's': return 'assets/S.png';
-        case 't': return 'assets/T.png';
-        case 'u': return 'assets/U.png';
-        case 'v': return 'assets/V.png';
-        case 'w': return 'assets/W.png';
-        case 'x': return 'assets/X.png';
-        case 'y': return 'assets/Y.png';
-        case 'z': return 'assets/Z.png';
-        case ' ': return 'assets/BLANK.png';
-        case 'R': return 'assets/pink-rose.png';
-    }
-} // getPieceImageSource(piece)
 
 /* movement functions */
 
@@ -507,6 +512,8 @@ console.error("No more levels");
         destinationSquare.appendChild(piece);
     }
     
+        // p1rack[i].piece = getPieceImageSource(p1rack[i]);
+
 console.log( '' );
 console.log( 'movePiece():' );
 console.log( 'curPlayer:', curPlayer, 'moves a:"', piece.id, '" from startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
@@ -535,80 +542,6 @@ function switchPlayer() {
 console.log( '' );
 console.log( 'switchPlayer():' );
 } // switchPlayer()
-
-function rePopRack1() {
-    // repopulate the p1rack
-    let dotcnt = p1rack.filter(x => x === '.').length;
-    for ( let i = 0; i < dotcnt; i++ ) {
-        let j = Math.floor(Math.random() * tiles.length); // Random draw of the remaining tiles.
-        let k = p1rack.indexOf('.');
-        p1rack[k] = tiles[j]; // Assign to the p1rack.
-        // Update p1rack[] and gameBoard[][][] based on the index of the empty.
-        switch(k) { // p1rack order
-            case 0: loadRack(p1rack[k], [1,1,1]); // returns [Z,Y,X] ids
-                    gameBoard[0][0][0] = p1rack[0];
-                    break;
-            case 1: loadRack(p1rack[k], [1,1,2]);
-                    gameBoard[0][0][1] = p1rack[1];
-                    break;
-            case 2: loadRack(p1rack[k], [1,1,3]);
-                    gameBoard[0][0][2] = p1rack[2];
-                    break;
-            case 3: loadRack(p1rack[k], [1,1,4]);
-                    gameBoard[0][0][3] = p1rack[3];
-                    break;
-            case 4: loadRack(p1rack[k], [1,2,1]);
-                    gameBoard[0][1][0] = p1rack[4];
-                    break;
-            case 5: loadRack(p1rack[k], [1,2,2]);
-                    gameBoard[0][1][1] = p1rack[5];
-                    break;
-        }
-        tiles.splice(j, 1); // Delete from tiles.
-console.log( '' );
-console.log( 'rePopRack1():' );
-console.log( 'curPlayer:', curPlayer, 'p1rack:', p1rack, 'ctr:', i, 'dot:', dotcnt, 'rnd:', j, 'index:', k, 'tiles:', tiles );
-        p1rack[i].piece = getPieceImageSource(p1rack[i]);
-        // await sleep(500); // sleep half a second after each tile draw
-    }
-} // rePopRack1()
-
-function rePopRack2() {
-    // repopulate the p2rack
-    let dotcnt = p2rack.filter(x => x === '.').length;
-    for ( let i = 0; i < dotcnt; i++ ) {
-        let j = Math.floor(Math.random() * tiles.length); // Random draw of the remaining tiles.
-        let k = p2rack.indexOf('.');
-        p2rack[k] = tiles[j]; // Assign to the p2rack.
-        // Update p2rack[] and gameBoard[][][] based on the index of the empty.
-        switch(k) { // p2rack order
-            case 0: loadRack(p2rack[k], [1,4,11]); // [Z,Y,X] ids
-                    gameBoard[0][3][10] = p2rack[0];
-                    break;
-            case 1: loadRack(p2rack[k], [1,5,10]);
-                    gameBoard[0][4][9] = p2rack[1];
-                    break;
-            case 2: loadRack(p2rack[k], [1,4,9]);
-                    gameBoard[0][3][8] = p2rack[2];
-                    break;
-            case 3: loadRack(p2rack[k], [1,5,8]);
-                    gameBoard[0][4][7] = p2rack[3];
-                    break;
-            case 4: loadRack(p2rack[k], [1,3,11]);
-                    gameBoard[0][2][10] = p2rack[4];
-                    break;
-            case 5: loadRack(p2rack[k], [1,4,10]);
-                    gameBoard[0][3][9] = p2rack[5];
-                    break;
-        }
-        tiles.splice(j, 1); // Delete from tiles.
-console.log( '' );
-console.log( 'rePopRack2():' );
-console.log( 'curPlayer:', curPlayer, 'p2rack:', p2rack, 'ctr:', i, 'dot:', dotcnt, 'rnd:', j, 'index:', k, 'tiles:', tiles );
-        p2rack[i].piece = getPieceImageSource(p2rack[i]);
-        // await sleep(500); // sleep half a second after each tile draw
-    }
-} // rePopRack2()
 
 function validateWhiteMovement(startingPosition, endingPosition) {
     const boardPiece = curBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
@@ -706,6 +639,80 @@ console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
                   }
     }
 } // validateBlackMovement(startingPosition, endingPosition)
+
+function rePopRack1() {
+    // repopulate the p1rack
+    let dotcnt = p1rack.filter(x => x === '.').length;
+    for ( let i = 0; i < dotcnt; i++ ) {
+        let j = Math.floor(Math.random() * tiles.length); // Random draw of the remaining tiles.
+        let k = p1rack.indexOf('.');
+        p1rack[k] = tiles[j]; // Assign to the p1rack.
+        // Update p1rack[] and gameBoard[][][] based on the index of the empty.
+        switch(k) { // p1rack order
+            case 0: loadRack(p1rack[k], [1,1,1]); // returns [Z,Y,X] ids
+                    gameBoard[0][0][0] = p1rack[0];
+                    break;
+            case 1: loadRack(p1rack[k], [1,1,2]);
+                    gameBoard[0][0][1] = p1rack[1];
+                    break;
+            case 2: loadRack(p1rack[k], [1,1,3]);
+                    gameBoard[0][0][2] = p1rack[2];
+                    break;
+            case 3: loadRack(p1rack[k], [1,1,4]);
+                    gameBoard[0][0][3] = p1rack[3];
+                    break;
+            case 4: loadRack(p1rack[k], [1,2,1]);
+                    gameBoard[0][1][0] = p1rack[4];
+                    break;
+            case 5: loadRack(p1rack[k], [1,2,2]);
+                    gameBoard[0][1][1] = p1rack[5];
+                    break;
+        }
+        tiles.splice(j, 1); // Delete from tiles.
+console.log( '' );
+console.log( 'rePopRack1():' );
+console.log( 'curPlayer:', curPlayer, 'p1rack:', p1rack, 'ctr:', i, 'dot:', dotcnt, 'rnd:', j, 'index:', k, 'tiles:', tiles );
+        p1rack[i].piece = getPieceImageSource(p1rack[i]);
+        // await sleep(500); // sleep half a second after each tile draw
+    }
+} // rePopRack1()
+
+function rePopRack2() {
+    // repopulate the p2rack
+    let dotcnt = p2rack.filter(x => x === '.').length;
+    for ( let i = 0; i < dotcnt; i++ ) {
+        let j = Math.floor(Math.random() * tiles.length); // Random draw of the remaining tiles.
+        let k = p2rack.indexOf('.');
+        p2rack[k] = tiles[j]; // Assign to the p2rack.
+        // Update p2rack[] and gameBoard[][][] based on the index of the empty.
+        switch(k) { // p2rack order
+            case 0: loadRack(p2rack[k], [1,4,11]); // [Z,Y,X] ids
+                    gameBoard[0][3][10] = p2rack[0];
+                    break;
+            case 1: loadRack(p2rack[k], [1,5,10]);
+                    gameBoard[0][4][9] = p2rack[1];
+                    break;
+            case 2: loadRack(p2rack[k], [1,4,9]);
+                    gameBoard[0][3][8] = p2rack[2];
+                    break;
+            case 3: loadRack(p2rack[k], [1,5,8]);
+                    gameBoard[0][4][7] = p2rack[3];
+                    break;
+            case 4: loadRack(p2rack[k], [1,3,11]);
+                    gameBoard[0][2][10] = p2rack[4];
+                    break;
+            case 5: loadRack(p2rack[k], [1,4,10]);
+                    gameBoard[0][3][9] = p2rack[5];
+                    break;
+        }
+        tiles.splice(j, 1); // Delete from tiles.
+console.log( '' );
+console.log( 'rePopRack2():' );
+console.log( 'curPlayer:', curPlayer, 'p2rack:', p2rack, 'ctr:', i, 'dot:', dotcnt, 'rnd:', j, 'index:', k, 'tiles:', tiles );
+        p2rack[i].piece = getPieceImageSource(p2rack[i]);
+        // await sleep(500); // sleep half a second after each tile draw
+    }
+} // rePopRack2()
 
 startGame();
 setPieceHoldEvents();
