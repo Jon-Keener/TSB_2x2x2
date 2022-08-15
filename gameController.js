@@ -522,9 +522,9 @@ console.log( 'p1rack:', p1rack, 'p1rack.dot_count:', p1rack.filter(x => x === '.
 console.log( 'p2rack:', p2rack, 'p2rack.dot_count:', p2rack.filter(x => x === '.').length );
     
     // artificially switch players after 3 white tile moves or 3 black tile moves
-    if ( ( p1rack.filter(x => x === '.').length >= 3 ) || ( p2rack.filter(x => x === '.').length >= 3 ) ) {
-        switchPlayer();
-    }
+    // if ( ( p1rack.filter(x => x === '.').length >= 3 ) || ( p2rack.filter(x => x === '.').length >= 3 ) ) {
+    //     switchPlayer();
+    // }
     
 } // movePiece(piece, startingPosition, endingPosition)
 
@@ -539,8 +539,10 @@ function switchPlayer() {
         rePopRack2();
         curPlayer = 'white';
     }
+    
 console.log( '' );
 console.log( 'switchPlayer():' );
+    
 } // switchPlayer()
 
 function validateWhiteMovement(startingPosition, endingPosition) {
