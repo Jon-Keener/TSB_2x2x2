@@ -64,12 +64,12 @@ function startGame() {
     // Draw letter tiles for the players by alternating.
     for (let i = 0; i < p1rack.length; i++) {
 	      
-        let j = Math.floor(Math.random() * tiles.length); // Random draw of the remaining tiles.
+        let j = Math.floor(Math.random() * tiles.length); // Random draw from the remaining tiles.
         p1rack[i] = tiles[j]; // Assign to the p1rack.
         p1rack[i].piece = getPieceImageSource(p1rack[i]);
         tiles.splice(j, 1); // Delete from tiles.
     
-        j = Math.floor(Math.random() * tiles.length); // Random draw of the remaining tiles.
+        j = Math.floor(Math.random() * tiles.length); // Random draw from the remaining tiles.
         p2rack[i] = tiles[j]; // Assign to the p2rack.
         p2rack[i].piece = getPieceImageSource(p2rack[i]);
         tiles.splice(j, 1); // Delete from tiles.
@@ -112,10 +112,11 @@ function loadPosition(position, playerToMove) {
         for (let i = 0; i < 5 ; i++) { // 5 rows
             for (let j = 0; j < 11; j++) { // 11 columns
                 if (position[h][i][j] != '.') {
-                    if ( ( inRack1([h,i,j]) ) || ( inRack2([h,i,j]) ) ) {
-                        loadRack(position[h][i][j], [h + 1, i + 1, j + 1]);
+    
+                    if ( inRack1([h,i,j]) || inRack2([h,i,j]) ) {
+                        loadRack(position[h][i][j], [h+1, i+1, j+1]);
                     } else {
-                        loadPiece(position[h][i][j], [h + 1, i + 1, j + 1]);
+                        loadPiece(position[h][i][j], [h+1, i+1, j+1]);
                     }
                 }
             }

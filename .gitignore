@@ -15,3 +15,6 @@ TSB_2x2x2.html~
 Testing.txt
 style.css~
 .style.css.un~
+.gameController.js.un~
+*.un~
+*.js~
