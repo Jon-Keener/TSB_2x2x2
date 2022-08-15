@@ -7,7 +7,7 @@ let curPlayer;
 let curHeldPiece;
 let curHeldPieceStartingPosition;
 
-const starterPosition = [ // 6 levels of 5 rows of 11 columns, [Z,Y,X]: [0,0,0] - [5,4,10]
+const gameBoard = [ // 6 levels of 5 rows of 11 columns, [Z,Y,X]: [0,0,0] - [5,4,10]
 [ ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
   ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
   ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
@@ -78,23 +78,23 @@ function startGame() {
     
     const starterPlayer = 'white';
     
-    // Add p1rack to starterPosition, unless undefined.
-    if (typeof p1rack[0] !== 'undefined') { starterPosition[0][0][0] = p1rack[0] } else { starterPosition[0][0][0] = '.' };
-    if (typeof p1rack[1] !== 'undefined') { starterPosition[0][0][1] = p1rack[1] } else { starterPosition[0][0][1] = '.' };
-    if (typeof p1rack[4] !== 'undefined') { starterPosition[0][0][2] = p1rack[2] } else { starterPosition[0][0][2] = '.' };
-    if (typeof p1rack[5] !== 'undefined') { starterPosition[0][0][3] = p1rack[3] } else { starterPosition[0][0][3] = '.' };
-    if (typeof p1rack[2] !== 'undefined') { starterPosition[0][1][0] = p1rack[4] } else { starterPosition[0][1][0] = '.' };
-    if (typeof p1rack[3] !== 'undefined') { starterPosition[0][1][1] = p1rack[5] } else { starterPosition[0][1][1] = '.' };
+    // Add p1rack to the gameBoard, unless undefined.
+    if (typeof p1rack[0] !== 'undefined') { gameBoard[0][0][0] = p1rack[0] } else { gameBoard[0][0][0] = '.' };
+    if (typeof p1rack[1] !== 'undefined') { gameBoard[0][0][1] = p1rack[1] } else { gameBoard[0][0][1] = '.' };
+    if (typeof p1rack[4] !== 'undefined') { gameBoard[0][0][2] = p1rack[2] } else { gameBoard[0][0][2] = '.' };
+    if (typeof p1rack[5] !== 'undefined') { gameBoard[0][0][3] = p1rack[3] } else { gameBoard[0][0][3] = '.' };
+    if (typeof p1rack[2] !== 'undefined') { gameBoard[0][1][0] = p1rack[4] } else { gameBoard[0][1][0] = '.' };
+    if (typeof p1rack[3] !== 'undefined') { gameBoard[0][1][1] = p1rack[5] } else { gameBoard[0][1][1] = '.' };
     
-    // Add p2rack to starterPosition, unless undefined.
-    if (typeof p2rack[5] !== 'undefined') { starterPosition[0][3][10] = p2rack[0] } else { starterPosition[0][3][10] = '.' };
-    if (typeof p2rack[4] !== 'undefined') { starterPosition[0][4][9] = p2rack[1] } else { starterPosition[0][4][9] = '.' };
-    if (typeof p2rack[1] !== 'undefined') { starterPosition[0][3][8] = p2rack[2] } else { starterPosition[0][3][8] = '.' };
-    if (typeof p2rack[0] !== 'undefined') { starterPosition[0][4][7] = p2rack[3] } else { starterPosition[0][4][7] = '.' };
-    if (typeof p2rack[3] !== 'undefined') { starterPosition[0][2][10] = p2rack[4] } else { starterPosition[0][2][10] = '.' };
-    if (typeof p2rack[2] !== 'undefined') { starterPosition[0][3][9] = p2rack[5] } else { starterPosition[0][3][9] = '.' };
+    // Add p2rack to the gameBoard, unless undefined.
+    if (typeof p2rack[5] !== 'undefined') { gameBoard[0][3][10] = p2rack[0] } else { gameBoard[0][3][10] = '.' };
+    if (typeof p2rack[4] !== 'undefined') { gameBoard[0][4][9] = p2rack[1] } else { gameBoard[0][4][9] = '.' };
+    if (typeof p2rack[1] !== 'undefined') { gameBoard[0][3][8] = p2rack[2] } else { gameBoard[0][3][8] = '.' };
+    if (typeof p2rack[0] !== 'undefined') { gameBoard[0][4][7] = p2rack[3] } else { gameBoard[0][4][7] = '.' };
+    if (typeof p2rack[3] !== 'undefined') { gameBoard[0][2][10] = p2rack[4] } else { gameBoard[0][2][10] = '.' };
+    if (typeof p2rack[2] !== 'undefined') { gameBoard[0][3][9] = p2rack[5] } else { gameBoard[0][3][9] = '.' };
     
-    loadPosition(starterPosition, starterPlayer);
+    loadPosition(gameBoard, starterPlayer);
     
 } // startGame()
 
@@ -272,19 +272,28 @@ console.log( 'y:', y );
 console.log( 'z:', z );
 console.log( 'position:', position );
 
-    if ( starterBoard[[5],[y],[x]] === '.' ) { // empty
-    // if ( curBoard[5][position[1]][position[2]].includes(".") ) { // empty
-
-    // if ( position[z][y][x] === '.' ) { // empty
-        return true;
+    if ( onBoard(position) ) {
+console.log( 'gameBoard[[5],[y],[x]]:', gameBoard[[5],[y],[x]] );
+        if ( gameBoard[[5],[y],[x]] === '.' ) { // empty
+        // if ( curBoard[5][position[1]][position[2]].includes(".") ) { // empty
+    
+        // if ( position[z][y][x] === '.' ) { // empty
+            return true;
+        } else {
+            return false;
+        }
     } else {
         return false;
     }
 } // openStack(position)
 
-// console.log( 'openStack([0,4,8]):', openStack([0,4,8]) );
-// console.log( 'openStack([0,4,9]):', openStack([0,4,9]) );
-// console.log( 'openStack([0,4,10]):', openStack([0,4,10]) );
+console.log( 'openStack([0,4,8]):', openStack([0,4,8]) ); // Expect false
+console.log( 'openStack([0,4,9]):', openStack([0,4,9]) ); // Expect false
+console.log( 'openStack([0,4,10]):', openStack([0,4,10]) ); // Expect false
+
+console.log( 'openStack([0,1,5]):', openStack([0,1,5]) ); // Expect true
+console.log( 'openStack([0,2,5]):', openStack([0,2,5]) ); // Expect true
+console.log( 'openStack([0,3,5]):', openStack([0,3,5]) ); // Expect true
 
 // function sleep(ms) {
 //     return new Promise(resolve => setTimeout(resolve, ms));
@@ -436,8 +445,10 @@ console.log( 'curPlayer:', curPlayer, 'yPosition:', yPosition, 'xPosition:', xPo
 
 function movePiece(piece, startingPosition, endingPosition) {
     const boardPiece = curBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
-    if (boardPiece != '.') {
     
+    // If the boardPiece is not empty AND the top rung is empty
+    if ( (boardPiece !== '.') && ( curBoard[endingPosition[0]+5][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
+
         // move the piece
         curBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]] = '.'; // clear the startingPosition
     
@@ -529,25 +540,25 @@ function rePopRack1() {
         let j = Math.floor(Math.random() * tiles.length); // Random draw of the remaining tiles.
         let k = p1rack.indexOf('.');
         p1rack[k] = tiles[j]; // Assign to the p1rack.
-        // Update p1rack[] and starterPosition[][][] based on the index of the empty.
+        // Update p1rack[] and gameBoard[][][] based on the index of the empty.
         switch(k) { // p1rack order
             case 0: loadRack(p1rack[k], [1,1,1]); // returns [Z,Y,X] ids
-                    starterPosition[0][0][0] = p1rack[0];
+                    gameBoard[0][0][0] = p1rack[0];
                     break;
             case 1: loadRack(p1rack[k], [1,1,2]);
-                    starterPosition[0][0][1] = p1rack[1];
+                    gameBoard[0][0][1] = p1rack[1];
                     break;
             case 2: loadRack(p1rack[k], [1,1,3]);
-                    starterPosition[0][0][2] = p1rack[2];
+                    gameBoard[0][0][2] = p1rack[2];
                     break;
             case 3: loadRack(p1rack[k], [1,1,4]);
-                    starterPosition[0][0][3] = p1rack[3];
+                    gameBoard[0][0][3] = p1rack[3];
                     break;
             case 4: loadRack(p1rack[k], [1,2,1]);
-                    starterPosition[0][1][0] = p1rack[4];
+                    gameBoard[0][1][0] = p1rack[4];
                     break;
             case 5: loadRack(p1rack[k], [1,2,2]);
-                    starterPosition[0][1][1] = p1rack[5];
+                    gameBoard[0][1][1] = p1rack[5];
                     break;
         }
         tiles.splice(j, 1); // Delete from tiles.
@@ -566,25 +577,25 @@ function rePopRack2() {
         let j = Math.floor(Math.random() * tiles.length); // Random draw of the remaining tiles.
         let k = p2rack.indexOf('.');
         p2rack[k] = tiles[j]; // Assign to the p2rack.
-        // Update p2rack[] and starterPosition[][][] based on the index of the empty.
+        // Update p2rack[] and gameBoard[][][] based on the index of the empty.
         switch(k) { // p2rack order
             case 0: loadRack(p2rack[k], [1,4,11]); // [Z,Y,X] ids
-                    starterPosition[0][3][10] = p2rack[0];
+                    gameBoard[0][3][10] = p2rack[0];
                     break;
             case 1: loadRack(p2rack[k], [1,5,10]);
-                    starterPosition[0][4][9] = p2rack[1];
+                    gameBoard[0][4][9] = p2rack[1];
                     break;
             case 2: loadRack(p2rack[k], [1,4,9]);
-                    starterPosition[0][3][8] = p2rack[2];
+                    gameBoard[0][3][8] = p2rack[2];
                     break;
             case 3: loadRack(p2rack[k], [1,5,8]);
-                    starterPosition[0][4][7] = p2rack[3];
+                    gameBoard[0][4][7] = p2rack[3];
                     break;
             case 4: loadRack(p2rack[k], [1,3,11]);
-                    starterPosition[0][2][10] = p2rack[4];
+                    gameBoard[0][2][10] = p2rack[4];
                     break;
             case 5: loadRack(p2rack[k], [1,4,10]);
-                    starterPosition[0][3][9] = p2rack[5];
+                    gameBoard[0][3][9] = p2rack[5];
                     break;
         }
         tiles.splice(j, 1); // Delete from tiles.
