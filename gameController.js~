@@ -1,5 +1,8 @@
 /* globals */
 // "use strict";
+// coords use [z,y,x] and [y,x] notation
+
+var words = [];
 
 let curBoard;
 let curPlayer;
@@ -10,7 +13,7 @@ let curHeldPieceStartingPosition;
 const gameBoard = [ // 6 levels of 5 rows of 11 columns, [Z,Y,X]: [0,0,0] - [5,4,10]
 [ ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
   ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
-  ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+  ['.', '.', '.', '.', '.', 'R', '.', '.', '.', '.', '.'],
   ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
   ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
 ], // level 0
@@ -46,6 +49,18 @@ const gameBoard = [ // 6 levels of 5 rows of 11 columns, [Z,Y,X]: [0,0,0] - [5,4
 ], // level 5
 ];
 
+var prevBoard = JSON.parse(JSON.stringify(gameBoard));
+prevBoard[0][0][0] = 'X';
+
+// The JSON method seemed to work.
+
+var flatBoard = [ // 5 rows of 11 columns, [Y,X]: [0,0] - [4,10]
+['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'] ];
+
 // Initialize the letter tiles, the player racks and scores.
 var tiles = ['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'b', 'b', 'b', 'c', 'c', 'd', 'd', 'd', 'd', 'e', 'e',
              'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'f', 'f', 'g', 'g', 'g', 'h', 'h', 'i', 'i', 'i', 'i', 
@@ -56,6 +71,8 @@ var p1rack = ['.', '.', '.', '.', '.', '.'];
 var p2rack = ['.', '.', '.', '.', '.', '.'];
 var p1score = 0;
 var p2score = 0;
+var p1scoreText = '';
+var p2scoreText = '';
 
 /* game functions */
 
@@ -63,7 +80,7 @@ function startGame() {
     
     // Draw letter tiles for the players by alternating.
     for (let i = 0; i < p1rack.length; i++) {
-	      
+              
         let j = Math.floor(Math.random() * tiles.length); // Random draw from the remaining tiles.
         p1rack[i] = tiles[j]; // Assign to the p1rack.
         p1rack[i].piece = getPieceImageSource(p1rack[i]);
@@ -73,7 +90,7 @@ function startGame() {
         p2rack[i] = tiles[j]; // Assign to the p2rack.
         p2rack[i].piece = getPieceImageSource(p2rack[i]);
         tiles.splice(j, 1); // Delete from tiles.
-	      
+              
         // await sleep(500); // sleep half a second after each tile draw
     }
     
@@ -98,34 +115,39 @@ function startGame() {
     if (typeof p2rack[0] !== 'undefined') { gameBoard[0][4][7] = p2rack[3] } else { gameBoard[0][4][7] = '.' };
     if (typeof p2rack[3] !== 'undefined') { gameBoard[0][2][10] = p2rack[4] } else { gameBoard[0][2][10] = '.' };
     if (typeof p2rack[2] !== 'undefined') { gameBoard[0][3][9] = p2rack[5] } else { gameBoard[0][3][9] = '.' };
-    
+
     loadPosition(gameBoard, starterPlayer);
     
 } // startGame()
 
-function loadPosition(position, playerToMove) {
+function loadPosition( position, playerToMove ) {
     curBoard = position;
     curPlayer = playerToMove;
-    
+
     // level h, row i and column j
     for (let h = 0; h < 6 ; h++) { // 6 levels
         for (let i = 0; i < 5 ; i++) { // 5 rows
             for (let j = 0; j < 11; j++) { // 11 columns
-                if (position[h][i][j] != '.') {
+                if ( position[h][i][j] !== '.' ) {
     
                     if ( inRack1([h,i,j]) || inRack2([h,i,j]) ) {
-                        loadRack(position[h][i][j], [h+1, i+1, j+1]);
+                        loadRack( position[h][i][j], [h+1,i+1,j+1] );
                     } else {
-                        loadPiece(position[h][i][j], [h+1, i+1, j+1]);
+                        loadPiece( position[h][i][j], [h+1,i+1,j+1] );
                     }
                 }
             }
         }
     }
-} // loadPosition(position, playerToMove)
+
+// console.log( 'curBoard:', curBoard );
+// console.log( 'gameBoard:', gameBoard );
+// console.log( 'prevBoard:', prevBoard );
+
+} // loadPosition( position, playerToMove )
 
 function loadRack(piece, position) {
-    // piece and position, an array of ZYX ids, which concat to the Id
+    // piece and position, an array of ZYX ids, which concat into the Id
     const squareElement = document.getElementById(`${position[0]}${position[1]}${position[2]}`);
 
     const pieceElement = document.createElement('img');
@@ -136,14 +158,15 @@ function loadRack(piece, position) {
 
     squareElement.appendChild(pieceElement);
 
-console.log( '' );
-console.log( 'loadRack(piece, position):' );
-console.log( 'InRack1:', inRack1(position), 'InRack2:', inRack2(position), 'piece:', piece, 'position:', position );
-// console.log( 'pieceElement:', pieceElement );
+// console.log( '' );
+// console.log( 'loadRack(piece, position):' );
+// console.log( 'InRack1:', inRack1( position ), 'InRack2:', inRack2( position ), 'piece:', piece, 'position:', position );
+// // console.log( 'pieceElement:', pieceElement );
 
 } // loadRack(piece, position)
 
-function loadPiece(piece, position) { // position = array of ZYX ids, which concat to the Id
+function loadPiece(piece, position) {
+    // piece and position, an array of ZYX ids, which concat to the Id
     const squareElement = document.getElementById(`${position[0]}${position[1]}${position[2]}`);
 
     const pieceElement = document.createElement('img');
@@ -154,9 +177,10 @@ function loadPiece(piece, position) { // position = array of ZYX ids, which conc
 
     squareElement.appendChild(pieceElement);
 
-console.log( '' );
-console.log( 'loadPiece(piece, position):' );
-console.log( 'piece:', piece, 'position:', position, 'pieceElement:', pieceElement );
+// console.log( '' );
+// console.log( 'loadPiece(piece, position):' );
+// console.log( 'piece:', piece, 'position:', position, 'pieceElement:', pieceElement );
+// // console.log( 'pieceElement:', pieceElement );
 
 } // loadPiece(piece, position)
 
@@ -164,50 +188,185 @@ function getPieceImageSource(piece) {
     switch (piece) {
         case '.': return '';
         case 'null': return '';
-        case 'a': return 'assets/A.png';
-        case 'b': return 'assets/B.png';
-        case 'c': return 'assets/C.png';
-        case 'd': return 'assets/D.png';
-        case 'e': return 'assets/E.png';
-        case 'f': return 'assets/F.png';
-        case 'g': return 'assets/G.png';
-        case 'h': return 'assets/H.png';
-        case 'i': return 'assets/I.png';
-        case 'j': return 'assets/J.png';
-        case 'k': return 'assets/K.png';
-        case 'l': return 'assets/L.png';
-        case 'm': return 'assets/M.png';
-        case 'n': return 'assets/N.png';
-        case 'o': return 'assets/O.png';
-        case 'p': return 'assets/P.png';
-        case 'q': return 'assets/Q.png';
-        case 'r': return 'assets/R.png';
-        case 's': return 'assets/S.png';
-        case 't': return 'assets/T.png';
-        case 'u': return 'assets/U.png';
-        case 'v': return 'assets/V.png';
-        case 'w': return 'assets/W.png';
-        case 'x': return 'assets/X.png';
-        case 'y': return 'assets/Y.png';
-        case 'z': return 'assets/Z.png';
-        case ' ': return 'assets/BLANK.png';
+        case 'a': return 'assets/A0.png';
+        case 'b': return 'assets/B0.png';
+        case 'c': return 'assets/C0.png';
+        case 'd': return 'assets/D0.png';
+        case 'e': return 'assets/E0.png';
+        case 'f': return 'assets/F0.png';
+        case 'g': return 'assets/G0.png';
+        case 'h': return 'assets/H0.png';
+        case 'i': return 'assets/I0.png';
+        case 'j': return 'assets/J0.png';
+        case 'k': return 'assets/K0.png';
+        case 'l': return 'assets/L0.png';
+        case 'm': return 'assets/M0.png';
+        case 'n': return 'assets/N0.png';
+        case 'o': return 'assets/O0.png';
+        case 'p': return 'assets/P0.png';
+        case 'q': return 'assets/Q0.png';
+        case 'r': return 'assets/R0.png';
+        case 's': return 'assets/S0.png';
+        case 't': return 'assets/T0.png';
+        case 'u': return 'assets/U0.png';
+        case 'v': return 'assets/V0.png';
+        case 'w': return 'assets/W0.png';
+        case 'x': return 'assets/X0.png';
+        case 'y': return 'assets/Y0.png';
+        case 'z': return 'assets/Z0.png';
+        case ' ': return 'assets/BLANK0.png';
+        case 'a1': return 'assets/A1.png';
+        case 'b1': return 'assets/B1.png';
+        case 'c1': return 'assets/C1.png';
+        case 'd1': return 'assets/D1.png';
+        case 'e1': return 'assets/E1.png';
+        case 'f1': return 'assets/F1.png';
+        case 'g1': return 'assets/G1.png';
+        case 'h1': return 'assets/H1.png';
+        case 'i1': return 'assets/I1.png';
+        case 'j1': return 'assets/J1.png';
+        case 'k1': return 'assets/K1.png';
+        case 'l1': return 'assets/L1.png';
+        case 'm1': return 'assets/M1.png';
+        case 'n1': return 'assets/N1.png';
+        case 'o1': return 'assets/O1.png';
+        case 'p1': return 'assets/P1.png';
+        case 'q1': return 'assets/Q1.png';
+        case 'r1': return 'assets/R1.png';
+        case 's1': return 'assets/S1.png';
+        case 't1': return 'assets/T1.png';
+        case 'u1': return 'assets/U1.png';
+        case 'v1': return 'assets/V1.png';
+        case 'w1': return 'assets/W1.png';
+        case 'x1': return 'assets/X1.png';
+        case 'y1': return 'assets/Y1.png';
+        case 'z1': return 'assets/Z1.png';
+        case ' 1': return 'assets/BLANK1.png';
+        case 'a2': return 'assets/A2.png';
+        case 'b2': return 'assets/B2.png';
+        case 'c2': return 'assets/C2.png';
+        case 'd2': return 'assets/D2.png';
+        case 'e2': return 'assets/E2.png';
+        case 'f2': return 'assets/F2.png';
+        case 'g2': return 'assets/G2.png';
+        case 'h2': return 'assets/H2.png';
+        case 'i2': return 'assets/I2.png';
+        case 'j2': return 'assets/J2.png';
+        case 'k2': return 'assets/K2.png';
+        case 'l2': return 'assets/L2.png';
+        case 'm2': return 'assets/M2.png';
+        case 'n2': return 'assets/N2.png';
+        case 'o2': return 'assets/O2.png';
+        case 'p2': return 'assets/P2.png';
+        case 'q2': return 'assets/Q2.png';
+        case 'r2': return 'assets/R2.png';
+        case 's2': return 'assets/S2.png';
+        case 't2': return 'assets/T2.png';
+        case 'u2': return 'assets/U2.png';
+        case 'v2': return 'assets/V2.png';
+        case 'w2': return 'assets/W2.png';
+        case 'x2': return 'assets/X2.png';
+        case 'y2': return 'assets/Y2.png';
+        case 'z2': return 'assets/Z2.png';
+        case ' 2': return 'assets/BLANK2.png';
+        case 'a3': return 'assets/A3.png';
+        case 'b3': return 'assets/B3.png';
+        case 'c3': return 'assets/C3.png';
+        case 'd3': return 'assets/D3.png';
+        case 'e3': return 'assets/E3.png';
+        case 'f3': return 'assets/F3.png';
+        case 'g3': return 'assets/G3.png';
+        case 'h3': return 'assets/H3.png';
+        case 'i3': return 'assets/I3.png';
+        case 'j3': return 'assets/J3.png';
+        case 'k3': return 'assets/K3.png';
+        case 'l3': return 'assets/L3.png';
+        case 'm3': return 'assets/M3.png';
+        case 'n3': return 'assets/N3.png';
+        case 'o3': return 'assets/O3.png';
+        case 'p3': return 'assets/P3.png';
+        case 'q3': return 'assets/Q3.png';
+        case 'r3': return 'assets/R3.png';
+        case 's3': return 'assets/S3.png';
+        case 't3': return 'assets/T3.png';
+        case 'u3': return 'assets/U3.png';
+        case 'v3': return 'assets/V3.png';
+        case 'w3': return 'assets/W3.png';
+        case 'x3': return 'assets/X3.png';
+        case 'y3': return 'assets/Y3.png';
+        case 'z3': return 'assets/Z3.png';
+        case ' 3': return 'assets/BLANK3.png';
+        case 'a4': return 'assets/A4.png';
+        case 'b4': return 'assets/B4.png';
+        case 'c4': return 'assets/C4.png';
+        case 'd4': return 'assets/D4.png';
+        case 'e4': return 'assets/E4.png';
+        case 'f4': return 'assets/F4.png';
+        case 'g4': return 'assets/G4.png';
+        case 'h4': return 'assets/H4.png';
+        case 'i4': return 'assets/I4.png';
+        case 'j4': return 'assets/J4.png';
+        case 'k4': return 'assets/K4.png';
+        case 'l4': return 'assets/L4.png';
+        case 'm4': return 'assets/M4.png';
+        case 'n4': return 'assets/N4.png';
+        case 'o4': return 'assets/O4.png';
+        case 'p4': return 'assets/P4.png';
+        case 'q4': return 'assets/Q4.png';
+        case 'r4': return 'assets/R4.png';
+        case 's4': return 'assets/S4.png';
+        case 't4': return 'assets/T4.png';
+        case 'u4': return 'assets/U4.png';
+        case 'v4': return 'assets/V4.png';
+        case 'w4': return 'assets/W4.png';
+        case 'x4': return 'assets/X4.png';
+        case 'y4': return 'assets/Y4.png';
+        case 'z4': return 'assets/Z4.png';
+        case ' 4': return 'assets/BLANK4.png';
+        case 'a5': return 'assets/A5.png';
+        case 'b5': return 'assets/B5.png';
+        case 'c5': return 'assets/C5.png';
+        case 'd5': return 'assets/D5.png';
+        case 'e5': return 'assets/E5.png';
+        case 'f5': return 'assets/F5.png';
+        case 'g5': return 'assets/G5.png';
+        case 'h5': return 'assets/H5.png';
+        case 'i5': return 'assets/I5.png';
+        case 'j5': return 'assets/J5.png';
+        case 'k5': return 'assets/K5.png';
+        case 'l5': return 'assets/L5.png';
+        case 'm5': return 'assets/M5.png';
+        case 'n5': return 'assets/N5.png';
+        case 'o5': return 'assets/O5.png';
+        case 'p5': return 'assets/P5.png';
+        case 'q5': return 'assets/Q5.png';
+        case 'r5': return 'assets/R5.png';
+        case 's5': return 'assets/S5.png';
+        case 't5': return 'assets/T5.png';
+        case 'u5': return 'assets/U5.png';
+        case 'v5': return 'assets/V5.png';
+        case 'w5': return 'assets/W5.png';
+        case 'x5': return 'assets/X5.png';
+        case 'y5': return 'assets/Y5.png';
+        case 'z5': return 'assets/Z5.png';
+        case ' 5': return 'assets/BLANK5.png';
         case 'R': return 'assets/pink-rose.png';
     }
 } // getPieceImageSource(piece)
 
 /* test functions */
 
-function inRack1(position) { // returns true if the position is within the p1rack
-    let x = position[2];
-    let y = position[1];
+function inRack1( position ) { // true if the position [z,y,x] is within the p1rack
     let z = position[0];
+    let y = position[1];
+    let x = position[2];
     
     if ( (z===0 && y===0 && x===0) || (z===0 && y===0 && x===1) || (z===0 && y===0 && x===2) || (z===0 && y===0 && x===3) || (z===0 && y===1 && x===0) || (z===0 && y===1 && x===1) ) { // p1rack
         return true;
     } else {
         return false;
     }
-} // inRack1(position)
+} // inRack1( position )
 
 // console.log( 'inRack1([0,0,0]):', inRack1([0,0,0]) );
 // console.log( 'inRack1([0,0,1]):', inRack1([0,0,1]) );
@@ -216,17 +375,17 @@ function inRack1(position) { // returns true if the position is within the p1rac
 // console.log( 'inRack1([0,1,0]):', inRack1([0,1,0]) );
 // console.log( 'inRack1([0,1,1]):', inRack1([0,1,1]) );
 
-function inRack2(position) { // true if the position's coordinates are within the p2rack
-    let x = position[2];
-    let y = position[1];
+function inRack2( position ) { // true if the position [z,y,x] is within the p2rack
     let z = position[0];
+    let y = position[1];
+    let x = position[2];
     
     if ( (z===0 && y===3 && x===10) || (z===0 && y===4 && x===9) || (z===0 && y===3 && x===8) || (z===0 && y===4 && x===7) || (z===0 && y===2 && x===10) || (z===0 && y===3 && x===9) ) { // p2rack
         return true;
     } else {
         return false;
     }
-} // inRack2(position)
+} // inRack2( position )
 
 // console.log( 'inRack2([0,3,10]):', inRack2([0,3,10]) );
 // console.log( 'inRack2([0,4,9]):', inRack2([0,4,9]) );
@@ -235,17 +394,17 @@ function inRack2(position) { // true if the position's coordinates are within th
 // console.log( 'inRack2([0,2,10]):', inRack2([0,2,10]) );
 // console.log( 'inRack2([0,3,9]):', inRack2([0,3,9]) );
 
-function onBoard(position) { // true if the position is on the board
-    let x = position[2];
-    let y = position[1];
+function onBoard( position ) { // true if the position is on the board
     let z = position[0];
+    let y = position[1];
+    let x = position[2];
     
     if ( (y===1 && x===4) || (y===1 && x===5) || (y===1 && x===6) || (y===2 && x===4) || (y===2 && x===5) || (y===2 && x===6) || (y===3 && x===5) ) { // board
         return true;
     } else {
         return false;
     }
-} // onBoard(position)
+} // onBoard( position )
 
 // console.log( 'onBoard([0,0,0]):', onBoard([0,0,0] ) );
 // console.log( 'onBoard([0,0,1]):', onBoard([0,0,1] ) );
@@ -303,17 +462,17 @@ function onBoard(position) { // true if the position is on the board
 // console.log( 'onBoard([0,4,9]):', onBoard([0,4,9] ) );
 // console.log( 'onBoard([0,4,10]):', onBoard([0,4,10]) );
 
-function openStack(position) { // returns true if the top position is empty
-    let x = position[2];
-    let y = position[1];
+function openStack( position ) { // true if the top level is a dot
     let z = position[0];
+    let y = position[1];
+    let x = position[2];
     
+console.log( 'z:', z );
 console.log( 'x:', x );
 console.log( 'y:', y );
-console.log( 'z:', z );
 console.log( 'position:', position );
     
-    if ( onBoard(position) ) {
+    if ( onBoard( position ) ) {
 
 console.log( 'gameBoard[[5],[y],[x]]:', gameBoard[[5],[y],[x]] );
 console.log( 'gameBoard[[5],[1],[2]]:', gameBoard[[5],[1],[2]] );
@@ -329,15 +488,15 @@ console.log( 'gameBoard[[5],[1],[2]]:', gameBoard[[5],[1],[2]] );
     } else {
         return false;
     }
-} // openStack(position)
+} // openStack( position )
 
-console.log( 'openStack([0,4,8]):', openStack([0,4,8]) ); // Expect false
-console.log( 'openStack([0,4,9]):', openStack([0,4,9]) ); // Expect false
-console.log( 'openStack([0,4,10]):', openStack([0,4,10]) ); // Expect false
+// console.log( 'openStack([0,4,8]):', openStack([0,4,8]) ); // Expect false
+// console.log( 'openStack([0,4,9]):', openStack([0,4,9]) ); // Expect false
+// console.log( 'openStack([0,4,10]):', openStack([0,4,10]) ); // Expect false
 
-console.log( 'openStack([0,1,5]):', openStack([0,1,5]) ); // Expect true
-console.log( 'openStack([0,2,5]):', openStack([0,2,5]) ); // Expect true
-console.log( 'openStack([0,3,5]):', openStack([0,3,5]) ); // Expect true
+// console.log( 'openStack([0,1,5]):', openStack([0,1,5]) ); // Expect true
+// console.log( 'openStack([0,2,5]):', openStack([0,2,5]) ); // Expect true
+// console.log( 'openStack([0,3,5]):', openStack([0,3,5]) ); // Expect true
 
 // function sleep(ms) {
 //     return new Promise(resolve => setTimeout(resolve, ms));
@@ -370,8 +529,8 @@ function setPieceHoldEvents() {
     
                 if (isNaN(parseInt(curHeldPieceStringPosition[3],10))) { // If the 4th digit is NaN then don't use it.
                     curHeldPieceStartingPosition = [ parseInt(curHeldPieceStringPosition[0],10)-1,
-			                             parseInt(curHeldPieceStringPosition[1],10)-1,
-			                             parseInt(curHeldPieceStringPosition[2],10)-1 ];
+                                                     parseInt(curHeldPieceStringPosition[1],10)-1,
+                                                     parseInt(curHeldPieceStringPosition[2],10)-1 ];
                 } else {
                     curHeldPieceStartingPosition = [ parseInt(curHeldPieceStringPosition[0],10)-1,
                                                      parseInt(curHeldPieceStringPosition[1],10)-1, 
@@ -399,7 +558,7 @@ function setPieceHoldEvents() {
     document.addEventListener('mouseup', function(event) {
         window.clearInterval(movePieceInterval);
     
-        if (curHeldPiece != null) {
+        if (curHeldPiece !== null) {
             const boardElement = document.querySelector('.board');
     
             if ((event.clientX > boardElement.offsetLeft - window.scrollX && event.clientX < boardElement.offsetLeft + boardElement.offsetWidth - window.scrollX) &&
@@ -418,9 +577,9 @@ function setPieceHoldEvents() {
                         var yPosition = Math.floor((mousePositionOnBoardY - boardBorderSize) / document.getElementsByClassName('square')[0].offsetHeight*0.77 - 0.5); // was 0.666, then 0.75
                     } else {
                         var yPosition = Math.floor((mousePositionOnBoardY - boardBorderSize) / document.getElementsByClassName('square')[0].offsetHeight*0.77); // was 0.666, then 0.75
-		    }
+                    }
 
-		    var zPosition = 0;
+                    var zPosition = 0;
                     const pieceReleasePosition = [zPosition, yPosition, xPosition];
     
                     if (!(pieceReleasePosition[0] === curHeldPieceStartingPosition[0] && pieceReleasePosition[1] === curHeldPieceStartingPosition[1] && pieceReleasePosition[2] === curHeldPieceStartingPosition[2])) {
@@ -455,12 +614,19 @@ console.log( 'curPlayer:', curPlayer, 'yPosition:', yPosition, 'xPosition:', xPo
 function movePiece(piece, startingPosition, endingPosition) {
     const boardPiece = curBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
     
+    // If the boardPiece is not empty 
+    if ( boardPiece !== '.' ) {
     // If the boardPiece is not empty AND the top rung is empty
-    if ( (boardPiece !== '.') && ( curBoard[endingPosition[0]+5][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
+    // if ( (boardPiece !== '.') && ( curBoard[endingPosition[0]+5][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
 
         // move the piece
-        curBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]] = '.'; // clear the startingPosition
+        curBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]] = '.'; // clear the startingPosition and remove the sourceSquare's child(piece)
+        const sourceSquare = document.getElementById(`${startingPosition[0] + 1}${startingPosition[1] + 1}${startingPosition[2] + 1}`);
+        sourceSquare.removeChild(piece);
     
+        // const sourceSquare = document.getElementById(`${startingPosition[0] + 1}${startingPosition[1] + 1}${startingPosition[2] + 1}`);
+        // sourceSquare.textContent = '';
+        // sourceSquare.removeChild(piece);
         if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 0 ) { p1rack[0] = '.'; } // clear the tile from the p1rack
         if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 1 ) { p1rack[1] = '.'; }
         if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 2 ) { p1rack[2] = '.'; }
@@ -474,43 +640,111 @@ function movePiece(piece, startingPosition, endingPosition) {
         if ( startingPosition[0] === 0 && startingPosition[1] === 2 && startingPosition[2] === 10 ) { p2rack[4] = '.'; }
         if ( startingPosition[0] === 0 && startingPosition[1] === 3 && startingPosition[2] === 9 ) { p2rack[5] = '.'; }
     
-        if (!( curBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
-	    // level 0 is not empty, check next level
+        if ( !( curBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]].includes(".") ) && !( curBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]].includes("R") ) ) {
+            // level 0 is not empty AND level 0 is not R, check next level
             if (!( curBoard[endingPosition[0]+1][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
-	        // level 1 is not empty, check next level
+                // level 1 is not empty, check next level
                 if (!( curBoard[endingPosition[0]+2][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
-	            // level 2 is not empty, check next level
+                    // level 2 is not empty, check next level
                     if (!( curBoard[endingPosition[0]+3][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
-	                // level 3 is not empty, check next level
+                        // level 3 is not empty, check next level
                         if (!( curBoard[endingPosition[0]+4][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
-	                    // level 4 is not empty, check next level
+                            // level 4 is not empty, check next level
                             if (!( curBoard[endingPosition[0]+5][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
-	                        // level 5 is not empty, no more levels, this needs to be prevented
+                                // level 5 is not empty, no more levels, this needs to be prevented
     
 console.error("No more levels");
     
-	                    } else {
+                            } else {
                                 curBoard[endingPosition[0]+5][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 5
-	                    }
-	                } else {
+                                const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
+                                destinationSquare.textContent = '';
+
+                                // build a new pieceElement and append it to the destinationSquare
+                                const pieceElement = document.createElement('img');
+                                pieceElement.classList.add('piece');
+                                pieceElement.id = boardPiece;
+                                pieceElement.draggable = false;
+                                pieceElement.src = getPieceImageSource(boardPiece+'5');
+                                destinationSquare.appendChild(pieceElement);
+                            }
+                        } else {
                             curBoard[endingPosition[0]+4][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 4
-	                }
-	            } else {
+                            const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
+                            destinationSquare.textContent = '';
+
+                            // build a new pieceElement and append it to the destinationSquare
+                            const pieceElement = document.createElement('img');
+                            pieceElement.classList.add('piece');
+                            pieceElement.id = boardPiece;
+                            pieceElement.draggable = false;
+                            pieceElement.src = getPieceImageSource(boardPiece+'4');
+                            destinationSquare.appendChild(pieceElement);
+                        }
+                    } else {
                         curBoard[endingPosition[0]+3][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 3
-	            }
-	        } else {
+                        const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
+                        destinationSquare.textContent = '';
+
+                        // build a new pieceElement and append it to the destinationSquare
+                        const pieceElement = document.createElement('img');
+                        pieceElement.classList.add('piece');
+                        pieceElement.id = boardPiece;
+                        pieceElement.draggable = false;
+                        pieceElement.src = getPieceImageSource(boardPiece+'3');
+                        destinationSquare.appendChild(pieceElement);
+                    }
+                } else {
                     curBoard[endingPosition[0]+2][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 2
-	        }
-	    } else {
+                    const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
+                    destinationSquare.textContent = '';
+
+                    // build a new pieceElement and append it to the destinationSquare
+                    const pieceElement = document.createElement('img');
+                    pieceElement.classList.add('piece');
+                    pieceElement.id = boardPiece;
+                    pieceElement.draggable = false;
+                    pieceElement.src = getPieceImageSource(boardPiece+'2');
+                    destinationSquare.appendChild(pieceElement);
+                }
+            } else {
                 curBoard[endingPosition[0]+1][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 1
-	    }
-	} else {
+                const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
+                destinationSquare.textContent = '';
+
+                // build a new pieceElement and append it to the destinationSquare
+                const pieceElement = document.createElement('img');
+                pieceElement.classList.add('piece');
+                pieceElement.id = boardPiece;
+                pieceElement.draggable = false;
+                pieceElement.src = getPieceImageSource(boardPiece+'1');
+                destinationSquare.appendChild(pieceElement);
+            }
+        } else {
             curBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 0
-	}
-    
-        const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
-        destinationSquare.textContent = '';
-        destinationSquare.appendChild(piece);
+            const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
+            destinationSquare.textContent = '';
+            destinationSquare.appendChild(piece);
+        }
+
+        // remove the image from the startingPosition ?
+
+        // const sourceSquare = document.getElementById(`${startingPosition[0] + 1}${startingPosition[1] + 1}${startingPosition[2] + 1}`);
+        // sourceSquare.textContent = '';
+        // sourceSquare.removeChild(piece);
+
+// console.log( 'boardPiece:', boardPiece );
+// console.log( 'boardPiece+1:', boardPiece+'1' );
+// console.log( 'getPieceImageSource(boardPiece+1):', getPieceImageSource(boardPiece+'1') );
+// boardPiece: a
+// boardPiece+1: a1
+// getPieceImageSource(boardPiece+1): assets/A1.png
+// 
+// console.log( 'destinationSquare:', destinationSquare );
+
+        // const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
+        // destinationSquare.textContent = '';
+        // destinationSquare.appendChild(piece);
     }
     
         // p1rack[i].piece = getPieceImageSource(p1rack[i]);
@@ -518,26 +752,46 @@ console.error("No more levels");
 console.log( '' );
 console.log( 'movePiece():' );
 console.log( 'curPlayer:', curPlayer, 'moves a:"', piece.id, '" from startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-	                                                         'to endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+                                                                 'to endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.log( 'p1rack:', p1rack, 'p1rack.dot_count:', p1rack.filter(x => x === '.').length );
 console.log( 'p2rack:', p2rack, 'p2rack.dot_count:', p2rack.filter(x => x === '.').length );
     
-    // artificially switch players after 3 white tile moves or 3 black tile moves
-    // if ( ( p1rack.filter(x => x === '.').length >= 3 ) || ( p2rack.filter(x => x === '.').length >= 3 ) ) {
-    //     switchPlayer();
-    // }
-    
 } // movePiece(piece, startingPosition, endingPosition)
 
+// console.log( 'diffBoards(prevBoard, curBoard)', diffBoards(prevBoard, curBoard) );
+
+
 function switchPlayer() {
-    // score, redraw and then switch players
-    if (curPlayer == 'white') {
-        p1score += 50;
+    // called by the $ onclick button:
+    //   calculate the score, 
+    //   redraw tile(s), 
+    //   update prevBoard and then switch players
+    
+    var score_words = [];
+    words = [];
+    
+    if (curPlayer === 'white') {
+    
+        calcScore();
+    
+        // redraw
         rePopRack1();
+    
+        // Backup curBoard to prevBoard
+        prevBoard = JSON.parse(JSON.stringify(curBoard));
+    
         curPlayer = 'black';
+    
     } else {
-        p2score += 50;
+    
+        calcScore();
+    
+        // redraw
         rePopRack2();
+    
+        // Backup curBoard to prevBoard
+        prevBoard = JSON.parse(JSON.stringify(curBoard));
+    
         curPlayer = 'white';
     }
     
@@ -545,6 +799,454 @@ console.log( '' );
 console.log( 'switchPlayer():' );
     
 } // switchPlayer()
+
+
+function calcScore() {
+    let dwb = 0; // double word bonus
+
+    // 1st: Find the tiles played last turn by diffing prevBoard[][][] and curBoard[][][] back into prevBoard[][][]:
+    for (let h = 0; h < 6 ; h++) { // 6 levels
+        for (let i = 0; i < 5 ; i++) { // 5 rows
+            for (let j = 0; j < 11; j++) { // 11 columns
+                if ( !onBoard([h,i,j]) ) {
+                    // If not on the board, clear the prevBoard element
+                    prevBoard[h][i][j] = '.';
+                }
+                if ( prevBoard[h][i][j] !== curBoard[h][i][j] && onBoard([h,i,j]) ) {
+                    // if different, save the difference to prevBoard
+                    prevBoard[h][i][j] = curBoard[h][i][j];
+                } else {
+                    // if the same, clear the element in prevBoard
+                    prevBoard[h][i][j] = '.';
+                }
+            }
+        }
+    } // prevBoard now contains only the tile(s) played for the last turn
+
+    if ( prevBoard[0][2][5] !== '.' ) { // Someone played on a double-word bonus
+        dwb = 1;
+    }
+    
+    // 2nd: Use the prevBoard[][][] positions to find any new word(s) in curBoard[][][]:
+    for (let h = 0; h < 6 ; h++) { // 6 levels
+        for (let i = 0; i < 5 ; i++) { // 5 rows
+            for (let j = 0; j < 11; j++) { // 11 columns
+    
+                // If its a new tile on the board, use the position to check for any words
+                if ( prevBoard[h][i][j] !== '.' && onBoard([h,i,j]) ) {
+                    // the score_words[] array is reset by switchPlayer()
+                    score_words = wordCheck([h,i,j]); // e.g. ['it, [0, 2, 4]', 'it, [0, 2, 5]']
+                    // wordCheck returns 
+                    // an element = the word, and the positions of every letter in the word
+                }
+            }
+        }
+    }
+    // 
+
+// console.log( 'score_words:', score_words ); 
+
+    // score score_words[]
+    var word_score = 0;
+    var turn_score = 0;
+    var element_str = '';
+    var word_str = '';
+    var curWord_str = '';
+    var z_str = '';
+    var turn_ledger = '';
+    
+console.log( 'score_words[]:', score_words );
+
+    // For every element (word and position) in the score_words[] array, calculate the word score
+    // score_words.forEach( element => {
+    for ( let index = 0; index < score_words.length; ++index ) {
+	const element = score_words[index];
+
+        word_score = 0;
+    
+        // convert the array element to a string
+        // element_str = new String( element );
+        element_str = element + '';
+        word_str = element_str.substring(0, element_str.indexOf(',') ); // just the word
+
+        if ( curWord_str !== word_str ) { // a new word to score
+
+            // for every letter in word_str, sum the individual values 
+            for ( var i = 0; i < word_str.length; i++ ) {
+
+                // get the letter and its z coord 
+                var letter = word_str.charAt(i);
+                z_str = element_str.charAt( element_str.length - 8 );
+    
+// console.log( 'element_str:', element_str);
+// console.log( 'word_str:', word_str);
+// console.log( 'z_str:', z_str);
+
+                // calculate the height multiplier
+                var hm = z_str + 1;
+    
+                word_score = word_score + hm * getLetterValue( letter );
+            }
+
+            // word_score complete, check for a double word bonus 
+            if ( dwb === 1 ) {
+                word_score = word_score * 2;
+	    }
+	
+            // build the turn ledger and score
+            turn_ledger = turn_ledger + word_str + ' ' + word_score + ', ';
+            turn_score = turn_score + word_score;
+        }
+        curWord_str = word_str;
+
+// console.log( 'Word:', element, 'Value:', word_score );
+// console.log( 'Turn_Score:', turn_score );
+    
+    }
+    // });
+
+    // turn_ledger now has the individual word scores, and
+    // turn_score now has the players total for the turn
+
+    // remove trailing ', ' from turn_ledger
+    turn_ledger = turn_ledger.replace(/, $/, '');
+
+    if (curPlayer === 'white') {
+        p1score = p1score + turn_score;
+        const p1scoreDiv = document.getElementById('p1score');
+        p1scoreText = p1scoreText + 'Player 1: ' + turn_ledger + ' = ' + p1score + '\n';
+        p1scoreDiv.innerHTML = p1scoreText;
+
+console.log( p1scoreDiv.innerHTML );
+    
+    } else {
+        p2score = p2score + turn_score;
+        const p2scoreDiv = document.getElementById('p2score');
+        p2scoreText = p2scoreText + 'Player 2: ' + turn_ledger + ' = ' + p2score + '\n';
+        p2scoreDiv.innerHTML = p2scoreText;
+
+console.log( p2scoreDiv.innerHTML );
+    
+    }
+} // calcScore()
+
+function calcScore_old() {
+    // diff prevBoard and curBoard to see what tile(s) were played
+    
+console.log( 'prevBoard[0]:', prevBoard[0], 'curBoard[0]:', curBoard[0] );
+    
+    var deltBoard = new Array();
+    deltBoard = diffBoards(prevBoard, curBoard);
+    
+    // inspect curBoard and prevBoard and deltBoard
+    
+    if (curPlayer === 'white') {
+        p1score += 50;
+        const p1scoreDiv = document.getElementById('p1score');
+        p1scoreDiv.innerHTML = 'Player 1: ' + p1score;
+    } else {
+        p2score += 45;
+        const p2scoreDiv = document.getElementById('p2score');
+        p2scoreDiv.innerHTML = 'Player 2: ' + p2score;
+    }
+} // calcScore_old()
+
+function inRack1( position ) { // true if the position is within the p1rack
+    let z = position[0];
+    let y = position[1];
+    let x = position[2];
+    
+    if ( (z===0 && y===0 && x===0) || (z===0 && y===0 && x===1) || (z===0 && y===0 && x===2) || (z===0 && y===0 && x===3) || (z===0 && y===1 && x===0) || (z===0 && y===1 && x===1) ) { // p1rack
+        return true;
+    } else {
+        return false;
+    }
+} // inRack1( position )
+
+function flattenBoard() {
+    // This function flattens the curBoard[][][] into flatBoard[][]
+    // by using the highest level letter tile in curBoard
+    
+    // level h, row i and column j
+    for (let h = 0; h < 6 ; h++) { // 6 levels
+        for (let i = 0; i < 5 ; i++) { // 5 rows
+            for (let j = 0; j < 11; j++) { // 11 columns
+                // Iterate over every curBoard element
+                if ( ( curBoard[h][i][j] !== '.' ) && ( curBoard[h][i][j] !== 'R' ) ) {
+                    // flatBoard will contain the highest letter tile in curBoard
+                    flatBoard[i][j] = curBoard[h][i][j];
+                }
+            }
+        }
+    }
+}; // flattenBoard()
+
+function wordCheck( position ) {
+    let z = position[0];
+    let y = position[1];
+    let x = position[2]; // position [z,y,x] is the source for finding word(s) in curBoard[][][]
+                         // the [z] coordinate is unused as curBoard is flattened into flatBoard
+    var str = '';
+
+    flattenBoard(); // flattens global curBoard[z][y][x] into the global flatBoard[y][x]
+
+    if ( onBoard( position ) ) { // only process valid board positions
+
+        const wordre = /[a-zA-Z]{2,}/; // A word is 2 or more consecutive letters
+    
+console.log( '' );
+console.log( 'wordCheck( position ):' );
+console.log( 'position:', position );
+
+        ///////////////////////////////////////////////////////////////////////
+        // check Upwards by checking all possible upward strings              /
+        ///////////////////////////////////////////////////////////////////////
+        if ( ( y === 1 && x === 4 ) || ( y === 1 && x === 5 ) ) {
+            str = flatBoard[1][4] + flatBoard[1][5];
+        }
+        if ( ( y === 2 && x === 4 ) || ( y === 2 && x === 5 ) || ( y === 1 && x === 6 ) ) {
+            str = flatBoard[2][4] + flatBoard[2][5] + flatBoard[1][6];
+        }
+        if ( ( y === 3 && x === 5 ) || ( y === 2 && x === 6 ) ) {
+            str = flatBoard[3][5] + flatBoard[2][6];
+        }
+        if ( str.match( wordre ) ) {
+            str = str.replaceAll('.', ''); // remove any dots in str
+            // The upwards str is a word
+            // add the word and the letter coords to words[]
+
+            if ( str.length === 3 ) { // has to be [z,2,4], [z,2,5], [z,1,6]
+                words.push( str + ', [' + z + ', ' + 2 + ', ' + 4 + ']' );
+                words.push( str + ', [' + z + ', ' + 2 + ', ' + 5 + ']' );
+                words.push( str + ', [' + z + ', ' + 1 + ', ' + 6 + ']' );
+            }
+            if ( str.length === 2 ) {
+                if ( y === 1 && x === 4 ) { // has to be [z,1,4], [z,1,5] 
+                    words.push( str + ', [' + z + ', ' + 1 + ', ' + 4 + ']' );
+                    words.push( str + ', [' + z + ', ' + 1 + ', ' + 5 + ']' );
+                }
+                if ( y === 1 && x === 5 ) { // has to be [z,1,5], [z,1,6] 
+                    words.push( str + ', [' + z + ', ' + 1 + ', ' + 5 + ']' );
+                    words.push( str + ', [' + z + ', ' + 1 + ', ' + 6 + ']' );
+                }
+                if ( y === 1 && x === 6 ) { // has to be [z,2,5], [z,1,6] 
+                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 5 + ']' );
+                    words.push( str + ', [' + z + ', ' + 1 + ', ' + 6 + ']' );
+                }
+                if ( y === 2 && x === 4 ) { // has to be [z,2,4], [z,2,5] 
+                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 4 + ']' );
+                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 5 + ']' );
+                }
+                if ( y === 3 && x === 5 ) { // has to be [z,3,5], [z,2,6] 
+                    words.push( str + ', [' + z + ', ' + 3 + ', ' + 5 + ']' );
+                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 6 + ']' );
+                }
+                if ( y === 2 && x === 6 ) { // has to be [z,3,5], [z,2,6] 
+                    words.push( str + ', [' + z + ', ' + 3 + ', ' + 5 + ']' );
+                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 6 + ']' );
+                }
+            }
+    
+console.log( 'Upwords word found:', str );
+    
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // check Downwards by checking all possible downward strings          /
+        ///////////////////////////////////////////////////////////////////////
+        str = '';
+        if ( ( y === 1 && x === 4 ) || ( y === 2 && x === 5 ) || ( y === 2 && x === 6 ) ) {
+            str = flatBoard[1][4] + flatBoard[2][5] + flatBoard[2][6];
+        }
+        if ( ( y === 2 && x === 4 ) || ( y === 3 && x === 5 ) ) {
+            str = flatBoard[2][4] + flatBoard[3][5];
+        }
+        if ( ( y === 1 && x === 5 ) || ( y === 1 && x === 6 ) ) {
+            str = flatBoard[1][5] + flatBoard[1][6];
+        }
+        if ( str.match( wordre ) ) {
+            str = str.replaceAll('.', ''); // remove any dots in str
+            // The downwards str is a word
+            // add the word and its letter coords to words[]
+
+            if ( str.length === 3 ) { // has to be [z,1,4], [z,2,5], [z,2,6]
+                words.push( str + ', [' + z + ', ' + 1 + ', ' + 4 + ']' );
+                words.push( str + ', [' + z + ', ' + 2 + ', ' + 5 + ']' );
+                words.push( str + ', [' + z + ', ' + 2 + ', ' + 6 + ']' );
+            }
+            if ( str.length === 2 ) {
+                if ( y === 1 && x === 4 ) { // has to be [z,1,4], [z,2,5] 
+                    words.push( str + ', [' + z + ', ' + 1 + ', ' + 4 + ']' );
+                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 5 + ']' );
+                }
+                if ( y === 1 && x === 5 ) { // has to be [z,1,5], [z,1,6] 
+                    words.push( str + ', [' + z + ', ' + 1 + ', ' + 5 + ']' );
+                    words.push( str + ', [' + z + ', ' + 1 + ', ' + 6 + ']' );
+                }
+                if ( y === 1 && x === 6 ) { // has to be [z,1,5], [z,1,6] 
+                    words.push( str + ', [' + z + ', ' + 1 + ', ' + 5 + ']' );
+                    words.push( str + ', [' + z + ', ' + 1 + ', ' + 6 + ']' );
+                }
+                if ( y === 2 && x === 4 ) { // has to be [z,2,4], [z,3,5] 
+                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 4 + ']' );
+                    words.push( str + ', [' + z + ', ' + 3 + ', ' + 5 + ']' );
+                }
+                if ( y === 3 && x === 5 ) { // has to be [z,2,4], [z,3,5] 
+                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 4 + ']' );
+                    words.push( str + ', [' + z + ', ' + 3 + ', ' + 5 + ']' );
+                }
+                if ( y === 2 && x === 6 ) { // has to be [z,2,5], [z,2,6] 
+                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 5 + ']' );
+                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 6 + ']' );
+                }
+            }
+
+console.log( 'Downwards word found:', str );
+    
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // check Straight-Down by checking all possible straight-down strings /
+        ///////////////////////////////////////////////////////////////////////
+        str = '';
+        if ( x === 4 ) {
+            str = flatBoard[1][4] + flatBoard[2][4];
+        }
+        if ( x === 5 ) {
+            str = flatBoard[1][5] + flatBoard[2][5] + flatBoard[3][5];
+        }
+        if ( x === 6 ) {
+            str = flatBoard[1][6] + flatBoard[2][6];
+        }
+        if ( str.match( wordre ) ) {
+            str = str.replaceAll('.', ''); // remove any dots in str
+            // The straight-down str is a word
+            // add the word and its letter coords to words[]
+
+            if ( str.length === 3 ) { // has to be [z,1,5], [z,2,5], [z,3,5]
+                words.push( str + ', [' + z + ', ' + 1 + ', ' + 5 + ']' );
+                words.push( str + ', [' + z + ', ' + 2 + ', ' + 5 + ']' );
+                words.push( str + ', [' + z + ', ' + 3 + ', ' + 5 + ']' );
+            }
+            if ( str.length === 2 ) {
+                if ( y === 1 && x === 4 ) { // has to be [z,1,4], [z,2,4] 
+                    words.push( str + ', [' + z + ', ' + 1 + ', ' + 4 + ']' );
+                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 4 + ']' );
+                }
+                if ( y === 1 && x === 5 ) { // has to be [z,1,5], [z,2,5] 
+                    words.push( str + ', [' + z + ', ' + 1 + ', ' + 5 + ']' );
+                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 5 + ']' );
+                }
+                if ( y === 2 && x === 4 ) { // has to be [z,1,4], [z,2,4]
+                    words.push( str + ', [' + z + ', ' + 1 + ', ' + 4 + ']' );
+                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 4 + ']' );
+		}
+                if ( y === 1 && x === 6 ) { // has to be [z,1,6], [z,2,6] 
+                    words.push( str + ', [' + z + ', ' + 1 + ', ' + 6 + ']' );
+                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 6 + ']' );
+                }
+                if ( y === 3 && x === 5 ) { // has to be [z,2,5], [z,3,5] 
+                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 5 + ']' );
+                    words.push( str + ', [' + z + ', ' + 3 + ', ' + 5 + ']' );
+                }
+                if ( y === 2 && x === 6 ) { // has to be [z,1,6], [z,2,6] 
+                    words.push( str + ', [' + z + ', ' + 1 + ', ' + 6 + ']' );
+                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 6 + ']' );
+                }
+            }
+
+            // words.push( str + ', [' + z + ', ' + y + ', ' + x + ']' );
+    
+console.log( 'Straight-Down word found:', str );
+    
+        }
+    
+        // a well-formed element in words[]: ['aj, [0, 1, 4]', 'aj, [0, 2, 5]']
+        // the length of the word = the number of elements in the array
+        // an element = the word, and a position of a letter in the word
+
+console.log( '=> => ' );
+console.log( 'words[]:', words );
+    
+        let unique_words = [... new Set(words)];
+    
+console.log( '=> => ' );
+console.log( 'unique_words[]:', unique_words );
+
+        return unique_words; // e.g. ['it, [0, 2, 4]', 'it, [0, 2, 5]']
+    }
+}; // wordCheck( position )
+
+/*******************/
+/* array functions */
+/*******************/
+
+function diffBoards(arr1, arr2) {
+    // Compares the board elements
+    var result = arr1;
+    
+    // level h, row i and column j
+    for (let h = 0; h < 6 ; h++) { // 6 levels
+        for (let i = 0; i < 5 ; i++) { // 5 rows
+            for (let j = 0; j < 11; j++) { // 11 columns
+                if ( arr1[h][i][j] !== arr2[h][i][j] ) {
+    
+                    // if different, save from arr2 to the result
+                    result[h][i][j] = arr2[h][i][j]
+                } else {
+                    result[h][i][j] = '.'
+                }
+            }
+        }
+    }
+    return result;
+}
+
+function getLetterValue( boardPiece ) {
+    // Return the value of the given boardPiece.
+    switch (boardPiece) {
+        case ' ':
+                  return 0;
+                  break;
+        case 'a':
+        case 'd':
+        case 'e':
+        case 'g':
+        case 'i':
+        case 'l':
+        case 'n':
+        case 'o':
+        case 'r':
+        case 's':
+        case 't':
+        case 'u':
+                  return 1;
+                  break;
+        case 'b':
+        case 'c':
+        case 'f':
+        case 'h':
+        case 'm':
+        case 'p':
+        case 'v':
+        case 'w':
+        case 'y':
+                  return 2;
+                  break;
+        case 'k':
+                  return 3;
+                  break;
+        case 'j':
+        case 'x':
+                  return 4;
+                  break;
+        case 'q':
+        case 'z':
+                  return 5;
+                  break;
+
+    }
+} // getLetterValue( boardPiece )
 
 function validateWhiteMovement(startingPosition, endingPosition) {
     const boardPiece = curBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
@@ -580,16 +1282,20 @@ function validateWhiteMovement(startingPosition, endingPosition) {
                   // if ( inRack1(startingPosition) && onBoard(endingPosition) && openStack(endingPosition) ) {
                   if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
                       // if the startingPosition is in p1rack and the endingPosition is on the board, and the endingPosition is open, return true 
+    
 console.log( 'validateWhiteMovement() success:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                  'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.log( 'inRack1(startingPosition):', inRack1(startingPosition) );
 console.log( 'onBoard(endingPosition):', onBoard(endingPosition) );
+    
                       return true;
                   } else {
+    
 console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+    
                       return false;
                   }
     }
@@ -628,6 +1334,7 @@ function validateBlackMovement(startingPosition, endingPosition) {
         case 'R':
                   if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
                       // if the startingPosition is in p2rack and the endingPosition is on the board, return true 
+    
 console.log( 'validateBlackMovement() success:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                  'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.log( 'inRack2(startingPosition):', inRack2(startingPosition) );
@@ -638,6 +1345,7 @@ console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', st
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+    
                       return false;
                   }
     }
@@ -646,13 +1354,15 @@ console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
 function rePopRack1() {
     // repopulate the p1rack
     let dotcnt = p1rack.filter(x => x === '.').length;
+    
     for ( let i = 0; i < dotcnt; i++ ) {
-        let j = Math.floor(Math.random() * tiles.length); // Random draw of the remaining tiles.
+        let j = Math.floor(Math.random() * tiles.length); // Random draw from the remaining tiles.
         let k = p1rack.indexOf('.');
         p1rack[k] = tiles[j]; // Assign to the p1rack.
-        // Update p1rack[] and gameBoard[][][] based on the index of the empty.
+    
+        // Update p1rack[] and gameBoard[][][] based on the index of the dot.
         switch(k) { // p1rack order
-            case 0: loadRack(p1rack[k], [1,1,1]); // returns [Z,Y,X] ids
+            case 0: loadRack(p1rack[k], [1,1,1]); // [Z,Y,X] ids
                     gameBoard[0][0][0] = p1rack[0];
                     break;
             case 1: loadRack(p1rack[k], [1,1,2]);
@@ -672,10 +1382,12 @@ function rePopRack1() {
                     break;
         }
         tiles.splice(j, 1); // Delete from tiles.
-console.log( '' );
-console.log( 'rePopRack1():' );
-console.log( 'curPlayer:', curPlayer, 'p1rack:', p1rack, 'ctr:', i, 'dot:', dotcnt, 'rnd:', j, 'index:', k, 'tiles:', tiles );
         p1rack[i].piece = getPieceImageSource(p1rack[i]);
+    
+// console.log( '' );
+// console.log( 'rePopRack1():' );
+// console.log( 'curPlayer:', curPlayer, 'p1rack:', p1rack, 'ctr:', i, 'dot:', dotcnt, 'rnd:', j, 'index:', k, 'tiles:', tiles );
+    
         // await sleep(500); // sleep half a second after each tile draw
     }
 } // rePopRack1()
@@ -683,11 +1395,13 @@ console.log( 'curPlayer:', curPlayer, 'p1rack:', p1rack, 'ctr:', i, 'dot:', dotc
 function rePopRack2() {
     // repopulate the p2rack
     let dotcnt = p2rack.filter(x => x === '.').length;
+    
     for ( let i = 0; i < dotcnt; i++ ) {
-        let j = Math.floor(Math.random() * tiles.length); // Random draw of the remaining tiles.
+        let j = Math.floor(Math.random() * tiles.length); // Random draw from the remaining tiles.
         let k = p2rack.indexOf('.');
         p2rack[k] = tiles[j]; // Assign to the p2rack.
-        // Update p2rack[] and gameBoard[][][] based on the index of the empty.
+    
+        // Update p2rack[] and gameBoard[][][] based on the index of the dot.
         switch(k) { // p2rack order
             case 0: loadRack(p2rack[k], [1,4,11]); // [Z,Y,X] ids
                     gameBoard[0][3][10] = p2rack[0];
@@ -709,10 +1423,12 @@ function rePopRack2() {
                     break;
         }
         tiles.splice(j, 1); // Delete from tiles.
-console.log( '' );
-console.log( 'rePopRack2():' );
-console.log( 'curPlayer:', curPlayer, 'p2rack:', p2rack, 'ctr:', i, 'dot:', dotcnt, 'rnd:', j, 'index:', k, 'tiles:', tiles );
         p2rack[i].piece = getPieceImageSource(p2rack[i]);
+    
+// console.log( '' );
+// console.log( 'rePopRack2():' );
+// console.log( 'curPlayer:', curPlayer, 'p2rack:', p2rack, 'ctr:', i, 'dot:', dotcnt, 'rnd:', j, 'index:', k, 'tiles:', tiles );
+    
         // await sleep(500); // sleep half a second after each tile draw
     }
 } // rePopRack2()

@@ -18,3 +18,7 @@ style.css~
 .gameController.js.un~
 *.un~
 *.js~
+.gameController.js.un~
+.TSB_2x2x2.html.swp
+assets/README.txt
+gameController.js~

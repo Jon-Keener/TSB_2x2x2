@@ -36,8 +36,9 @@ button {
     border: 10px solid red;
     border-radius: 6px;
 
-    text-align: center;
+    text-align: left;
     float: left;
+    white-space: pre-wrap;
 }
 
 .board {
@@ -45,6 +46,9 @@ button {
     margin: 32px auto 0;
     border: 10px solid red;
     border-radius: 6px;
+
+/* background: #ffe5b4; orange; */
+background: #ffe5b4; /* peach */
 
     display: flex;
     flex-direction: row;
@@ -56,8 +60,9 @@ button {
     border: 10px solid red;
     border-radius: 6px;
 
-    text-align: center;
+    text-align: right;
     float: right;
+    white-space: pre-wrap;
 }
 
 .column {
