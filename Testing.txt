@@ -1,3 +1,91 @@
+New Testing 20220829:
+
+score_words[]: ['od, [1,4], UP'] correct
+score_words[]: ['it, [2,4], UP'] correct - fixed switch statement in wordCheck()
+score_words[]: ['du, [2,5], UP'] correct 
+score_words[]: ['ex, [3,5], UP'] correct - fixed switch statement in wordCheck()
+
+score_words[]: ['li, [1,5], DW'] correct
+score_words[]: ['te, [1,4], DW'] correct
+score_words[]: ['li, [2,5], DW'] correct - fixed switch statement in wordCheck()
+score_words[]: ['ex, [2,4], DW'] correct - fixed switch statement in wordCheck()
+
+score_words[]: ['to, [1,4], DO'] correct
+score_words[]: ['yi, [1,5], DO'] correct
+score_words[]: ['oh, [2,5], DO'] correct
+score_words[]: ['tt, [1,6], DO'] correct
+score_words[]: ['ab, [1,5], DO'] correct - fixed switch statement in wordCheck()
+
+very interesting...
+correct - fixed switch statement in wordCheck() on 20220829
+every first word I've tried scores correctly now.
+
+================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2:15 PM 8/29/20222:15 PM 8/29/2022
+--> made word: at
+
+wordCheck( position ):
+gameController.js:1073 position: (3) [0, 1, 4]
+gameController.js:1071 
+gameController.js:1072 wordCheck( position ):
+gameController.js:1073 position: (3) [0, 1, 5]
+gameController.js:875 score_words[]: ['at, [1,4], UP']
+gameController.js:798 
+gameController.js:799 getLevel( position ):
+gameController.js:800 position: 1,4
+gameController.js:798 
+gameController.js:799 getLevel( position ):
+gameController.js:800 position: 1,5
+gameController.js:1022 Player 1: at 2 = 2		<-- 2 getLevel() calls and the correct score
+
+--> made words: at
+
+gameController.js:786 
+gameController.js:787 switchPlayer():
+gameController.js:1071 
+gameController.js:1072 wordCheck( position ):
+gameController.js:1073 position: (3) [0, 2, 5]
+gameController.js:875 score_words[]: (2) ['at, [1,4], UP', 'to, [1,5], DO']
+gameController.js:798 
+gameController.js:799 getLevel( position ):
+gameController.js:800 position: 1,4
+gameController.js:798 
+gameController.js:799 getLevel( position ):
+gameController.js:800 position: 1,5
+gameController.js:798 
+gameController.js:799 getLevel( position ):
+gameController.js:800 position: 1,5
+gameController.js:798 
+gameController.js:799 getLevel( position ):
+gameController.js:800 position: 2,5
+gameController.js:1030 Player 2: at 4, to 4 = 8		<-- did not clear ['at', [1,4], UP'] from words[]
+							<-- wordCheck did not find ['ao', [1,4], DW']
+
+							
+
+
+
+
+
+
+
+
 
 New Testing 20220811:
 

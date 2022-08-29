@@ -3,6 +3,7 @@
 // coords use [z,y,x] and [y,x] notation
 
 var words = [];
+var score_words = [];
 
 let curBoard;
 let curPlayer;
@@ -50,9 +51,6 @@ const gameBoard = [ // 6 levels of 5 rows of 11 columns, [Z,Y,X]: [0,0,0] - [5,4
 ];
 
 var prevBoard = JSON.parse(JSON.stringify(gameBoard));
-prevBoard[0][0][0] = 'X';
-
-// The JSON method seemed to work.
 
 var flatBoard = [ // 5 rows of 11 columns, [Y,X]: [0,0] - [4,10]
 ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
@@ -139,11 +137,6 @@ function loadPosition( position, playerToMove ) {
             }
         }
     }
-
-// console.log( 'curBoard:', curBoard );
-// console.log( 'gameBoard:', gameBoard );
-// console.log( 'prevBoard:', prevBoard );
-
 } // loadPosition( position, playerToMove )
 
 function loadRack(piece, position) {
@@ -161,7 +154,7 @@ function loadRack(piece, position) {
 // console.log( '' );
 // console.log( 'loadRack(piece, position):' );
 // console.log( 'InRack1:', inRack1( position ), 'InRack2:', inRack2( position ), 'piece:', piece, 'position:', position );
-// // console.log( 'pieceElement:', pieceElement );
+// console.log( 'pieceElement:', pieceElement );
 
 } // loadRack(piece, position)
 
@@ -179,8 +172,8 @@ function loadPiece(piece, position) {
 
 // console.log( '' );
 // console.log( 'loadPiece(piece, position):' );
-// console.log( 'piece:', piece, 'position:', position, 'pieceElement:', pieceElement );
-// // console.log( 'pieceElement:', pieceElement );
+// console.log( 'InRack1:', inRack1( position ), 'InRack2:', inRack2( position ), 'piece:', piece, 'position:', position );
+// console.log( 'pieceElement:', pieceElement );
 
 } // loadPiece(piece, position)
 
@@ -594,12 +587,12 @@ function setPieceHoldEvents() {
                             }
                         }
     
-console.log( '' );
-console.log( 'setPieceHoldEvents():' );
-console.log( 'Even/odd column:', xPosition%2 );
-console.log( 'X:', (mousePositionOnBoardX - boardBorderSize) / document.getElementsByClassName('square')[0].offsetWidth*1.0 );
-console.log( 'Y:', (mousePositionOnBoardY - boardBorderSize) / document.getElementsByClassName('square')[0].offsetHeight*0.77 );
-console.log( 'curPlayer:', curPlayer, 'yPosition:', yPosition, 'xPosition:', xPosition );
+// console.log( '' );
+// console.log( 'setPieceHoldEvents():' );
+// console.log( 'Even/odd column:', xPosition%2 );
+// console.log( 'X:', (mousePositionOnBoardX - boardBorderSize) / document.getElementsByClassName('square')[0].offsetWidth*1.0 );
+// console.log( 'Y:', (mousePositionOnBoardY - boardBorderSize) / document.getElementsByClassName('square')[0].offsetHeight*0.77 );
+// console.log( 'curPlayer:', curPlayer, 'yPosition:', yPosition, 'xPosition:', xPosition );
     
                     }
                 }
@@ -749,16 +742,14 @@ console.error("No more levels");
     
         // p1rack[i].piece = getPieceImageSource(p1rack[i]);
 
-console.log( '' );
-console.log( 'movePiece():' );
-console.log( 'curPlayer:', curPlayer, 'moves a:"', piece.id, '" from startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                                 'to endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.log( 'p1rack:', p1rack, 'p1rack.dot_count:', p1rack.filter(x => x === '.').length );
-console.log( 'p2rack:', p2rack, 'p2rack.dot_count:', p2rack.filter(x => x === '.').length );
+// console.log( '' );
+// console.log( 'movePiece():' );
+// console.log( 'curPlayer:', curPlayer, 'moves a:"', piece.id, '" from startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+//                                                                  'to endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+// console.log( 'p1rack:', p1rack, 'p1rack.dot_count:', p1rack.filter(x => x === '.').length );
+// console.log( 'p2rack:', p2rack, 'p2rack.dot_count:', p2rack.filter(x => x === '.').length );
     
 } // movePiece(piece, startingPosition, endingPosition)
-
-// console.log( 'diffBoards(prevBoard, curBoard)', diffBoards(prevBoard, curBoard) );
 
 
 function switchPlayer() {
@@ -767,31 +758,30 @@ function switchPlayer() {
     //   redraw tile(s), 
     //   update prevBoard and then switch players
     
-    var score_words = [];
-    words = [];
+    // words = [];
+    words.length = 0; // empty words[]
+    // score_words = [];
+    score_words.length = 0; // empty score_words[]
+
+console.log( 'switchPlayer score_words', score_words );
     
     if (curPlayer === 'white') {
-    
+        // calculate the score    
         calcScore();
-    
         // redraw
         rePopRack1();
-    
-        // Backup curBoard to prevBoard
+        // backup curBoard to prevBoard
         prevBoard = JSON.parse(JSON.stringify(curBoard));
-    
+        // switch player
         curPlayer = 'black';
-    
     } else {
-    
+        // calculate the score    
         calcScore();
-    
         // redraw
         rePopRack2();
-    
-        // Backup curBoard to prevBoard
+        // backup curBoard to prevBoard
         prevBoard = JSON.parse(JSON.stringify(curBoard));
-    
+        // switch player
         curPlayer = 'white';
     }
     
@@ -799,6 +789,28 @@ console.log( '' );
 console.log( 'switchPlayer():' );
     
 } // switchPlayer()
+
+
+function getLevel( position ) { // position = string of yxCoords, returns the highest level
+    // convert string position to an array
+    const myArray = position.split(',');
+    let y = Number(myArray[0]);
+    let x = Number(myArray[1]); // position [y,x] is the source for finding the top z level in curBoard[][][]
+
+console.log( '' );
+console.log( 'getLevel( position ):' );
+console.log( 'position:', position );
+// console.log( 'y:', y );
+// console.log( 'x:', x );
+
+    // use the yxCoords to get the top level from curBoard
+    for (let level = 5; level >= 0 ; level--) { // 6 levels
+        if ( curBoard[level][y][x] !== '.' ) {
+            return level;
+            break;
+        }
+    }
+} // getLevel( position )
 
 
 function calcScore() {
@@ -823,26 +835,35 @@ function calcScore() {
         }
     } // prevBoard now contains only the tile(s) played for the last turn
 
+    // check for double-word bonuses
     if ( prevBoard[0][2][5] !== '.' ) { // Someone played on a double-word bonus
         dwb = 1;
     }
     
-    // 2nd: Use the prevBoard[][][] positions to find any new word(s) in curBoard[][][]:
+    // 2nd: Use the prevBoard[][][] position(s) to find any new word(s) in curBoard[][][]:
     for (let h = 0; h < 6 ; h++) { // 6 levels
         for (let i = 0; i < 5 ; i++) { // 5 rows
             for (let j = 0; j < 11; j++) { // 11 columns
     
-                // If its a new tile on the board, use the position to check for any words
-                if ( prevBoard[h][i][j] !== '.' && onBoard([h,i,j]) ) {
-                    // the score_words[] array is reset by switchPlayer()
-                    score_words = wordCheck([h,i,j]); // e.g. ['it, [0, 2, 4]', 'it, [0, 2, 5]']
-                    // wordCheck returns 
-                    // an element = the word, and the positions of every letter in the word
+                // If the position is on the board
+                if ( onBoard([h,i,j]) ) {
+
+                    // If its a new tile on the board, use that position to check for any words
+                    if ( prevBoard[h][i][j] !== '.' ) {
+
+// console.log( 'new tile position:', '[' + h + '][' + i + '][' + j + ']' );
+
+                        // the score_words[] array is reset by switchPlayer()
+                        score_words = wordCheck([h,i,j]); // e.g. ['it, [2, 4], UP']
+
+                        // wordCheck returns an array of unique words to score
+                        // an element = the word, the word position, and the direction
+                    }
                 }
             }
         }
     }
-    // 
+    // score_words[] now contains the words to score
 
 // console.log( 'score_words:', score_words ); 
 
@@ -852,12 +873,14 @@ function calcScore() {
     var element_str = '';
     var word_str = '';
     var curWord_str = '';
-    var z_str = '';
     var turn_ledger = '';
     
 console.log( 'score_words[]:', score_words );
 
-    // For every element (word and position) in the score_words[] array, calculate the word score
+    //////////////////////////////////////////////////////////////////////////////
+    // For every element (word, position, direction) in the score_words[] array, /
+    // calculate the word score                                                  /
+    //////////////////////////////////////////////////////////////////////////////
     // score_words.forEach( element => {
     for ( let index = 0; index < score_words.length; ++index ) {
 	const element = score_words[index];
@@ -865,37 +888,119 @@ console.log( 'score_words[]:', score_words );
         word_score = 0;
     
         // convert the array element to a string
-        // element_str = new String( element );
         element_str = element + '';
-        word_str = element_str.substring(0, element_str.indexOf(',') ); // just the word
+
+        // get the word from the element string
+        word_str = element_str.substring( 0, element_str.indexOf(',') ); 
+
+        // get the lead yxCoord from the element string
+        yx_str = element_str.substring( element_str.indexOf(',')+3, element_str.indexOf(']') ); 
+// console.log( 'yx_str:', yx_str  );
+        y = yx_str.substring(0, yx_str.indexOf(',') );
+        x = yx_str.substring(yx_str.indexOf(',')+1 );
+        y = Number(y); // convert to a number
+        x = Number(x); // convert to a number
+// console.log( 'y:', y );
+// console.log( 'x:', x );
+
+        // get the word direction from the element string
+        yx_dir = element_str.substring( element_str.length - 2, element_str.length ); 
+// console.log( 'yx_dir:', yx_dir  );
 
         if ( curWord_str !== word_str ) { // a new word to score
 
-            // for every letter in word_str, sum the individual values 
-            for ( var i = 0; i < word_str.length; i++ ) {
+            switch ( yx_dir ) {
 
-                // get the letter and its z coord 
-                var letter = word_str.charAt(i);
-                z_str = element_str.charAt( element_str.length - 8 );
+                case 'UP': // Upwards Word
+                    // for every letter in word_str, sum the individual values 
+                    for ( var i = 0; i < word_str.length; i++ ) {
+                        // get the letter
+                        var letter = word_str.charAt(i);
+// console.log( 'letter:', letter );
+                        // get the letter value
+                        letterVal = getLetterValue( letter );
+// console.log( 'letterVal:', letterVal );
+                        // get the letter level
+                        // update yx_str according to i
+                        yx_str = upwd_lookup( yx_str, i ); // string and a number, returns yx_str
+// console.log( 'yx_str:', yx_str );
+                        letterLev = getLevel( yx_str ); // position = string of yxCoords, returns the highest level
+// console.log( 'letterLev:', letterLev );
     
-// console.log( 'element_str:', element_str);
-// console.log( 'word_str:', word_str);
-// console.log( 'z_str:', z_str);
+                        // get the stacking multiplier
+                        var sm = letterLev + 1;
+            
+                        word_score = word_score + sm * letterVal;
+                    }
+                    // word_score complete, check for a double word bonus 
+                    if ( dwb === 1 ) {
+                        word_score = word_score * 2;
+	            }
+                    // build the turn ledger and score
+                    turn_ledger = turn_ledger + word_str + ' ' + word_score + ', ';
+                    turn_score = turn_score + word_score;
+                    break;
 
-                // calculate the height multiplier
-                var hm = z_str + 1;
+                case 'DW': // Downwards Word
+                    // for every letter in word_str, sum the individual values 
+                    for ( var i = 0; i < word_str.length; i++ ) {
+                        // get the letter
+                        var letter = word_str.charAt(i);
+// console.log( 'letter:', letter );
+                        // get the letter value
+                        letterVal = getLetterValue( letter );
+// console.log( 'letterVal:', letterVal );
+                        // get the letter level
+                        // update yx_str according to i
+                        yx_str = dnwd_lookup( yx_str, i ); // string and a number, returns yx_str
+// console.log( 'yx_str:', yx_str );
+                        letterLev = getLevel( yx_str ); // position = string of yxCoords, returns the highest level
+// console.log( 'letterLev:', letterLev );
     
-                word_score = word_score + hm * getLetterValue( letter );
-            }
+                        // get the stacking multiplier
+                        var sm = letterLev + 1;
+            
+                        word_score = word_score + sm * letterVal;
+                    }
+                    // word_score complete, check for a double word bonus 
+                    if ( dwb === 1 ) {
+                        word_score = word_score * 2;
+	            }
+                    // build the turn ledger and score
+                    turn_ledger = turn_ledger + word_str + ' ' + word_score + ', ';
+                    turn_score = turn_score + word_score;
+                    break;
 
-            // word_score complete, check for a double word bonus 
-            if ( dwb === 1 ) {
-                word_score = word_score * 2;
+                case 'DO': // Straight-Down Word
+                    // for every letter in word_str, sum the individual values 
+                    for ( var i = 0; i < word_str.length; i++ ) {
+                        // get the letter
+                        var letter = word_str.charAt(i);
+// console.log( 'letter:', letter );
+                        // get the letter value
+                        letterVal = getLetterValue( letter );
+// console.log( 'letterVal:', letterVal );
+                        // get the letter level
+                        yx_str = (y + i)+','+x;
+// console.log( 'yx_str:', yx_str );
+                        letterLev = getLevel( yx_str ); // position = string of yxCoords, returns the highest level
+// console.log( 'letterLev:', letterLev );
+    
+                        // get the stacking multiplier
+                        var sm = letterLev + 1;
+            
+                        word_score = word_score + sm * letterVal;
+                    }
+                    // word_score complete, check for a double word bonus 
+                    if ( dwb === 1 ) {
+                        word_score = word_score * 2;
+	            }
+                    // build the turn ledger and score
+                    turn_ledger = turn_ledger + word_str + ' ' + word_score + ', ';
+                    turn_score = turn_score + word_score;
+                    break;
+
 	    }
-	
-            // build the turn ledger and score
-            turn_ledger = turn_ledger + word_str + ' ' + word_score + ', ';
-            turn_score = turn_score + word_score;
         }
         curWord_str = word_str;
 
@@ -930,38 +1035,6 @@ console.log( p2scoreDiv.innerHTML );
     }
 } // calcScore()
 
-function calcScore_old() {
-    // diff prevBoard and curBoard to see what tile(s) were played
-    
-console.log( 'prevBoard[0]:', prevBoard[0], 'curBoard[0]:', curBoard[0] );
-    
-    var deltBoard = new Array();
-    deltBoard = diffBoards(prevBoard, curBoard);
-    
-    // inspect curBoard and prevBoard and deltBoard
-    
-    if (curPlayer === 'white') {
-        p1score += 50;
-        const p1scoreDiv = document.getElementById('p1score');
-        p1scoreDiv.innerHTML = 'Player 1: ' + p1score;
-    } else {
-        p2score += 45;
-        const p2scoreDiv = document.getElementById('p2score');
-        p2scoreDiv.innerHTML = 'Player 2: ' + p2score;
-    }
-} // calcScore_old()
-
-function inRack1( position ) { // true if the position is within the p1rack
-    let z = position[0];
-    let y = position[1];
-    let x = position[2];
-    
-    if ( (z===0 && y===0 && x===0) || (z===0 && y===0 && x===1) || (z===0 && y===0 && x===2) || (z===0 && y===0 && x===3) || (z===0 && y===1 && x===0) || (z===0 && y===1 && x===1) ) { // p1rack
-        return true;
-    } else {
-        return false;
-    }
-} // inRack1( position )
 
 function flattenBoard() {
     // This function flattens the curBoard[][][] into flatBoard[][]
@@ -981,11 +1054,15 @@ function flattenBoard() {
     }
 }; // flattenBoard()
 
-function wordCheck( position ) {
+
+function wordCheck( position ) { // position = an array of numbers
+	                         // If a word is found, return a record: ['it, [2, 4], UP']
+                                 // [ the word, its position, and its direction ]
     let z = position[0];
     let y = position[1];
-    let x = position[2]; // position [z,y,x] is the source for finding word(s) in curBoard[][][]
-                         // the [z] coordinate is unused as curBoard is flattened into flatBoard
+    let x = position[2]; 
+    // the [z] coordinate is unused, the source curBoard[][][] is flattened into flatBoard[][]
+
     var str = '';
 
     flattenBoard(); // flattens global curBoard[z][y][x] into the global flatBoard[y][x]
@@ -997,184 +1074,402 @@ function wordCheck( position ) {
 console.log( '' );
 console.log( 'wordCheck( position ):' );
 console.log( 'position:', position );
+console.log( 'y:', y );
+console.log( 'x:', x );
 
         ///////////////////////////////////////////////////////////////////////
-        // check Upwards by checking all possible upward strings              /
+        // build and number all possible Upward strings on flatBoard[][]      /
         ///////////////////////////////////////////////////////////////////////
-        if ( ( y === 1 && x === 4 ) || ( y === 1 && x === 5 ) ) {
-            str = flatBoard[1][4] + flatBoard[1][5];
-        }
-        if ( ( y === 2 && x === 4 ) || ( y === 2 && x === 5 ) || ( y === 1 && x === 6 ) ) {
-            str = flatBoard[2][4] + flatBoard[2][5] + flatBoard[1][6];
-        }
-        if ( ( y === 3 && x === 5 ) || ( y === 2 && x === 6 ) ) {
-            str = flatBoard[3][5] + flatBoard[2][6];
-        }
-        if ( str.match( wordre ) ) {
-            str = str.replaceAll('.', ''); // remove any dots in str
-            // The upwards str is a word
-            // add the word and the letter coords to words[]
-
-            if ( str.length === 3 ) { // has to be [z,2,4], [z,2,5], [z,1,6]
-                words.push( str + ', [' + z + ', ' + 2 + ', ' + 4 + ']' );
-                words.push( str + ', [' + z + ', ' + 2 + ', ' + 5 + ']' );
-                words.push( str + ', [' + z + ', ' + 1 + ', ' + 6 + ']' );
-            }
-            if ( str.length === 2 ) {
-                if ( y === 1 && x === 4 ) { // has to be [z,1,4], [z,1,5] 
-                    words.push( str + ', [' + z + ', ' + 1 + ', ' + 4 + ']' );
-                    words.push( str + ', [' + z + ', ' + 1 + ', ' + 5 + ']' );
-                }
-                if ( y === 1 && x === 5 ) { // has to be [z,1,5], [z,1,6] 
-                    words.push( str + ', [' + z + ', ' + 1 + ', ' + 5 + ']' );
-                    words.push( str + ', [' + z + ', ' + 1 + ', ' + 6 + ']' );
-                }
-                if ( y === 1 && x === 6 ) { // has to be [z,2,5], [z,1,6] 
-                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 5 + ']' );
-                    words.push( str + ', [' + z + ', ' + 1 + ', ' + 6 + ']' );
-                }
-                if ( y === 2 && x === 4 ) { // has to be [z,2,4], [z,2,5] 
-                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 4 + ']' );
-                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 5 + ']' );
-                }
-                if ( y === 3 && x === 5 ) { // has to be [z,3,5], [z,2,6] 
-                    words.push( str + ', [' + z + ', ' + 3 + ', ' + 5 + ']' );
-                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 6 + ']' );
-                }
-                if ( y === 2 && x === 6 ) { // has to be [z,3,5], [z,2,6] 
-                    words.push( str + ', [' + z + ', ' + 3 + ', ' + 5 + ']' );
-                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 6 + ']' );
-                }
-            }
-    
-console.log( 'Upwords word found:', str );
-    
-        }
-
+        upwd_str0=flatBoard[1][4]+flatBoard[1][5];
+        upwd_str1=flatBoard[2][4]+flatBoard[2][5]+flatBoard[1][6];
+        upwd_str2=flatBoard[3][5]+flatBoard[2][6];
         ///////////////////////////////////////////////////////////////////////
-        // check Downwards by checking all possible downward strings          /
+        // build and number all possible Down strings on flatBoard[][]        /
         ///////////////////////////////////////////////////////////////////////
-        str = '';
-        if ( ( y === 1 && x === 4 ) || ( y === 2 && x === 5 ) || ( y === 2 && x === 6 ) ) {
-            str = flatBoard[1][4] + flatBoard[2][5] + flatBoard[2][6];
-        }
-        if ( ( y === 2 && x === 4 ) || ( y === 3 && x === 5 ) ) {
-            str = flatBoard[2][4] + flatBoard[3][5];
-        }
-        if ( ( y === 1 && x === 5 ) || ( y === 1 && x === 6 ) ) {
-            str = flatBoard[1][5] + flatBoard[1][6];
-        }
-        if ( str.match( wordre ) ) {
-            str = str.replaceAll('.', ''); // remove any dots in str
-            // The downwards str is a word
-            // add the word and its letter coords to words[]
-
-            if ( str.length === 3 ) { // has to be [z,1,4], [z,2,5], [z,2,6]
-                words.push( str + ', [' + z + ', ' + 1 + ', ' + 4 + ']' );
-                words.push( str + ', [' + z + ', ' + 2 + ', ' + 5 + ']' );
-                words.push( str + ', [' + z + ', ' + 2 + ', ' + 6 + ']' );
-            }
-            if ( str.length === 2 ) {
-                if ( y === 1 && x === 4 ) { // has to be [z,1,4], [z,2,5] 
-                    words.push( str + ', [' + z + ', ' + 1 + ', ' + 4 + ']' );
-                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 5 + ']' );
-                }
-                if ( y === 1 && x === 5 ) { // has to be [z,1,5], [z,1,6] 
-                    words.push( str + ', [' + z + ', ' + 1 + ', ' + 5 + ']' );
-                    words.push( str + ', [' + z + ', ' + 1 + ', ' + 6 + ']' );
-                }
-                if ( y === 1 && x === 6 ) { // has to be [z,1,5], [z,1,6] 
-                    words.push( str + ', [' + z + ', ' + 1 + ', ' + 5 + ']' );
-                    words.push( str + ', [' + z + ', ' + 1 + ', ' + 6 + ']' );
-                }
-                if ( y === 2 && x === 4 ) { // has to be [z,2,4], [z,3,5] 
-                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 4 + ']' );
-                    words.push( str + ', [' + z + ', ' + 3 + ', ' + 5 + ']' );
-                }
-                if ( y === 3 && x === 5 ) { // has to be [z,2,4], [z,3,5] 
-                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 4 + ']' );
-                    words.push( str + ', [' + z + ', ' + 3 + ', ' + 5 + ']' );
-                }
-                if ( y === 2 && x === 6 ) { // has to be [z,2,5], [z,2,6] 
-                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 5 + ']' );
-                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 6 + ']' );
-                }
-            }
-
-console.log( 'Downwards word found:', str );
-    
-        }
-
+        down_str0=flatBoard[1][4]+flatBoard[2][4];
+        down_str1=flatBoard[1][5]+flatBoard[2][5]+flatBoard[3][5];
+        down_str2=flatBoard[1][6]+flatBoard[2][6];
         ///////////////////////////////////////////////////////////////////////
-        // check Straight-Down by checking all possible straight-down strings /
+        // build and number all possible Downward strings on flatBoard[][]    /
         ///////////////////////////////////////////////////////////////////////
-        str = '';
-        if ( x === 4 ) {
-            str = flatBoard[1][4] + flatBoard[2][4];
-        }
-        if ( x === 5 ) {
-            str = flatBoard[1][5] + flatBoard[2][5] + flatBoard[3][5];
-        }
-        if ( x === 6 ) {
-            str = flatBoard[1][6] + flatBoard[2][6];
-        }
-        if ( str.match( wordre ) ) {
-            str = str.replaceAll('.', ''); // remove any dots in str
-            // The straight-down str is a word
-            // add the word and its letter coords to words[]
+        dnwd_str0=flatBoard[1][5]+flatBoard[1][6];
+        dnwd_str1=flatBoard[1][4]+flatBoard[2][5]+flatBoard[2][6];
+        dnwd_str2=flatBoard[2][4]+flatBoard[3][5];
 
-            if ( str.length === 3 ) { // has to be [z,1,5], [z,2,5], [z,3,5]
-                words.push( str + ', [' + z + ', ' + 1 + ', ' + 5 + ']' );
-                words.push( str + ', [' + z + ', ' + 2 + ', ' + 5 + ']' );
-                words.push( str + ', [' + z + ', ' + 3 + ', ' + 5 + ']' );
+        yandx_str = '' + y + x;
+// console.log( 'yandx_str:', yandx_str );
+        switch ( yandx_str ) {
+
+	    case '14':
+// console.log( 'in case 14' );
+            // check upwd str0
+            result = upwd_str0.match( wordre );
+            if ( result ) {
+                // get werd 
+                idx = upwd_str0.indexOf( result );
+                len = result.length;
+                werd = upwd_str0.substring( idx, idx+len+1 );
+                // get werd yxCoords for upwd_str0
+                for ( let i = 0; i < werd.length; i++ ) {
+                    switch (idx) {
+                        case 0: yxCoords = '[1,4]'; break;
+                    }
+                }
+                words.push( werd + ', ' + yxCoords + ', UP' );
             }
-            if ( str.length === 2 ) {
-                if ( y === 1 && x === 4 ) { // has to be [z,1,4], [z,2,4] 
-                    words.push( str + ', [' + z + ', ' + 1 + ', ' + 4 + ']' );
-                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 4 + ']' );
+            // check dnwd_str1
+            result = dnwd_str1.match( wordre );
+            if ( result ) {
+                // get werd 
+                idx = dnwd_str1.indexOf( result );
+                len = result.length;
+                werd = dnwd_str1.substring( idx, idx+len+1 );
+                // get werd yxCoords for dnwd_str1
+                for ( let i = 0; i < werd.length; i++ ) {
+                    switch (idx) {
+                        case 0: yxCoords = '[1,4]'; break;
+                        case 1: yxCoords = '[2,5]'; break;
+                    }
                 }
-                if ( y === 1 && x === 5 ) { // has to be [z,1,5], [z,2,5] 
-                    words.push( str + ', [' + z + ', ' + 1 + ', ' + 5 + ']' );
-                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 5 + ']' );
-                }
-                if ( y === 2 && x === 4 ) { // has to be [z,1,4], [z,2,4]
-                    words.push( str + ', [' + z + ', ' + 1 + ', ' + 4 + ']' );
-                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 4 + ']' );
-		}
-                if ( y === 1 && x === 6 ) { // has to be [z,1,6], [z,2,6] 
-                    words.push( str + ', [' + z + ', ' + 1 + ', ' + 6 + ']' );
-                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 6 + ']' );
-                }
-                if ( y === 3 && x === 5 ) { // has to be [z,2,5], [z,3,5] 
-                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 5 + ']' );
-                    words.push( str + ', [' + z + ', ' + 3 + ', ' + 5 + ']' );
-                }
-                if ( y === 2 && x === 6 ) { // has to be [z,1,6], [z,2,6] 
-                    words.push( str + ', [' + z + ', ' + 1 + ', ' + 6 + ']' );
-                    words.push( str + ', [' + z + ', ' + 2 + ', ' + 6 + ']' );
-                }
+                words.push( werd + ', ' + yxCoords + ', DW' );
             }
+            // check down str0
+            result = down_str0.match( wordre );
+            if ( result ) {
+                // get werd 
+                idx = down_str0.indexOf( result );
+                len = result.length;
+                werd = down_str0.substring( idx, idx+len+1 );
+                // get werd yxCoords for down_str0
+                for ( let i = 0; i < werd.length; i++ ) {
+                    switch (idx) {
+                        case 0: yxCoords = '[1,4]'; break;
+                    }
+                }
+                words.push( werd + ', ' + yxCoords + ', DO' );
+            }
+            break;
 
-            // words.push( str + ', [' + z + ', ' + y + ', ' + x + ']' );
-    
-console.log( 'Straight-Down word found:', str );
-    
-        }
-    
-        // a well-formed element in words[]: ['aj, [0, 1, 4]', 'aj, [0, 2, 5]']
-        // the length of the word = the number of elements in the array
-        // an element = the word, and a position of a letter in the word
+	    case '15':
+// console.log( 'in case 15' );
+            // check upwd str0
+            result = upwd_str0.match( wordre );
+            if ( result ) {
+                // get werd 
+                idx = upwd_str0.indexOf( result );
+                len = result.length;
+                werd = upwd_str0.substring( idx, idx+len+1 );
+                // get werd yxCoords for upwd_str0
+                for ( let i = 0; i < werd.length; i++ ) {
+                    switch (idx) {
+                        case 0: yxCoords = '[1,4]'; break;
+                    }
+                }
+                words.push( werd + ', ' + yxCoords + ', UP' );
+            }
+            // check dnwd_str0
+            result = dnwd_str0.match( wordre );
+            if ( result ) {
+                // get werd 
+                idx = dnwd_str0.indexOf( result );
+                len = result.length;
+                werd = dnwd_str0.substring( idx, idx+len+1 );
+                // get werd yxCoords for dnwd_str0
+                for ( let i = 0; i < werd.length; i++ ) {
+                    switch (idx) {
+                        case 0: yxCoords = '[1,5]'; break;
+                    }
+                }
+                words.push( werd + ', ' + yxCoords + ', DW' );
+            }
+            // check down str1
+            result = down_str1.match( wordre );
+            if ( result ) {
+                // get werd 
+                idx = down_str1.indexOf( result );
+                len = result.length;
+                werd = down_str1.substring( idx, idx+len+1 );
+                // get werd yxCoords for down_str1
+                for ( let i = 0; i < werd.length; i++ ) {
+                    switch (idx) {
+                        case 0: yxCoords = '[1,5]'; break;
+                        case 1: yxCoords = '[2,5]'; break;
+                    }
+                }
+                words.push( werd + ', ' + yxCoords + ', DO' );
+            }
+            break;
 
-console.log( '=> => ' );
-console.log( 'words[]:', words );
-    
-        let unique_words = [... new Set(words)];
-    
-console.log( '=> => ' );
-console.log( 'unique_words[]:', unique_words );
+	    case '24':
+// console.log( 'in case 24' );
+            // check upwd str1
+            result = upwd_str1.match( wordre );
+            if ( result ) {
+                // get werd 
+                idx = upwd_str1.indexOf( result );
+                len = result.length;
+                werd = upwd_str1.substring( idx, idx+len+1 );
+                // get werd yxCoords for upwd_str1
+                for ( let i = 0; i < werd.length; i++ ) {
+                    switch (idx) {
+                        case 0: yxCoords = '[2,4]'; break;
+                        case 1: yxCoords = '[2,5]'; break;
+                    }
+                }
+                words.push( werd + ', ' + yxCoords + ', UP' );
+            }
+            // check dnwd_str0
+            result = dnwd_str0.match( wordre );
+            if ( result ) {
+                // get werd 
+                idx = dnwd_str0.indexOf( result );
+                len = result.length;
+                werd = dnwd_str0.substring( idx, idx+len+1 );
+                // get werd yxCoords for dnwd_str0
+                for ( let i = 0; i < werd.length; i++ ) {
+                    switch (idx) {
+                        case 0: yxCoords = '[1,5]'; break;
+                    }
+                }
+                words.push( werd + ', ' + yxCoords + ', DW' );
+            }
+            // check down str0
+            result = down_str0.match( wordre );
+            if ( result ) {
+                // get werd 
+                idx = down_str0.indexOf( result );
+                len = result.length;
+                werd = down_str0.substring( idx, idx+len+1 );
+                // get werd yxCoords for down_str0
+                for ( let i = 0; i < werd.length; i++ ) {
+                    switch (idx) {
+                        case 0: yxCoords = '[1,4]'; break;
+                    }
+                }
+                words.push( werd + ', ' + yxCoords + ', DO' );
+            }
+            break;
 
-        return unique_words; // e.g. ['it, [0, 2, 4]', 'it, [0, 2, 5]']
+	    case '25':
+// console.log( 'in case 25' );
+            // check upwd str1
+            result = upwd_str1.match( wordre );
+            if ( result ) {
+                // get werd 
+                idx = upwd_str1.indexOf( result );
+                len = result.length;
+                werd = upwd_str1.substring( idx, idx+len+1 );
+                // get werd yxCoords for upwd_str1
+                for ( let i = 0; i < werd.length; i++ ) {
+                    switch (idx) {
+                        case 0: yxCoords = '[2,4]'; break;
+                        case 1: yxCoords = '[2,5]'; break;
+                    }
+                }
+                words.push( werd + ', ' + yxCoords + ', UP' );
+            }
+            // check dnwd_str1
+            result = dnwd_str1.match( wordre );
+            if ( result ) {
+                // get werd 
+                idx = dnwd_str1.indexOf( result );
+                len = result.length;
+                werd = dnwd_str1.substring( idx, idx+len+1 );
+                // get werd yxCoords for dnwd_str1
+                for ( let i = 0; i < werd.length; i++ ) {
+                    switch (idx) {
+                        case 0: yxCoords = '[1,4]'; break;
+                        case 1: yxCoords = '[2,5]'; break;
+                    }
+                }
+                words.push( werd + ', ' + yxCoords + ', DW' );
+            }
+            // check down str1
+            result = down_str1.match( wordre );
+            if ( result ) {
+                // get werd 
+                idx = down_str1.indexOf( result );
+                len = result.length;
+                werd = down_str1.substring( idx, idx+len+1 );
+                // get werd yxCoords for down_str1
+                for ( let i = 0; i < werd.length; i++ ) {
+                    switch (idx) {
+                        case 0: yxCoords = '[1,5]'; break;
+                        case 1: yxCoords = '[2,5]'; break;
+                    }
+                }
+                words.push( werd + ', ' + yxCoords + ', DO' );
+            }
+            break;
+
+	    case '16':
+// console.log( 'in case 16' );
+            // check upwd str1
+            result = upwd_str1.match( wordre );
+            if ( result ) {
+                // get werd 
+                idx = upwd_str1.indexOf( result );
+                len = result.length;
+                werd = upwd_str1.substring( idx, idx+len+1 );
+                // get werd yxCoords for upwd_str1
+                for ( let i = 0; i < werd.length; i++ ) {
+                    switch (idx) {
+                        case 0: yxCoords = '[2,4]'; break;
+                        case 1: yxCoords = '[2,5]'; break;
+                    }
+                }
+                words.push( werd + ', ' + yxCoords + ', UP' );
+            }
+            // check dnwd_str0
+            result = dnwd_str0.match( wordre );
+            if ( result ) {
+                // get werd 
+                idx = dnwd_str0.indexOf( result );
+                len = result.length;
+                werd = dnwd_str0.substring( idx, idx+len+1 );
+                // get werd yxCoords for dnwd_str0
+                for ( let i = 0; i < werd.length; i++ ) {
+                    switch (idx) {
+                        case 0: yxCoords = '[1,5]'; break;
+                    }
+                }
+                words.push( werd + ', ' + yxCoords + ', DW' );
+            }
+            // check down str2
+            result = down_str2.match( wordre );
+            if ( result ) {
+                // get werd 
+                idx = down_str2.indexOf( result );
+                len = result.length;
+                werd = down_str2.substring( idx, idx+len+1 );
+                // get werd yxCoords for down_str2
+                for ( let i = 0; i < werd.length; i++ ) {
+                    switch (idx) {
+                        case 0: yxCoords = '[1,6]'; break;
+                    }
+                }
+                words.push( werd + ', ' + yxCoords + ', DO' );
+            }
+            break;
+
+	    case '35':
+// console.log( 'in case 35' );
+            // check upwd str2
+            result = upwd_str2.match( wordre );
+            if ( result ) {
+                // get werd 
+                idx = upwd_str2.indexOf( result );
+                len = result.length;
+                werd = upwd_str2.substring( idx, idx+len+1 );
+                // get werd yxCoords for upwd_str2
+                for ( let i = 0; i < werd.length; i++ ) {
+                    switch (idx) {
+                        case 0: yxCoords = '[3,5]'; break;
+                    }
+                }
+                words.push( werd + ', ' + yxCoords + ', UP' );
+            }
+            // check dnwd_str2
+            result = dnwd_str2.match( wordre );
+            if ( result ) {
+                // get werd 
+                idx = dnwd_str2.indexOf( result );
+                len = result.length;
+                werd = dnwd_str2.substring( idx, idx+len+1 );
+                // get werd yxCoords for dnwd_str2
+                for ( let i = 0; i < werd.length; i++ ) {
+                    switch (idx) {
+                        case 0: yxCoords = '[2,4]'; break;
+                    }
+                }
+                words.push( werd + ', ' + yxCoords + ', DW' );
+            }
+            // check down str1
+            result = down_str1.match( wordre );
+            if ( result ) {
+                // get werd 
+                idx = down_str1.indexOf( result );
+                len = result.length;
+                werd = down_str1.substring( idx, idx+len+1 );
+                // get werd yxCoords for down_str1
+                for ( let i = 0; i < werd.length; i++ ) {
+                    switch (idx) {
+                        case 0: yxCoords = '[1,5]'; break;
+                        case 1: yxCoords = '[2,5]'; break;
+                    }
+                }
+                words.push( werd + ', ' + yxCoords + ', DO' );
+            }
+            break;
+
+	    case '26':
+// console.log( 'in case 26' );
+            // check upwd str2
+            result = upwd_str2.match( wordre );
+            if ( result ) {
+                // get werd 
+                idx = upwd_str2.indexOf( result );
+                len = result.length;
+                werd = upwd_str2.substring( idx, idx+len+1 );
+                // get werd yxCoords for upwd_str2
+                for ( let i = 0; i < werd.length; i++ ) {
+                    switch (idx) {
+                        case 0: yxCoords = '[3,5]'; break;
+                    }
+                }
+                words.push( werd + ', ' + yxCoords + ', UP' );
+            }
+            // check dnwd_str1
+            result = dnwd_str1.match( wordre );
+            if ( result ) {
+                // get werd 
+                idx = dnwd_str1.indexOf( result );
+                len = result.length;
+                werd = dnwd_str1.substring( idx, idx+len+1 );
+                // get werd yxCoords for dnwd_str1
+                for ( let i = 0; i < werd.length; i++ ) {
+                    switch (idx) {
+                        case 0: yxCoords = '[1,4]'; break;
+                        case 1: yxCoords = '[2,5]'; break;
+                    }
+                }
+                words.push( werd + ', ' + yxCoords + ', DW' );
+            }
+            // check down str2
+            result = down_str2.match( wordre );
+            if ( result ) {
+                // get werd 
+                idx = down_str2.indexOf( result );
+                len = result.length;
+                werd = down_str2.substring( idx, idx+len+1 );
+                // get werd yxCoords for down_str2
+                for ( let i = 0; i < werd.length; i++ ) {
+                    switch (idx) {
+                        case 0: yxCoords = '[1,6]'; break;
+                    }
+                }
+                words.push( werd + ', ' + yxCoords + ', DO' );
+            }
+            break;
+        } // end of switch
+    } // only process valid board positions
+    
+    // a well-formed element in words[]: ['an, [1,4], UP']
+    // an element = the word, the position, and the direction
+
+// console.log( 'words[]:', words );
+    
+    let unique_words = [... new Set(words)]; // this makes unique_words[] unique
+    
+// console.log( 'unique_words[]:', unique_words );
+
+    return unique_words; // e.g. ['it, [2, 4]', UP']
+
+    // empty words
+    while( words.length > 0 ) {
+        words.pop();
     }
+
 }; // wordCheck( position )
 
 /*******************/
@@ -1200,6 +1495,28 @@ function diffBoards(arr1, arr2) {
         }
     }
     return result;
+}
+
+function upwd_lookup( position, idx ) { // string and a number, returns yx_str
+    if ( idx === 0 ) return position;
+    if ( idx === 1 ) {
+        if ( position === '1,4' ) return '1,5'; 
+        if ( position === '2,4' ) return '2,5'; 
+        if ( position === '2,5' ) return '1,6'; 
+        if ( position === '3,5' ) return '2,6'; 
+    }
+    if ( idx === 2 ) return '1,6';
+}
+
+function dnwd_lookup( position, idx ) { // string and a number, returns yx_str
+    if ( idx === 0 ) return position;
+    if ( idx === 1 ) {
+        if ( position === '1,4' ) return '2,5'; 
+        if ( position === '1,5' ) return '1,6'; 
+        if ( position === '2,4' ) return '3,5'; 
+        if ( position === '2,5' ) return '2,6'; 
+    }
+    if ( idx === 2 ) return '2,6';
 }
 
 function getLetterValue( boardPiece ) {
@@ -1283,10 +1600,12 @@ function validateWhiteMovement(startingPosition, endingPosition) {
                   if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
                       // if the startingPosition is in p1rack and the endingPosition is on the board, and the endingPosition is open, return true 
     
-console.log( 'validateWhiteMovement() success:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                 'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.log( 'inRack1(startingPosition):', inRack1(startingPosition) );
-console.log( 'onBoard(endingPosition):', onBoard(endingPosition) );
+// console.log( '' );
+// console.log( 'validateWhiteMovement(startingPosition, endingPosition)' );
+// console.log( 'validateWhiteMovement() success:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+//                                                  'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+// console.log( 'inRack1(startingPosition):', inRack1(startingPosition) );
+// console.log( 'onBoard(endingPosition):', onBoard(endingPosition) );
     
                       return true;
                   } else {
@@ -1335,10 +1654,12 @@ function validateBlackMovement(startingPosition, endingPosition) {
                   if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
                       // if the startingPosition is in p2rack and the endingPosition is on the board, return true 
     
-console.log( 'validateBlackMovement() success:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                 'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.log( 'inRack2(startingPosition):', inRack2(startingPosition) );
-console.log( 'onBoard(endingPosition):', onBoard(endingPosition) );
+// console.log( '' );
+// console.log( 'validateBlackMovement(startingPosition, endingPosition)' );
+// console.log( 'validateBlackMovement() success:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+//                                                  'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+// console.log( 'inRack2(startingPosition):', inRack2(startingPosition) );
+// console.log( 'onBoard(endingPosition):', onBoard(endingPosition) );
                       return true;
                   } else {
 console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
