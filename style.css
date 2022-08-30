@@ -60,7 +60,7 @@ background: #ffe5b4; /* peach */
     border: 10px solid red;
     border-radius: 6px;
 
-    text-align: right;
+    text-align: left;
     float: right;
     white-space: pre-wrap;
 }

@@ -1,24 +1,83 @@
-New Testing 20220829:
+Constinued Testing 20220830:
 
-score_words[]: ['od, [1,4], UP'] correct
-score_words[]: ['it, [2,4], UP'] correct - fixed switch statement in wordCheck()
-score_words[]: ['du, [2,5], UP'] correct 
-score_words[]: ['ex, [3,5], UP'] correct - fixed switch statement in wordCheck()
+--> Test Cases
+--> 2 letter UP words
 
-score_words[]: ['li, [1,5], DW'] correct
-score_words[]: ['te, [1,4], DW'] correct
-score_words[]: ['li, [2,5], DW'] correct - fixed switch statement in wordCheck()
-score_words[]: ['ex, [2,4], DW'] correct - fixed switch statement in wordCheck()
+score_words[]: ['od, [1,4], UP'] correct score
+score_words[]: ['it, [2,4], UP'] correct score
+score_words[]: ['du, [2,5], UP'] correct score
+score_words[]: ['ex, [3,5], UP'] correct score
 
-score_words[]: ['to, [1,4], DO'] correct
-score_words[]: ['yi, [1,5], DO'] correct
-score_words[]: ['oh, [2,5], DO'] correct
-score_words[]: ['tt, [1,6], DO'] correct
-score_words[]: ['ab, [1,5], DO'] correct - fixed switch statement in wordCheck()
+--> 2 letter DW words
 
-very interesting...
+score_words[]: ['li, [1,5], DW'] correct score
+score_words[]: ['te, [1,4], DW'] correct score
+score_words[]: ['li, [2,5], DW'] correct score
+score_words[]: ['ex, [2,4], DW'] correct score
+
+--> 2 letter DO words
+
+score_words[]: ['to, [1,4], DO'] correct score
+score_words[]: ['yi, [1,5], DO'] correct score
+score_words[]: ['oh, [2,5], DO'] correct score
+score_words[]: ['tt, [1,6], DO'] correct score
+
+================================================================================
+
+--> 3 letter UP word
+
+score_words[]: ['raj, [2,4], UP'] correct score
+
+--> 3 letter DW word
+
+score_words[]: ['rid, [1,4], DW'] correct score
+
+--> 3 letter DO word
+
+score_words[]: ['mod, [1,5], DO'] correct score
+
+================================================================================
+
+Stacking on a single location:
+
+score_words[]: ['me, [1,4], UP'] correct score
+score_words[]: ['ve, [1,4], UP'] correct score (v doubled)
+score_words[]: ['he, [1,4], UP'] correct score (h tripled)
+score_words[]: ['de, [1,4], UP'] correct score (d quadrupled)
+score_words[]: ['oe, [1,4], UP'] correct score (o quintupled)
+score_words[]: ['fe, [1,4], UP'] correct score (f sextupled)
+
+================================================================================
+
+Multiple stacking test:
+
+score_words[]: ['et, [1,4], DW'] correct score
+score_words[]: ['ity, [1,4], DW'] correct score (i doubled)
+score_words[]: ['itt, [1,4], DW'] correct score (i doubled and t doubled)
+score_words[]: ['sat, [1,4], DW'] correct score (s tripled, a doubled, t doubled)
+score_words[]: ['set, [1,4], DW'] correct score (s tripled, e tripled, t doubled)
+score_words[]: ['sot, [1,4], DW'] correct score (s tripled, o quadrupled, t doubled)
+score_words[]: ['rot, [1,4], DW'] correct score (r quadrupled, o quadrupled, t doubled)
+score_words[]: ['got, [1,4], DW'] correct score (g quintupled, o quadrupled, t doubled)
+score_words[]: ['tot, [1,4], DW'] correct score (t sextupled, o quadrupled, t doubled)
+
+================================================================================
+everything seems to be working, scoring-wise...
+there are still issues with not being able to replay from the rack, and others...
+check in these 2x2x2x changes [202208300, then promote to TSB.
+
+
+
+
+
 correct - fixed switch statement in wordCheck() on 20220829
-every first word I've tried scores correctly now.
+every first word I've tried scores correctly now, except for the 3-letter words.
+
+Checking in the TSB_2x2x2 code 20220829 - fixed switch statement in wordCheck().
+
+20220830 - corrected wordCheck by removing '.'s found in the element
+20220830 - corrected wordCheck by using word = result[0];
+           this also  got rid of the extra '.'s
 
 ================================================================================
 

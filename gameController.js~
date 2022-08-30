@@ -863,8 +863,8 @@ function calcScore() {
             }
         }
     }
-    // score_words[] now contains the words to score
-
+    // score_words[] now contains the words to score, but needs to only keep the longest word per location and direction
+    
 // console.log( 'score_words:', score_words ); 
 
     // score score_words[]
@@ -876,6 +876,63 @@ function calcScore() {
     var turn_ledger = '';
     
 console.log( 'score_words[]:', score_words );
+// console.log( 'score_words_copy[]:', score_words_copy );
+
+//     ////////////////////////////////////////////////////////////
+//     // 1st, remove any dots in the word_strs of score_words[] //
+//     ////////////////////////////////////////////////////////////
+//     for ( let i = 0; i < score_words.length; ++i ) {
+//         const element = score_words[i];
+//     
+//         // convert the array element to a string
+//         element_str = element + '';
+//         word_str = element_str.substring( 0, element_str.indexOf(',') ); 
+//     
+//         // convert the array element to a string
+//         if ( word_str.indexOf('.') ) {
+// // console.log( 'b_score_words[i]:', score_words[i] );
+//             // remove all '.'s from score_words[i]
+//             score_words[i] = score_words[i].replace(/\./g, '');
+// // console.log( 'a_score_words[i]:', score_words[i] );
+//         }
+//     }
+
+// console.log( 'score_words[]:', score_words );
+// console.log( 'score_words_copy[]:', score_words_copy );
+
+//     ///////////////////////////////////////////////////////////
+//     // 2nd, make a copy of score_words[]                     //
+//     ///////////////////////////////////////////////////////////
+//     // make a copy of score_words[] to help remove everything but the longest word per location and direction
+//     var score_words_copy = JSON.parse(JSON.stringify(score_words));
+
+
+//     ///////////////////////////////////////////////////////////////////////
+//     // 3rd, use only the longest scoring word per position and direction //
+//     ///////////////////////////////////////////////////////////////////////
+//     for ( let i = 0; i < score_words.length; ++i ) {
+//         for ( let j = 0; j < score_words_copy.length; ++j ) {
+//             const a_element = score_words[i];
+//             const b_element = score_words_copy[j];
+//     
+//             // convert the array elements to strings
+//             a_element_str = a_element + '';
+//             b_element_str = b_element + '';
+//     
+//             // get the lead yxCoords from the element strings
+//             a_yx_str = element_str.substring( a_element_str.indexOf(',')+3, a_element_str.indexOf(']') ); 
+//             b_yx_str = element_str.substring( b_element_str.indexOf(',')+3, b_element_str.indexOf(']') ); 
+//     
+//             // get the word directions from the element strings
+//             a_yx_dir = element_str.substring( element_str.length - 2, element_str.length ); 
+//             b_yx_dir = element_str.substring( element_str.length - 2, element_str.length ); 
+//     
+//             // if the position and direction are the same, print it
+//             if ( ( a_yx_str === b_yx_str ) && ( a_yx_dir === b_yx_dir ) ) {
+// console.log( 'matching score_words[i]:', score_words[i] );
+//             }
+//         }
+//     }
 
     //////////////////////////////////////////////////////////////////////////////
     // For every element (word, position, direction) in the score_words[] array, /
@@ -883,7 +940,7 @@ console.log( 'score_words[]:', score_words );
     //////////////////////////////////////////////////////////////////////////////
     // score_words.forEach( element => {
     for ( let index = 0; index < score_words.length; ++index ) {
-	const element = score_words[index];
+        const element = score_words[index];
 
         word_score = 0;
     
@@ -935,7 +992,7 @@ console.log( 'score_words[]:', score_words );
                     // word_score complete, check for a double word bonus 
                     if ( dwb === 1 ) {
                         word_score = word_score * 2;
-	            }
+                    }
                     // build the turn ledger and score
                     turn_ledger = turn_ledger + word_str + ' ' + word_score + ', ';
                     turn_score = turn_score + word_score;
@@ -965,7 +1022,7 @@ console.log( 'score_words[]:', score_words );
                     // word_score complete, check for a double word bonus 
                     if ( dwb === 1 ) {
                         word_score = word_score * 2;
-	            }
+                    }
                     // build the turn ledger and score
                     turn_ledger = turn_ledger + word_str + ' ' + word_score + ', ';
                     turn_score = turn_score + word_score;
@@ -994,13 +1051,13 @@ console.log( 'score_words[]:', score_words );
                     // word_score complete, check for a double word bonus 
                     if ( dwb === 1 ) {
                         word_score = word_score * 2;
-	            }
+                    }
                     // build the turn ledger and score
                     turn_ledger = turn_ledger + word_str + ' ' + word_score + ', ';
                     turn_score = turn_score + word_score;
                     break;
 
-	    }
+            }
         }
         curWord_str = word_str;
 
@@ -1056,7 +1113,7 @@ function flattenBoard() {
 
 
 function wordCheck( position ) { // position = an array of numbers
-	                         // If a word is found, return a record: ['it, [2, 4], UP']
+                                 // If a word is found, return a record: ['it, [2, 4], UP']
                                  // [ the word, its position, and its direction ]
     let z = position[0];
     let y = position[1];
@@ -1069,7 +1126,7 @@ function wordCheck( position ) { // position = an array of numbers
 
     if ( onBoard( position ) ) { // only process valid board positions
 
-        const wordre = /[a-zA-Z]{2,}/; // A word is 2 or more consecutive letters
+        const wordre = /[a-z]{2,}/; // A word is 2 or more consecutive lower-case letters, used to have A-Z
     
 console.log( '' );
 console.log( 'wordCheck( position ):' );
@@ -1100,355 +1157,355 @@ console.log( 'x:', x );
 // console.log( 'yandx_str:', yandx_str );
         switch ( yandx_str ) {
 
-	    case '14':
+            case '14':
 // console.log( 'in case 14' );
             // check upwd str0
             result = upwd_str0.match( wordre );
             if ( result ) {
-                // get werd 
-                idx = upwd_str0.indexOf( result );
-                len = result.length;
-                werd = upwd_str0.substring( idx, idx+len+1 );
-                // get werd yxCoords for upwd_str0
-                for ( let i = 0; i < werd.length; i++ ) {
+                // get word 
+                word = result[0];
+                len = word.length;
+                idx = upwd_str0.indexOf( word );
+                // get word yxCoords for upwd_str0
+                for ( let i = 0; i < word.length; i++ ) {
                     switch (idx) {
                         case 0: yxCoords = '[1,4]'; break;
                     }
                 }
-                words.push( werd + ', ' + yxCoords + ', UP' );
+                words.push( word + ', ' + yxCoords + ', UP' );
             }
             // check dnwd_str1
             result = dnwd_str1.match( wordre );
             if ( result ) {
-                // get werd 
+                // get word 
+                word = result[0];
+                len = word.length;
                 idx = dnwd_str1.indexOf( result );
-                len = result.length;
-                werd = dnwd_str1.substring( idx, idx+len+1 );
-                // get werd yxCoords for dnwd_str1
-                for ( let i = 0; i < werd.length; i++ ) {
+                // get word yxCoords for dnwd_str1
+                for ( let i = 0; i < word.length; i++ ) {
                     switch (idx) {
                         case 0: yxCoords = '[1,4]'; break;
                         case 1: yxCoords = '[2,5]'; break;
                     }
                 }
-                words.push( werd + ', ' + yxCoords + ', DW' );
+                words.push( word + ', ' + yxCoords + ', DW' );
             }
             // check down str0
             result = down_str0.match( wordre );
             if ( result ) {
-                // get werd 
-                idx = down_str0.indexOf( result );
-                len = result.length;
-                werd = down_str0.substring( idx, idx+len+1 );
-                // get werd yxCoords for down_str0
-                for ( let i = 0; i < werd.length; i++ ) {
+                // get word 
+                word = result[0];
+                len = word.length;
+                idx = down_str0.indexOf( word );
+                // get word yxCoords for down_str0
+                for ( let i = 0; i < word.length; i++ ) {
                     switch (idx) {
                         case 0: yxCoords = '[1,4]'; break;
                     }
                 }
-                words.push( werd + ', ' + yxCoords + ', DO' );
+                words.push( word + ', ' + yxCoords + ', DO' );
             }
             break;
 
-	    case '15':
+            case '15':
 // console.log( 'in case 15' );
             // check upwd str0
             result = upwd_str0.match( wordre );
             if ( result ) {
-                // get werd 
-                idx = upwd_str0.indexOf( result );
-                len = result.length;
-                werd = upwd_str0.substring( idx, idx+len+1 );
-                // get werd yxCoords for upwd_str0
-                for ( let i = 0; i < werd.length; i++ ) {
+                // get word 
+                word = result[0];
+                len = word.length;
+                idx = upwd_str0.indexOf( word );
+                // get word yxCoords for upwd_str0
+                for ( let i = 0; i < word.length; i++ ) {
                     switch (idx) {
                         case 0: yxCoords = '[1,4]'; break;
                     }
                 }
-                words.push( werd + ', ' + yxCoords + ', UP' );
+                words.push( word + ', ' + yxCoords + ', UP' );
             }
             // check dnwd_str0
             result = dnwd_str0.match( wordre );
             if ( result ) {
-                // get werd 
-                idx = dnwd_str0.indexOf( result );
-                len = result.length;
-                werd = dnwd_str0.substring( idx, idx+len+1 );
-                // get werd yxCoords for dnwd_str0
-                for ( let i = 0; i < werd.length; i++ ) {
+                // get word 
+                word = result[0];
+                len = word.length;
+                idx = dnwd_str0.indexOf( word );
+                // get word yxCoords for dnwd_str0
+                for ( let i = 0; i < word.length; i++ ) {
                     switch (idx) {
                         case 0: yxCoords = '[1,5]'; break;
                     }
                 }
-                words.push( werd + ', ' + yxCoords + ', DW' );
+                words.push( word + ', ' + yxCoords + ', DW' );
             }
             // check down str1
             result = down_str1.match( wordre );
             if ( result ) {
-                // get werd 
-                idx = down_str1.indexOf( result );
-                len = result.length;
-                werd = down_str1.substring( idx, idx+len+1 );
-                // get werd yxCoords for down_str1
-                for ( let i = 0; i < werd.length; i++ ) {
+                // get word 
+                word = result[0];
+                len = word.length;
+                idx = down_str1.indexOf( word );
+                // get word yxCoords for down_str1
+                for ( let i = 0; i < word.length; i++ ) {
                     switch (idx) {
                         case 0: yxCoords = '[1,5]'; break;
                         case 1: yxCoords = '[2,5]'; break;
                     }
                 }
-                words.push( werd + ', ' + yxCoords + ', DO' );
+                words.push( word + ', ' + yxCoords + ', DO' );
             }
             break;
 
-	    case '24':
+            case '24':
 // console.log( 'in case 24' );
             // check upwd str1
             result = upwd_str1.match( wordre );
             if ( result ) {
-                // get werd 
-                idx = upwd_str1.indexOf( result );
-                len = result.length;
-                werd = upwd_str1.substring( idx, idx+len+1 );
-                // get werd yxCoords for upwd_str1
-                for ( let i = 0; i < werd.length; i++ ) {
+                // get word 
+                word = result[0];
+                len = word.length;
+                idx = upwd_str1.indexOf( word );
+                // get word yxCoords for upwd_str1
+                for ( let i = 0; i < word.length; i++ ) {
                     switch (idx) {
                         case 0: yxCoords = '[2,4]'; break;
                         case 1: yxCoords = '[2,5]'; break;
                     }
                 }
-                words.push( werd + ', ' + yxCoords + ', UP' );
+                words.push( word + ', ' + yxCoords + ', UP' );
             }
             // check dnwd_str0
             result = dnwd_str0.match( wordre );
             if ( result ) {
-                // get werd 
-                idx = dnwd_str0.indexOf( result );
-                len = result.length;
-                werd = dnwd_str0.substring( idx, idx+len+1 );
-                // get werd yxCoords for dnwd_str0
-                for ( let i = 0; i < werd.length; i++ ) {
+                // get word 
+                word = result[0];
+                len = word.length;
+                idx = dnwd_str0.indexOf( word );
+                // get word yxCoords for dnwd_str0
+                for ( let i = 0; i < word.length; i++ ) {
                     switch (idx) {
                         case 0: yxCoords = '[1,5]'; break;
                     }
                 }
-                words.push( werd + ', ' + yxCoords + ', DW' );
+                words.push( word + ', ' + yxCoords + ', DW' );
             }
             // check down str0
             result = down_str0.match( wordre );
             if ( result ) {
-                // get werd 
-                idx = down_str0.indexOf( result );
-                len = result.length;
-                werd = down_str0.substring( idx, idx+len+1 );
-                // get werd yxCoords for down_str0
-                for ( let i = 0; i < werd.length; i++ ) {
+                // get word 
+                word = result[0];
+                len = word.length; // was result.length
+                idx = down_str0.indexOf( word );
+                // get word yxCoords for down_str0
+                for ( let i = 0; i < word.length; i++ ) {
                     switch (idx) {
                         case 0: yxCoords = '[1,4]'; break;
                     }
                 }
-                words.push( werd + ', ' + yxCoords + ', DO' );
+                words.push( word + ', ' + yxCoords + ', DO' );
             }
             break;
 
-	    case '25':
+            case '25':
 // console.log( 'in case 25' );
             // check upwd str1
             result = upwd_str1.match( wordre );
             if ( result ) {
-                // get werd 
-                idx = upwd_str1.indexOf( result );
-                len = result.length;
-                werd = upwd_str1.substring( idx, idx+len+1 );
-                // get werd yxCoords for upwd_str1
-                for ( let i = 0; i < werd.length; i++ ) {
+                // get word 
+                word = result[0];
+                len = word.length;
+                idx = upwd_str1.indexOf( word );
+                // get word yxCoords for upwd_str1
+                for ( let i = 0; i < word.length; i++ ) {
                     switch (idx) {
                         case 0: yxCoords = '[2,4]'; break;
                         case 1: yxCoords = '[2,5]'; break;
                     }
                 }
-                words.push( werd + ', ' + yxCoords + ', UP' );
+                words.push( word + ', ' + yxCoords + ', UP' );
             }
             // check dnwd_str1
             result = dnwd_str1.match( wordre );
             if ( result ) {
-                // get werd 
-                idx = dnwd_str1.indexOf( result );
-                len = result.length;
-                werd = dnwd_str1.substring( idx, idx+len+1 );
-                // get werd yxCoords for dnwd_str1
-                for ( let i = 0; i < werd.length; i++ ) {
+                // get word 
+                word = result[0];
+                len = word.length;
+                idx = dnwd_str1.indexOf( word );
+                // get word yxCoords for dnwd_str1
+                for ( let i = 0; i < word.length; i++ ) {
                     switch (idx) {
                         case 0: yxCoords = '[1,4]'; break;
                         case 1: yxCoords = '[2,5]'; break;
                     }
                 }
-                words.push( werd + ', ' + yxCoords + ', DW' );
+                words.push( word + ', ' + yxCoords + ', DW' );
             }
             // check down str1
             result = down_str1.match( wordre );
             if ( result ) {
-                // get werd 
-                idx = down_str1.indexOf( result );
-                len = result.length;
-                werd = down_str1.substring( idx, idx+len+1 );
-                // get werd yxCoords for down_str1
-                for ( let i = 0; i < werd.length; i++ ) {
+                // get word 
+                word = result[0];
+                len = word.length;
+                idx = down_str1.indexOf( word );
+                // get word yxCoords for down_str1
+                for ( let i = 0; i < word.length; i++ ) {
                     switch (idx) {
                         case 0: yxCoords = '[1,5]'; break;
                         case 1: yxCoords = '[2,5]'; break;
                     }
                 }
-                words.push( werd + ', ' + yxCoords + ', DO' );
+                words.push( word + ', ' + yxCoords + ', DO' );
             }
             break;
 
-	    case '16':
+            case '16':
 // console.log( 'in case 16' );
             // check upwd str1
             result = upwd_str1.match( wordre );
             if ( result ) {
-                // get werd 
-                idx = upwd_str1.indexOf( result );
-                len = result.length;
-                werd = upwd_str1.substring( idx, idx+len+1 );
-                // get werd yxCoords for upwd_str1
-                for ( let i = 0; i < werd.length; i++ ) {
+                // get word 
+                word = result[0];
+                len = word.length;
+                idx = upwd_str1.indexOf( word );
+                // get word yxCoords for upwd_str1
+                for ( let i = 0; i < word.length; i++ ) {
                     switch (idx) {
                         case 0: yxCoords = '[2,4]'; break;
                         case 1: yxCoords = '[2,5]'; break;
                     }
                 }
-                words.push( werd + ', ' + yxCoords + ', UP' );
+                words.push( word + ', ' + yxCoords + ', UP' );
             }
             // check dnwd_str0
             result = dnwd_str0.match( wordre );
             if ( result ) {
-                // get werd 
-                idx = dnwd_str0.indexOf( result );
-                len = result.length;
-                werd = dnwd_str0.substring( idx, idx+len+1 );
-                // get werd yxCoords for dnwd_str0
-                for ( let i = 0; i < werd.length; i++ ) {
+                // get word 
+                word = result[0];
+                len = word.length;
+                idx = dnwd_str0.indexOf( word );
+                // get word yxCoords for dnwd_str0
+                for ( let i = 0; i < word.length; i++ ) {
                     switch (idx) {
                         case 0: yxCoords = '[1,5]'; break;
                     }
                 }
-                words.push( werd + ', ' + yxCoords + ', DW' );
+                words.push( word + ', ' + yxCoords + ', DW' );
             }
             // check down str2
             result = down_str2.match( wordre );
             if ( result ) {
-                // get werd 
-                idx = down_str2.indexOf( result );
-                len = result.length;
-                werd = down_str2.substring( idx, idx+len+1 );
-                // get werd yxCoords for down_str2
-                for ( let i = 0; i < werd.length; i++ ) {
+                // get word 
+                word = result[0];
+                len = word.length;
+                idx = down_str2.indexOf( word );
+                // get word yxCoords for down_str2
+                for ( let i = 0; i < word.length; i++ ) {
                     switch (idx) {
                         case 0: yxCoords = '[1,6]'; break;
                     }
                 }
-                words.push( werd + ', ' + yxCoords + ', DO' );
+                words.push( word + ', ' + yxCoords + ', DO' );
             }
             break;
 
-	    case '35':
+            case '35':
 // console.log( 'in case 35' );
             // check upwd str2
             result = upwd_str2.match( wordre );
             if ( result ) {
-                // get werd 
+                // get word 
+                word = result[0];
+                len = word.length;
                 idx = upwd_str2.indexOf( result );
-                len = result.length;
-                werd = upwd_str2.substring( idx, idx+len+1 );
-                // get werd yxCoords for upwd_str2
-                for ( let i = 0; i < werd.length; i++ ) {
+                // get word yxCoords for upwd_str2
+                for ( let i = 0; i < word.length; i++ ) {
                     switch (idx) {
                         case 0: yxCoords = '[3,5]'; break;
                     }
                 }
-                words.push( werd + ', ' + yxCoords + ', UP' );
+                words.push( word + ', ' + yxCoords + ', UP' );
             }
             // check dnwd_str2
             result = dnwd_str2.match( wordre );
             if ( result ) {
-                // get werd 
-                idx = dnwd_str2.indexOf( result );
-                len = result.length;
-                werd = dnwd_str2.substring( idx, idx+len+1 );
-                // get werd yxCoords for dnwd_str2
-                for ( let i = 0; i < werd.length; i++ ) {
+                // get word 
+                word = result[0];
+                len = word.length;
+                idx = dnwd_str2.indexOf( word );
+                // get word yxCoords for dnwd_str2
+                for ( let i = 0; i < word.length; i++ ) {
                     switch (idx) {
                         case 0: yxCoords = '[2,4]'; break;
                     }
                 }
-                words.push( werd + ', ' + yxCoords + ', DW' );
+                words.push( word + ', ' + yxCoords + ', DW' );
             }
             // check down str1
             result = down_str1.match( wordre );
             if ( result ) {
-                // get werd 
-                idx = down_str1.indexOf( result );
-                len = result.length;
-                werd = down_str1.substring( idx, idx+len+1 );
-                // get werd yxCoords for down_str1
-                for ( let i = 0; i < werd.length; i++ ) {
+                // get word 
+                word = result[0];
+                len = word.length;
+                idx = down_str1.indexOf( word );
+                // get word yxCoords for down_str1
+                for ( let i = 0; i < word.length; i++ ) {
                     switch (idx) {
                         case 0: yxCoords = '[1,5]'; break;
                         case 1: yxCoords = '[2,5]'; break;
                     }
                 }
-                words.push( werd + ', ' + yxCoords + ', DO' );
+                words.push( word + ', ' + yxCoords + ', DO' );
             }
             break;
 
-	    case '26':
+            case '26':
 // console.log( 'in case 26' );
             // check upwd str2
             result = upwd_str2.match( wordre );
             if ( result ) {
-                // get werd 
-                idx = upwd_str2.indexOf( result );
-                len = result.length;
-                werd = upwd_str2.substring( idx, idx+len+1 );
-                // get werd yxCoords for upwd_str2
-                for ( let i = 0; i < werd.length; i++ ) {
+                // get word 
+                word = result[0];
+                len = word.length;
+                idx = upwd_str2.indexOf( word );
+                // get word yxCoords for upwd_str2
+                for ( let i = 0; i < word.length; i++ ) {
                     switch (idx) {
                         case 0: yxCoords = '[3,5]'; break;
                     }
                 }
-                words.push( werd + ', ' + yxCoords + ', UP' );
+                words.push( word + ', ' + yxCoords + ', UP' );
             }
             // check dnwd_str1
             result = dnwd_str1.match( wordre );
             if ( result ) {
-                // get werd 
-                idx = dnwd_str1.indexOf( result );
-                len = result.length;
-                werd = dnwd_str1.substring( idx, idx+len+1 );
-                // get werd yxCoords for dnwd_str1
-                for ( let i = 0; i < werd.length; i++ ) {
+                // get word 
+                word = result[0];
+                len = word.length;
+                idx = dnwd_str1.indexOf( word );
+                // get word yxCoords for dnwd_str1
+                for ( let i = 0; i < word.length; i++ ) {
                     switch (idx) {
                         case 0: yxCoords = '[1,4]'; break;
                         case 1: yxCoords = '[2,5]'; break;
                     }
                 }
-                words.push( werd + ', ' + yxCoords + ', DW' );
+                words.push( word + ', ' + yxCoords + ', DW' );
             }
             // check down str2
             result = down_str2.match( wordre );
             if ( result ) {
-                // get werd 
-                idx = down_str2.indexOf( result );
-                len = result.length;
-                werd = down_str2.substring( idx, idx+len+1 );
-                // get werd yxCoords for down_str2
-                for ( let i = 0; i < werd.length; i++ ) {
+                // get word 
+                word = result[0];
+                len = word.length;
+                idx = down_str2.indexOf( word );
+                // get word yxCoords for down_str2
+                for ( let i = 0; i < word.length; i++ ) {
                     switch (idx) {
                         case 0: yxCoords = '[1,6]'; break;
                     }
                 }
-                words.push( werd + ', ' + yxCoords + ', DO' );
+                words.push( word + ', ' + yxCoords + ', DO' );
             }
             break;
         } // end of switch
