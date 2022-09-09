@@ -1,4 +1,80 @@
-Constinued Testing 20220830:
+New testing 20220908:
+I got scoring to work for 3-or-more-letter words and removed the lookup functions,
+but this broke scoring for stacked letters, so I reverted the change.
+
+Logging is enabled for UP word testing:
+
+2-letter UP words:
+[1,4] - OK
+[2,4] - OK
+[2,5] - OK
+[3,5] - OK
+
+2-letter DW words:
+[1,5] - OK
+[2,4] - OK
+[2,5] - OK
+[2,4] - OK
+
+2-letter DO words:
+[1,4] - OK
+[1,5] - OK
+[2,5] - OK
+[1,6] - OK
+
+3-letter UP word:
+[2,4] - OK
+
+================================================================================
+
+Stacking tests:
+2-levels high:
+
+--> upward stacking
+(Z)5 + 2(I)1 + (T)1 = 8, OK
+2(T)1 + 2(I)1 + 2(E)1 = 6, OK
+(P)2 + 2(A)1 = 4, OK
+2(L)1 + 2(A)1 = 4, OK
+
+--> downward stacking
+(Z)5 + 2(I)1 + (T)1 = 8, OK
+2(W)2 + (E)1 = 5, OK
+2(W)2 + 2(P)2 = 8, OK
+
+--> down stacking
+2(B)2 + (U)1 + (T)1 = 6, OK
+2(B)2 + (U)1 + 2(S)1 = 7, OK
+
+================================================================================
+
+3-levels high:
+
+3(O)1 + 2(P)2 = 8, OK
+2(T)1 + 3(E)1 + 2(E)1 = 7, OK
+2(L)1 + 3(I)1 = 5, OK
+
+3(O)1 + 2(P)2 = 7, OK
+3(O)1 + 3(D)1 = 6, OK
+
+--> down stacking
+
+3(K)3 + (U)1 + 2(S)1 = 12, OK
+3(K)3 + (U)1 + 3(E)1 = 13, OK
+
+================================================================================
+
+4-levels high:
+
+3(C)2 + 4(Y)2 = 14, OK
+
+
+--> looking good for UP words, promote update to DW and DO words...
+
+
+
+
+
+Continued Testing 20220830:
 
 --> Test Cases
 --> 2 letter UP words

@@ -11,6 +11,8 @@ let curPlayer;
 let curHeldPiece;
 let curHeldPieceStartingPosition;
 
+const wordre = /[a-z]{2,}/; // A word is 2 or more consecutive lower-case letters, used to have A-Z
+    
 const gameBoard = [ // 6 levels of 5 rows of 11 columns, [Z,Y,X]: [0,0,0] - [5,4,10]
 [ ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
   ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
@@ -88,8 +90,6 @@ function startGame() {
         p2rack[i] = tiles[j]; // Assign to the p2rack.
         p2rack[i].piece = getPieceImageSource(p2rack[i]);
         tiles.splice(j, 1); // Delete from tiles.
-              
-        // await sleep(500); // sleep half a second after each tile draw
     }
     
 // console.log( 'p1rack:', p1rack.sort() ); A side-effect is that this sorts the racks.
@@ -347,6 +347,86 @@ function getPieceImageSource(piece) {
     }
 } // getPieceImageSource(piece)
 
+function rePopRack1() {
+    // repopulate the p1rack
+    let dotcnt = p1rack.filter(x => x === '.').length;
+    
+    for ( let i = 0; i < dotcnt; i++ ) {
+        let j = Math.floor(Math.random() * tiles.length); // Random draw from the remaining tiles.
+        let k = p1rack.indexOf('.');
+        p1rack[k] = tiles[j]; // Assign to the p1rack.
+    
+        // Update p1rack[] and gameBoard[][][] based on the index of the dot.
+        switch(k) { // p1rack order
+            case 0: loadRack(p1rack[k], [1,1,1]); // [Z,Y,X] ids
+                    gameBoard[0][0][0] = p1rack[0];
+                    break;
+            case 1: loadRack(p1rack[k], [1,1,2]);
+                    gameBoard[0][0][1] = p1rack[1];
+                    break;
+            case 2: loadRack(p1rack[k], [1,1,3]);
+                    gameBoard[0][0][2] = p1rack[2];
+                    break;
+            case 3: loadRack(p1rack[k], [1,1,4]);
+                    gameBoard[0][0][3] = p1rack[3];
+                    break;
+            case 4: loadRack(p1rack[k], [1,2,1]);
+                    gameBoard[0][1][0] = p1rack[4];
+                    break;
+            case 5: loadRack(p1rack[k], [1,2,2]);
+                    gameBoard[0][1][1] = p1rack[5];
+                    break;
+        }
+        tiles.splice(j, 1); // Delete from tiles.
+        p1rack[i].piece = getPieceImageSource(p1rack[i]);
+    
+// console.log( '' );
+// console.log( 'rePopRack1():' );
+// console.log( 'curPlayer:', curPlayer, 'p1rack:', p1rack, 'ctr:', i, 'dot:', dotcnt, 'rnd:', j, 'index:', k, 'tiles:', tiles );
+    
+    }
+} // rePopRack1()
+
+function rePopRack2() {
+    // repopulate the p2rack
+    let dotcnt = p2rack.filter(x => x === '.').length;
+    
+    for ( let i = 0; i < dotcnt; i++ ) {
+        let j = Math.floor(Math.random() * tiles.length); // Random draw from the remaining tiles.
+        let k = p2rack.indexOf('.');
+        p2rack[k] = tiles[j]; // Assign to the p2rack.
+    
+        // Update p2rack[] and gameBoard[][][] based on the index of the dot.
+        switch(k) { // p2rack order
+            case 0: loadRack(p2rack[k], [1,4,11]); // [Z,Y,X] ids
+                    gameBoard[0][3][10] = p2rack[0];
+                    break;
+            case 1: loadRack(p2rack[k], [1,5,10]);
+                    gameBoard[0][4][9] = p2rack[1];
+                    break;
+            case 2: loadRack(p2rack[k], [1,4,9]);
+                    gameBoard[0][3][8] = p2rack[2];
+                    break;
+            case 3: loadRack(p2rack[k], [1,5,8]);
+                    gameBoard[0][4][7] = p2rack[3];
+                    break;
+            case 4: loadRack(p2rack[k], [1,3,11]);
+                    gameBoard[0][2][10] = p2rack[4];
+                    break;
+            case 5: loadRack(p2rack[k], [1,4,10]);
+                    gameBoard[0][3][9] = p2rack[5];
+                    break;
+        }
+        tiles.splice(j, 1); // Delete from tiles.
+        p2rack[i].piece = getPieceImageSource(p2rack[i]);
+    
+// console.log( '' );
+// console.log( 'rePopRack2():' );
+// console.log( 'curPlayer:', curPlayer, 'p2rack:', p2rack, 'ctr:', i, 'dot:', dotcnt, 'rnd:', j, 'index:', k, 'tiles:', tiles );
+    
+    }
+} // rePopRack2()
+
 /* test functions */
 
 function inRack1( position ) { // true if the position [z,y,x] is within the p1rack
@@ -454,46 +534,6 @@ function onBoard( position ) { // true if the position is on the board
 // console.log( 'onBoard([0,4,8]):', onBoard([0,4,8] ) );
 // console.log( 'onBoard([0,4,9]):', onBoard([0,4,9] ) );
 // console.log( 'onBoard([0,4,10]):', onBoard([0,4,10]) );
-
-function openStack( position ) { // true if the top level is a dot
-    let z = position[0];
-    let y = position[1];
-    let x = position[2];
-    
-console.log( 'z:', z );
-console.log( 'x:', x );
-console.log( 'y:', y );
-console.log( 'position:', position );
-    
-    if ( onBoard( position ) ) {
-
-console.log( 'gameBoard[[5],[y],[x]]:', gameBoard[[5],[y],[x]] );
-console.log( 'gameBoard[[5],[1],[2]]:', gameBoard[[5],[1],[2]] );
-
-        if ( gameBoard[[5],[y],[x]] === '.' ) { // empty
-        // if ( curBoard[5][position[1]][position[2]].includes(".") ) { // empty
-    
-        // if ( position[z][y][x] === '.' ) { // empty
-            return true;
-        } else {
-            return false;
-        }
-    } else {
-        return false;
-    }
-} // openStack( position )
-
-// console.log( 'openStack([0,4,8]):', openStack([0,4,8]) ); // Expect false
-// console.log( 'openStack([0,4,9]):', openStack([0,4,9]) ); // Expect false
-// console.log( 'openStack([0,4,10]):', openStack([0,4,10]) ); // Expect false
-
-// console.log( 'openStack([0,1,5]):', openStack([0,1,5]) ); // Expect true
-// console.log( 'openStack([0,2,5]):', openStack([0,2,5]) ); // Expect true
-// console.log( 'openStack([0,3,5]):', openStack([0,3,5]) ); // Expect true
-
-// function sleep(ms) {
-//     return new Promise(resolve => setTimeout(resolve, ms));
-// }
 
 /* movement functions */
 
@@ -719,28 +759,7 @@ console.error("No more levels");
             destinationSquare.textContent = '';
             destinationSquare.appendChild(piece);
         }
-
-        // remove the image from the startingPosition ?
-
-        // const sourceSquare = document.getElementById(`${startingPosition[0] + 1}${startingPosition[1] + 1}${startingPosition[2] + 1}`);
-        // sourceSquare.textContent = '';
-        // sourceSquare.removeChild(piece);
-
-// console.log( 'boardPiece:', boardPiece );
-// console.log( 'boardPiece+1:', boardPiece+'1' );
-// console.log( 'getPieceImageSource(boardPiece+1):', getPieceImageSource(boardPiece+'1') );
-// boardPiece: a
-// boardPiece+1: a1
-// getPieceImageSource(boardPiece+1): assets/A1.png
-// 
-// console.log( 'destinationSquare:', destinationSquare );
-
-        // const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
-        // destinationSquare.textContent = '';
-        // destinationSquare.appendChild(piece);
     }
-    
-        // p1rack[i].piece = getPieceImageSource(p1rack[i]);
 
 // console.log( '' );
 // console.log( 'movePiece():' );
@@ -751,6 +770,836 @@ console.error("No more levels");
     
 } // movePiece(piece, startingPosition, endingPosition)
 
+function validateWhiteMovement(startingPosition, endingPosition) {
+    const boardPiece = curBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
+    switch (boardPiece) {
+        case 'a':
+                    if ( getTopLetter( endingPosition ) !== 'a' ) {
+                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+    
+// console.log( '' );
+// console.log( 'validateWhiteMovement(startingPosition, endingPosition)' );
+// console.log( 'validateWhiteMovement() success:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+//                                                  'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+// console.log( 'inRack1(startingPosition):', inRack1(startingPosition) );
+// console.log( 'onBoard(endingPosition):', onBoard(endingPosition) );
+    
+                            return true;
+                        } else { // Error condition
+        
+console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+    
+                            return false;
+                        }
+                    } else { // Error condition
+        
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself.' );
+    
+                    }
+                    break;
+        case 'b':
+                    if ( getTopLetter( endingPosition ) !== 'b' ) {
+                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'c':
+                    if ( getTopLetter( endingPosition ) !== 'c' ) {
+                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'd':
+                    if ( getTopLetter( endingPosition ) !== 'd' ) {
+                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'e':
+                    if ( getTopLetter( endingPosition ) !== 'e' ) {
+                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'f':
+                    if ( getTopLetter( endingPosition ) !== 'f' ) {
+                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'g':
+                    if ( getTopLetter( endingPosition ) !== 'g' ) {
+                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'h':
+                    if ( getTopLetter( endingPosition ) !== 'h' ) {
+                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'i':
+                    if ( getTopLetter( endingPosition ) !== 'i' ) {
+                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'j':
+                    if ( getTopLetter( endingPosition ) !== 'j' ) {
+                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'k':
+                    if ( getTopLetter( endingPosition ) !== 'k' ) {
+                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'l':
+                    if ( getTopLetter( endingPosition ) !== 'l' ) {
+                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'm':
+                    if ( getTopLetter( endingPosition ) !== 'm' ) {
+                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'n':
+                    if ( getTopLetter( endingPosition ) !== 'n' ) {
+                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'o':
+                    if ( getTopLetter( endingPosition ) !== 'o' ) {
+                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'p':
+                    if ( getTopLetter( endingPosition ) !== 'p' ) {
+                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'q':
+                    if ( getTopLetter( endingPosition ) !== 'q' ) {
+                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'r':
+                    if ( getTopLetter( endingPosition ) !== 'r' ) {
+                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 's':
+                    if ( getTopLetter( endingPosition ) !== 's' ) {
+                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 't':
+                    if ( getTopLetter( endingPosition ) !== 't' ) {
+                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'u':
+                    if ( getTopLetter( endingPosition ) !== 'u' ) {
+                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'v':
+                    if ( getTopLetter( endingPosition ) !== 'v' ) {
+                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'w':
+                    if ( getTopLetter( endingPosition ) !== 'w' ) {
+                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'x':
+                    if ( getTopLetter( endingPosition ) !== 'x' ) {
+                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'y':
+                    if ( getTopLetter( endingPosition ) !== 'y' ) {
+                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'z':
+                    if ( getTopLetter( endingPosition ) !== 'z' ) {
+                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case ' ':
+        case 'R':
+                  if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                      // if the startingPosition is in p1rack and the endingPosition is on the board, and the endingPosition is open, return true 
+    
+// console.log( '' );
+// console.log( 'validateWhiteMovement(startingPosition, endingPosition)' );
+// console.log( 'validateWhiteMovement() success:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+//                                                  'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+// console.log( 'inRack1(startingPosition):', inRack1(startingPosition) );
+// console.log( 'onBoard(endingPosition):', onBoard(endingPosition) );
+    
+                      return true;
+                  } else {
+    
+console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+    
+                      return false;
+                  }
+    } // switch
+} // validateWhiteMovement(startingPosition, endingPosition)
+
+function validateBlackMovement(startingPosition, endingPosition) {
+    const boardPiece = curBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
+    switch (boardPiece) {
+        case 'a':
+        case 'b':
+                    if ( getTopLetter( endingPosition ) !== 'b' ) {
+                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'c':
+                    if ( getTopLetter( endingPosition ) !== 'c' ) {
+                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'd':
+                    if ( getTopLetter( endingPosition ) !== 'd' ) {
+                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'e':
+                    if ( getTopLetter( endingPosition ) !== 'e' ) {
+                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'f':
+                    if ( getTopLetter( endingPosition ) !== 'f' ) {
+                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'g':
+                    if ( getTopLetter( endingPosition ) !== 'g' ) {
+                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'h':
+                    if ( getTopLetter( endingPosition ) !== 'h' ) {
+                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'i':
+                    if ( getTopLetter( endingPosition ) !== 'i' ) {
+                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'j':
+                    if ( getTopLetter( endingPosition ) !== 'j' ) {
+                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'k':
+                    if ( getTopLetter( endingPosition ) !== 'k' ) {
+                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'l':
+                    if ( getTopLetter( endingPosition ) !== 'l' ) {
+                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'm':
+                    if ( getTopLetter( endingPosition ) !== 'm' ) {
+                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'n':
+                    if ( getTopLetter( endingPosition ) !== 'n' ) {
+                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'o':
+                    if ( getTopLetter( endingPosition ) !== '0' ) {
+                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'p':
+                    if ( getTopLetter( endingPosition ) !== 'p' ) {
+                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'q':
+                    if ( getTopLetter( endingPosition ) !== 'q' ) {
+                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'r':
+                    if ( getTopLetter( endingPosition ) !== 'r' ) {
+                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 's':
+                    if ( getTopLetter( endingPosition ) !== 's' ) {
+                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 't':
+                    if ( getTopLetter( endingPosition ) !== 't' ) {
+                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'u':
+                    if ( getTopLetter( endingPosition ) !== 'u' ) {
+                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'v':
+                    if ( getTopLetter( endingPosition ) !== 'v' ) {
+                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'w':
+                    if ( getTopLetter( endingPosition ) !== 'w' ) {
+                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'x':
+                    if ( getTopLetter( endingPosition ) !== 'x' ) {
+                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'y':
+                    if ( getTopLetter( endingPosition ) !== 'y' ) {
+                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case 'z':
+                    if ( getTopLetter( endingPosition ) !== 'z' ) {
+                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                            return true;
+                        } else { // Error condition
+console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                            return false;
+                        }
+                    } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
+                    }
+                    break;
+        case ' ':
+        case 'R':
+                  if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+// console.log( '' );
+// console.log( 'validateBlackMovement(startingPosition, endingPosition)' );
+// console.log( 'validateBlackMovement() success:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+//                                                  'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+// console.log( 'inRack2(startingPosition):', inRack2(startingPosition) );
+// console.log( 'onBoard(endingPosition):', onBoard(endingPosition) );
+                      return true;
+                  } else {
+console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+    
+                      return false;
+                  }
+    } // switch
+} // validateBlackMovement(startingPosition, endingPosition)
+
 
 function switchPlayer() {
     // called by the $ onclick button:
@@ -758,12 +1607,8 @@ function switchPlayer() {
     //   redraw tile(s), 
     //   update prevBoard and then switch players
     
-    // words = [];
     words.length = 0; // empty words[]
-    // score_words = [];
     score_words.length = 0; // empty score_words[]
-
-console.log( 'switchPlayer score_words', score_words );
     
     if (curPlayer === 'white') {
         // calculate the score    
@@ -790,27 +1635,6 @@ console.log( 'switchPlayer():' );
     
 } // switchPlayer()
 
-
-function getLevel( position ) { // position = string of yxCoords, returns the highest level
-    // convert string position to an array
-    const myArray = position.split(',');
-    let y = Number(myArray[0]);
-    let x = Number(myArray[1]); // position [y,x] is the source for finding the top z level in curBoard[][][]
-
-console.log( '' );
-console.log( 'getLevel( position ):' );
-console.log( 'position:', position );
-// console.log( 'y:', y );
-// console.log( 'x:', x );
-
-    // use the yxCoords to get the top level from curBoard
-    for (let level = 5; level >= 0 ; level--) { // 6 levels
-        if ( curBoard[level][y][x] !== '.' ) {
-            return level;
-            break;
-        }
-    }
-} // getLevel( position )
 
 
 function calcScore() {
@@ -938,13 +1762,12 @@ console.log( 'score_words[]:', score_words );
     // For every element (word, position, direction) in the score_words[] array, /
     // calculate the word score                                                  /
     //////////////////////////////////////////////////////////////////////////////
-    // score_words.forEach( element => {
     for ( let index = 0; index < score_words.length; ++index ) {
         const element = score_words[index];
 
         word_score = 0;
     
-        // convert the array element to a string
+        // convert the array element into a string
         element_str = element + '';
 
         // get the word from the element string
@@ -969,20 +1792,19 @@ console.log( 'score_words[]:', score_words );
             switch ( yx_dir ) {
 
                 case 'UP': // Upwards Word
+console.log( 'An Upwards Word Lookup:' );
                     // for every letter in word_str, sum the individual values 
                     for ( var i = 0; i < word_str.length; i++ ) {
                         // get the letter
                         var letter = word_str.charAt(i);
-// console.log( 'letter:', letter );
                         // get the letter value
                         letterVal = getLetterValue( letter );
-// console.log( 'letterVal:', letterVal );
-                        // get the letter level
-                        // update yx_str according to i
-                        yx_str = upwd_lookup( yx_str, i ); // string and a number, returns yx_str
-// console.log( 'yx_str:', yx_str );
-                        letterLev = getLevel( yx_str ); // position = string of yxCoords, returns the highest level
-// console.log( 'letterLev:', letterLev );
+                        // get the letter level using the position of the next character in the string
+                        new_str = upwd_lookup( yx_str, i ); // lookup new yxCoords
+                        letterLev = getTopLevel( new_str ); // use the yxCoords from the lookup
+
+// console.log( 'yx_str:', yx_str, 'new_str:', new_str );
+// console.log( 'letter:', letter, 'letterVal:', letterVal, 'letterLev:', letterLev );
     
                         // get the stacking multiplier
                         var sm = letterLev + 1;
@@ -999,20 +1821,19 @@ console.log( 'score_words[]:', score_words );
                     break;
 
                 case 'DW': // Downwards Word
+console.log( 'A Downwards Word Lookup:' );
                     // for every letter in word_str, sum the individual values 
                     for ( var i = 0; i < word_str.length; i++ ) {
                         // get the letter
                         var letter = word_str.charAt(i);
-// console.log( 'letter:', letter );
                         // get the letter value
                         letterVal = getLetterValue( letter );
-// console.log( 'letterVal:', letterVal );
-                        // get the letter level
-                        // update yx_str according to i
-                        yx_str = dnwd_lookup( yx_str, i ); // string and a number, returns yx_str
-// console.log( 'yx_str:', yx_str );
-                        letterLev = getLevel( yx_str ); // position = string of yxCoords, returns the highest level
-// console.log( 'letterLev:', letterLev );
+                        // get the letter level using the position of the next character in the string
+                        new_str = dnwd_lookup( yx_str, i ); // lookup new yxCoords
+                        letterLev = getTopLevel( new_str ); // use the yxCoords from the lookup
+
+// console.log( 'yx_str:', yx_str, 'new_str:', new_str );
+// console.log( 'letter:', letter, 'letterVal:', letterVal, 'letterLev:', letterLev );
     
                         // get the stacking multiplier
                         var sm = letterLev + 1;
@@ -1029,19 +1850,19 @@ console.log( 'score_words[]:', score_words );
                     break;
 
                 case 'DO': // Straight-Down Word
+console.log( 'A Down Word Lookup:' );
                     // for every letter in word_str, sum the individual values 
                     for ( var i = 0; i < word_str.length; i++ ) {
                         // get the letter
                         var letter = word_str.charAt(i);
-// console.log( 'letter:', letter );
                         // get the letter value
                         letterVal = getLetterValue( letter );
-// console.log( 'letterVal:', letterVal );
                         // get the letter level
-                        yx_str = (y + i)+','+x;
-// console.log( 'yx_str:', yx_str );
-                        letterLev = getLevel( yx_str ); // position = string of yxCoords, returns the highest level
-// console.log( 'letterLev:', letterLev );
+                        new_str = (y + i)+','+x;
+                        letterLev = getTopLevel( new_str ); // use the new_str yxCoords
+    
+// console.log( 'yx_str:', yx_str, 'new_str:', new_str );
+// console.log( 'letter:', letter, 'letterVal:', letterVal, 'letterLev:', letterLev );
     
                         // get the stacking multiplier
                         var sm = letterLev + 1;
@@ -1064,8 +1885,7 @@ console.log( 'score_words[]:', score_words );
 // console.log( 'Word:', element, 'Value:', word_score );
 // console.log( 'Turn_Score:', turn_score );
     
-    }
-    // });
+    } // for every word in score_words[]
 
     // turn_ledger now has the individual word scores, and
     // turn_score now has the players total for the turn
@@ -1093,24 +1913,6 @@ console.log( p2scoreDiv.innerHTML );
 } // calcScore()
 
 
-function flattenBoard() {
-    // This function flattens the curBoard[][][] into flatBoard[][]
-    // by using the highest level letter tile in curBoard
-    
-    // level h, row i and column j
-    for (let h = 0; h < 6 ; h++) { // 6 levels
-        for (let i = 0; i < 5 ; i++) { // 5 rows
-            for (let j = 0; j < 11; j++) { // 11 columns
-                // Iterate over every curBoard element
-                if ( ( curBoard[h][i][j] !== '.' ) && ( curBoard[h][i][j] !== 'R' ) ) {
-                    // flatBoard will contain the highest letter tile in curBoard
-                    flatBoard[i][j] = curBoard[h][i][j];
-                }
-            }
-        }
-    }
-}; // flattenBoard()
-
 
 function wordCheck( position ) { // position = an array of numbers
                                  // If a word is found, return a record: ['it, [2, 4], UP']
@@ -1126,13 +1928,11 @@ function wordCheck( position ) { // position = an array of numbers
 
     if ( onBoard( position ) ) { // only process valid board positions
 
-        const wordre = /[a-z]{2,}/; // A word is 2 or more consecutive lower-case letters, used to have A-Z
-    
-console.log( '' );
-console.log( 'wordCheck( position ):' );
-console.log( 'position:', position );
-console.log( 'y:', y );
-console.log( 'x:', x );
+// console.log( '' );
+// console.log( 'wordCheck( position ):' );
+// console.log( 'position:', position );
+// console.log( 'y:', y );
+// console.log( 'x:', x );
 
         ///////////////////////////////////////////////////////////////////////
         // build and number all possible Upward strings on flatBoard[][]      /
@@ -1140,12 +1940,7 @@ console.log( 'x:', x );
         upwd_str0=flatBoard[1][4]+flatBoard[1][5];
         upwd_str1=flatBoard[2][4]+flatBoard[2][5]+flatBoard[1][6];
         upwd_str2=flatBoard[3][5]+flatBoard[2][6];
-        ///////////////////////////////////////////////////////////////////////
-        // build and number all possible Down strings on flatBoard[][]        /
-        ///////////////////////////////////////////////////////////////////////
-        down_str0=flatBoard[1][4]+flatBoard[2][4];
-        down_str1=flatBoard[1][5]+flatBoard[2][5]+flatBoard[3][5];
-        down_str2=flatBoard[1][6]+flatBoard[2][6];
+
         ///////////////////////////////////////////////////////////////////////
         // build and number all possible Downward strings on flatBoard[][]    /
         ///////////////////////////////////////////////////////////////////////
@@ -1153,360 +1948,64 @@ console.log( 'x:', x );
         dnwd_str1=flatBoard[1][4]+flatBoard[2][5]+flatBoard[2][6];
         dnwd_str2=flatBoard[2][4]+flatBoard[3][5];
 
+        ///////////////////////////////////////////////////////////////////////
+        // build and number all possible Down strings on flatBoard[][]        /
+        ///////////////////////////////////////////////////////////////////////
+        down_str0=flatBoard[1][4]+flatBoard[2][4];
+        down_str1=flatBoard[1][5]+flatBoard[2][5]+flatBoard[3][5];
+        down_str2=flatBoard[1][6]+flatBoard[2][6];
+
         yandx_str = '' + y + x;
 // console.log( 'yandx_str:', yandx_str );
         switch ( yandx_str ) {
 
             case '14':
 // console.log( 'in case 14' );
-            // check upwd str0
-            result = upwd_str0.match( wordre );
-            if ( result ) {
-                // get word 
-                word = result[0];
-                len = word.length;
-                idx = upwd_str0.indexOf( word );
-                // get word yxCoords for upwd_str0
-                for ( let i = 0; i < word.length; i++ ) {
-                    switch (idx) {
-                        case 0: yxCoords = '[1,4]'; break;
-                    }
-                }
-                words.push( word + ', ' + yxCoords + ', UP' );
-            }
-            // check dnwd_str1
-            result = dnwd_str1.match( wordre );
-            if ( result ) {
-                // get word 
-                word = result[0];
-                len = word.length;
-                idx = dnwd_str1.indexOf( result );
-                // get word yxCoords for dnwd_str1
-                for ( let i = 0; i < word.length; i++ ) {
-                    switch (idx) {
-                        case 0: yxCoords = '[1,4]'; break;
-                        case 1: yxCoords = '[2,5]'; break;
-                    }
-                }
-                words.push( word + ', ' + yxCoords + ', DW' );
-            }
-            // check down str0
-            result = down_str0.match( wordre );
-            if ( result ) {
-                // get word 
-                word = result[0];
-                len = word.length;
-                idx = down_str0.indexOf( word );
-                // get word yxCoords for down_str0
-                for ( let i = 0; i < word.length; i++ ) {
-                    switch (idx) {
-                        case 0: yxCoords = '[1,4]'; break;
-                    }
-                }
-                words.push( word + ', ' + yxCoords + ', DO' );
-            }
+            check_upwd_str0();
+            check_dnwd_str1();
+            check_down_str0();
             break;
 
             case '15':
 // console.log( 'in case 15' );
-            // check upwd str0
-            result = upwd_str0.match( wordre );
-            if ( result ) {
-                // get word 
-                word = result[0];
-                len = word.length;
-                idx = upwd_str0.indexOf( word );
-                // get word yxCoords for upwd_str0
-                for ( let i = 0; i < word.length; i++ ) {
-                    switch (idx) {
-                        case 0: yxCoords = '[1,4]'; break;
-                    }
-                }
-                words.push( word + ', ' + yxCoords + ', UP' );
-            }
-            // check dnwd_str0
-            result = dnwd_str0.match( wordre );
-            if ( result ) {
-                // get word 
-                word = result[0];
-                len = word.length;
-                idx = dnwd_str0.indexOf( word );
-                // get word yxCoords for dnwd_str0
-                for ( let i = 0; i < word.length; i++ ) {
-                    switch (idx) {
-                        case 0: yxCoords = '[1,5]'; break;
-                    }
-                }
-                words.push( word + ', ' + yxCoords + ', DW' );
-            }
-            // check down str1
-            result = down_str1.match( wordre );
-            if ( result ) {
-                // get word 
-                word = result[0];
-                len = word.length;
-                idx = down_str1.indexOf( word );
-                // get word yxCoords for down_str1
-                for ( let i = 0; i < word.length; i++ ) {
-                    switch (idx) {
-                        case 0: yxCoords = '[1,5]'; break;
-                        case 1: yxCoords = '[2,5]'; break;
-                    }
-                }
-                words.push( word + ', ' + yxCoords + ', DO' );
-            }
+            check_upwd_str0();
+            check_dnwd_str0();
+            check_down_str1();
             break;
 
             case '24':
 // console.log( 'in case 24' );
-            // check upwd str1
-            result = upwd_str1.match( wordre );
-            if ( result ) {
-                // get word 
-                word = result[0];
-                len = word.length;
-                idx = upwd_str1.indexOf( word );
-                // get word yxCoords for upwd_str1
-                for ( let i = 0; i < word.length; i++ ) {
-                    switch (idx) {
-                        case 0: yxCoords = '[2,4]'; break;
-                        case 1: yxCoords = '[2,5]'; break;
-                    }
-                }
-                words.push( word + ', ' + yxCoords + ', UP' );
-            }
-            // check dnwd_str0
-            result = dnwd_str0.match( wordre );
-            if ( result ) {
-                // get word 
-                word = result[0];
-                len = word.length;
-                idx = dnwd_str0.indexOf( word );
-                // get word yxCoords for dnwd_str0
-                for ( let i = 0; i < word.length; i++ ) {
-                    switch (idx) {
-                        case 0: yxCoords = '[1,5]'; break;
-                    }
-                }
-                words.push( word + ', ' + yxCoords + ', DW' );
-            }
-            // check down str0
-            result = down_str0.match( wordre );
-            if ( result ) {
-                // get word 
-                word = result[0];
-                len = word.length; // was result.length
-                idx = down_str0.indexOf( word );
-                // get word yxCoords for down_str0
-                for ( let i = 0; i < word.length; i++ ) {
-                    switch (idx) {
-                        case 0: yxCoords = '[1,4]'; break;
-                    }
-                }
-                words.push( word + ', ' + yxCoords + ', DO' );
-            }
+            check_upwd_str1();
+            check_dnwd_str2();
+            check_down_str0();
             break;
 
             case '25':
 // console.log( 'in case 25' );
-            // check upwd str1
-            result = upwd_str1.match( wordre );
-            if ( result ) {
-                // get word 
-                word = result[0];
-                len = word.length;
-                idx = upwd_str1.indexOf( word );
-                // get word yxCoords for upwd_str1
-                for ( let i = 0; i < word.length; i++ ) {
-                    switch (idx) {
-                        case 0: yxCoords = '[2,4]'; break;
-                        case 1: yxCoords = '[2,5]'; break;
-                    }
-                }
-                words.push( word + ', ' + yxCoords + ', UP' );
-            }
-            // check dnwd_str1
-            result = dnwd_str1.match( wordre );
-            if ( result ) {
-                // get word 
-                word = result[0];
-                len = word.length;
-                idx = dnwd_str1.indexOf( word );
-                // get word yxCoords for dnwd_str1
-                for ( let i = 0; i < word.length; i++ ) {
-                    switch (idx) {
-                        case 0: yxCoords = '[1,4]'; break;
-                        case 1: yxCoords = '[2,5]'; break;
-                    }
-                }
-                words.push( word + ', ' + yxCoords + ', DW' );
-            }
-            // check down str1
-            result = down_str1.match( wordre );
-            if ( result ) {
-                // get word 
-                word = result[0];
-                len = word.length;
-                idx = down_str1.indexOf( word );
-                // get word yxCoords for down_str1
-                for ( let i = 0; i < word.length; i++ ) {
-                    switch (idx) {
-                        case 0: yxCoords = '[1,5]'; break;
-                        case 1: yxCoords = '[2,5]'; break;
-                    }
-                }
-                words.push( word + ', ' + yxCoords + ', DO' );
-            }
+            check_upwd_str1();
+            check_dnwd_str1();
+            check_down_str1();
             break;
 
             case '16':
 // console.log( 'in case 16' );
-            // check upwd str1
-            result = upwd_str1.match( wordre );
-            if ( result ) {
-                // get word 
-                word = result[0];
-                len = word.length;
-                idx = upwd_str1.indexOf( word );
-                // get word yxCoords for upwd_str1
-                for ( let i = 0; i < word.length; i++ ) {
-                    switch (idx) {
-                        case 0: yxCoords = '[2,4]'; break;
-                        case 1: yxCoords = '[2,5]'; break;
-                    }
-                }
-                words.push( word + ', ' + yxCoords + ', UP' );
-            }
-            // check dnwd_str0
-            result = dnwd_str0.match( wordre );
-            if ( result ) {
-                // get word 
-                word = result[0];
-                len = word.length;
-                idx = dnwd_str0.indexOf( word );
-                // get word yxCoords for dnwd_str0
-                for ( let i = 0; i < word.length; i++ ) {
-                    switch (idx) {
-                        case 0: yxCoords = '[1,5]'; break;
-                    }
-                }
-                words.push( word + ', ' + yxCoords + ', DW' );
-            }
-            // check down str2
-            result = down_str2.match( wordre );
-            if ( result ) {
-                // get word 
-                word = result[0];
-                len = word.length;
-                idx = down_str2.indexOf( word );
-                // get word yxCoords for down_str2
-                for ( let i = 0; i < word.length; i++ ) {
-                    switch (idx) {
-                        case 0: yxCoords = '[1,6]'; break;
-                    }
-                }
-                words.push( word + ', ' + yxCoords + ', DO' );
-            }
+            check_upwd_str1();
+            check_dnwd_str0();
+            check_down_str2();
             break;
 
             case '35':
 // console.log( 'in case 35' );
-            // check upwd str2
-            result = upwd_str2.match( wordre );
-            if ( result ) {
-                // get word 
-                word = result[0];
-                len = word.length;
-                idx = upwd_str2.indexOf( result );
-                // get word yxCoords for upwd_str2
-                for ( let i = 0; i < word.length; i++ ) {
-                    switch (idx) {
-                        case 0: yxCoords = '[3,5]'; break;
-                    }
-                }
-                words.push( word + ', ' + yxCoords + ', UP' );
-            }
-            // check dnwd_str2
-            result = dnwd_str2.match( wordre );
-            if ( result ) {
-                // get word 
-                word = result[0];
-                len = word.length;
-                idx = dnwd_str2.indexOf( word );
-                // get word yxCoords for dnwd_str2
-                for ( let i = 0; i < word.length; i++ ) {
-                    switch (idx) {
-                        case 0: yxCoords = '[2,4]'; break;
-                    }
-                }
-                words.push( word + ', ' + yxCoords + ', DW' );
-            }
-            // check down str1
-            result = down_str1.match( wordre );
-            if ( result ) {
-                // get word 
-                word = result[0];
-                len = word.length;
-                idx = down_str1.indexOf( word );
-                // get word yxCoords for down_str1
-                for ( let i = 0; i < word.length; i++ ) {
-                    switch (idx) {
-                        case 0: yxCoords = '[1,5]'; break;
-                        case 1: yxCoords = '[2,5]'; break;
-                    }
-                }
-                words.push( word + ', ' + yxCoords + ', DO' );
-            }
+            check_upwd_str2();
+            check_dnwd_str2();
+            check_down_str1();
             break;
 
             case '26':
 // console.log( 'in case 26' );
-            // check upwd str2
-            result = upwd_str2.match( wordre );
-            if ( result ) {
-                // get word 
-                word = result[0];
-                len = word.length;
-                idx = upwd_str2.indexOf( word );
-                // get word yxCoords for upwd_str2
-                for ( let i = 0; i < word.length; i++ ) {
-                    switch (idx) {
-                        case 0: yxCoords = '[3,5]'; break;
-                    }
-                }
-                words.push( word + ', ' + yxCoords + ', UP' );
-            }
-            // check dnwd_str1
-            result = dnwd_str1.match( wordre );
-            if ( result ) {
-                // get word 
-                word = result[0];
-                len = word.length;
-                idx = dnwd_str1.indexOf( word );
-                // get word yxCoords for dnwd_str1
-                for ( let i = 0; i < word.length; i++ ) {
-                    switch (idx) {
-                        case 0: yxCoords = '[1,4]'; break;
-                        case 1: yxCoords = '[2,5]'; break;
-                    }
-                }
-                words.push( word + ', ' + yxCoords + ', DW' );
-            }
-            // check down str2
-            result = down_str2.match( wordre );
-            if ( result ) {
-                // get word 
-                word = result[0];
-                len = word.length;
-                idx = down_str2.indexOf( word );
-                // get word yxCoords for down_str2
-                for ( let i = 0; i < word.length; i++ ) {
-                    switch (idx) {
-                        case 0: yxCoords = '[1,6]'; break;
-                    }
-                }
-                words.push( word + ', ' + yxCoords + ', DO' );
-            }
+            check_upwd_str2();
+            check_dnwd_str1();
+            check_down_str2();
             break;
         } // end of switch
     } // only process valid board positions
@@ -1529,52 +2028,63 @@ console.log( 'x:', x );
 
 }; // wordCheck( position )
 
-/*******************/
-/* array functions */
-/*******************/
-
-function diffBoards(arr1, arr2) {
-    // Compares the board elements
-    var result = arr1;
+function flattenBoard() {
+    // This function flattens the curBoard[][][] into flatBoard[][]
+    // by using the highest level letter tile in curBoard
     
     // level h, row i and column j
     for (let h = 0; h < 6 ; h++) { // 6 levels
         for (let i = 0; i < 5 ; i++) { // 5 rows
             for (let j = 0; j < 11; j++) { // 11 columns
-                if ( arr1[h][i][j] !== arr2[h][i][j] ) {
-    
-                    // if different, save from arr2 to the result
-                    result[h][i][j] = arr2[h][i][j]
-                } else {
-                    result[h][i][j] = '.'
+                // Iterate over every curBoard element
+                if ( ( curBoard[h][i][j] !== '.' ) && ( curBoard[h][i][j] !== 'R' ) ) {
+                    // flatBoard will contain the highest letter tile in curBoard
+                    flatBoard[i][j] = curBoard[h][i][j];
                 }
             }
         }
     }
-    return result;
-}
+}; // flattenBoard()
 
-function upwd_lookup( position, idx ) { // string and a number, returns yx_str
-    if ( idx === 0 ) return position;
-    if ( idx === 1 ) {
-        if ( position === '1,4' ) return '1,5'; 
-        if ( position === '2,4' ) return '2,5'; 
-        if ( position === '2,5' ) return '1,6'; 
-        if ( position === '3,5' ) return '2,6'; 
+function getTopLevel( position ) { // position = string of yxCoords, returns the highest level
+    // convert string position to an array
+    const myArray = position.split(',');
+    let y = Number(myArray[0]);
+    let x = Number(myArray[1]); // position [y,x] is the source for finding the top z level in curBoard[][][]
+    
+console.log( '' );
+console.log( 'getTopLevel(', position, '):' );
+// console.log( 'position:', position );
+// console.log( 'y:', y );
+// console.log( 'x:', x );
+    
+    // use the yxCoords to get the top level from curBoard
+    for (let level = 5; level >= 0 ; level--) { // 6 levels
+        if ( curBoard[level][y][x] !== '.' ) {
+            return level;
+            break;
+        }
     }
-    if ( idx === 2 ) return '1,6';
-}
+} // getTopLevel( position )
 
-function dnwd_lookup( position, idx ) { // string and a number, returns yx_str
-    if ( idx === 0 ) return position;
-    if ( idx === 1 ) {
-        if ( position === '1,4' ) return '2,5'; 
-        if ( position === '1,5' ) return '1,6'; 
-        if ( position === '2,4' ) return '3,5'; 
-        if ( position === '2,5' ) return '2,6'; 
+function getTopLetter( position ) { // return the piece that is on top of the current position
+    let z = position[0]; // this z-coordinate is not accurate
+    let y = position[1]; // use the yxCoords
+    let x = position[2];
+    let top_letter = '';
+
+console.log( 'In getTopLetter:' );
+console.log( 'position:', position, 'z:', z, 'y:', y, 'x:', x );
+
+    // get the top letter from curBoard for yxCoord
+    for (let level = 5; level >= 0 ; level--) { // 6 levels
+        if ( curBoard[level][y][x] !== '.' ) {
+            top_letter = curBoard[level][y][x];
+            break;
+        }
     }
-    if ( idx === 2 ) return '2,6';
-}
+    return top_letter;
+} // getTopLetter( position )
 
 function getLetterValue( boardPiece ) {
     // Return the value of the given boardPiece.
@@ -1618,198 +2128,203 @@ function getLetterValue( boardPiece ) {
         case 'z':
                   return 5;
                   break;
-
+    
     }
 } // getLetterValue( boardPiece )
 
-function validateWhiteMovement(startingPosition, endingPosition) {
-    const boardPiece = curBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
-    switch (boardPiece) {
-        case 'a':
-        case 'b':
-        case 'c':
-        case 'd':
-        case 'e':
-        case 'f':
-        case 'g':
-        case 'h':
-        case 'i':
-        case 'j':
-        case 'k':
-        case 'l':
-        case 'm':
-        case 'n':
-        case 'o':
-        case 'p':
-        case 'q':
-        case 'r':
-        case 's':
-        case 't':
-        case 'u':
-        case 'v':
-        case 'w':
-        case 'x':
-        case 'y':
-        case 'z':
-        case ' ':
-        case 'R':
-                  // if ( inRack1(startingPosition) && onBoard(endingPosition) && openStack(endingPosition) ) {
-                  if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                      // if the startingPosition is in p1rack and the endingPosition is on the board, and the endingPosition is open, return true 
-    
-// console.log( '' );
-// console.log( 'validateWhiteMovement(startingPosition, endingPosition)' );
-// console.log( 'validateWhiteMovement() success:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-//                                                  'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-// console.log( 'inRack1(startingPosition):', inRack1(startingPosition) );
-// console.log( 'onBoard(endingPosition):', onBoard(endingPosition) );
-    
-                      return true;
-                  } else {
-    
-console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-    
-                      return false;
-                  }
-    }
-} // validateWhiteMovement(startingPosition, endingPosition)
+/*********************************/
+/* check upward string functions */
+/*********************************/
 
-function validateBlackMovement(startingPosition, endingPosition) {
-    const boardPiece = curBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
-    switch (boardPiece) {
-        case 'a':
-        case 'b':
-        case 'c':
-        case 'd':
-        case 'e':
-        case 'f':
-        case 'g':
-        case 'h':
-        case 'i':
-        case 'j':
-        case 'k':
-        case 'l':
-        case 'm':
-        case 'n':
-        case 'o':
-        case 'p':
-        case 'q':
-        case 'r':
-        case 's':
-        case 't':
-        case 'u':
-        case 'v':
-        case 'w':
-        case 'x':
-        case 'y':
-        case 'z':
-        case ' ':
-        case 'R':
-                  if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                      // if the startingPosition is in p2rack and the endingPosition is on the board, return true 
-    
-// console.log( '' );
-// console.log( 'validateBlackMovement(startingPosition, endingPosition)' );
-// console.log( 'validateBlackMovement() success:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-//                                                  'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-// console.log( 'inRack2(startingPosition):', inRack2(startingPosition) );
-// console.log( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                      return true;
-                  } else {
-console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-    
-                      return false;
-                  }
-    }
-} // validateBlackMovement(startingPosition, endingPosition)
-
-function rePopRack1() {
-    // repopulate the p1rack
-    let dotcnt = p1rack.filter(x => x === '.').length;
-    
-    for ( let i = 0; i < dotcnt; i++ ) {
-        let j = Math.floor(Math.random() * tiles.length); // Random draw from the remaining tiles.
-        let k = p1rack.indexOf('.');
-        p1rack[k] = tiles[j]; // Assign to the p1rack.
-    
-        // Update p1rack[] and gameBoard[][][] based on the index of the dot.
-        switch(k) { // p1rack order
-            case 0: loadRack(p1rack[k], [1,1,1]); // [Z,Y,X] ids
-                    gameBoard[0][0][0] = p1rack[0];
-                    break;
-            case 1: loadRack(p1rack[k], [1,1,2]);
-                    gameBoard[0][0][1] = p1rack[1];
-                    break;
-            case 2: loadRack(p1rack[k], [1,1,3]);
-                    gameBoard[0][0][2] = p1rack[2];
-                    break;
-            case 3: loadRack(p1rack[k], [1,1,4]);
-                    gameBoard[0][0][3] = p1rack[3];
-                    break;
-            case 4: loadRack(p1rack[k], [1,2,1]);
-                    gameBoard[0][1][0] = p1rack[4];
-                    break;
-            case 5: loadRack(p1rack[k], [1,2,2]);
-                    gameBoard[0][1][1] = p1rack[5];
-                    break;
+function check_upwd_str0() {
+    result = upwd_str0.match( wordre );
+    if ( result ) {
+        // get word 
+        word = result[0];
+        len = word.length;
+        idx = upwd_str0.indexOf( word );
+        // get word yxCoords for upwd_str0
+        for ( let i = 0; i < word.length; i++ ) {
+            switch (idx) {
+                case 0: yxCoords = '[1,4]'; break;
+            }
         }
-        tiles.splice(j, 1); // Delete from tiles.
-        p1rack[i].piece = getPieceImageSource(p1rack[i]);
-    
-// console.log( '' );
-// console.log( 'rePopRack1():' );
-// console.log( 'curPlayer:', curPlayer, 'p1rack:', p1rack, 'ctr:', i, 'dot:', dotcnt, 'rnd:', j, 'index:', k, 'tiles:', tiles );
-    
-        // await sleep(500); // sleep half a second after each tile draw
+        words.push( word + ', ' + yxCoords + ', UP' );
     }
-} // rePopRack1()
+}
 
-function rePopRack2() {
-    // repopulate the p2rack
-    let dotcnt = p2rack.filter(x => x === '.').length;
-    
-    for ( let i = 0; i < dotcnt; i++ ) {
-        let j = Math.floor(Math.random() * tiles.length); // Random draw from the remaining tiles.
-        let k = p2rack.indexOf('.');
-        p2rack[k] = tiles[j]; // Assign to the p2rack.
-    
-        // Update p2rack[] and gameBoard[][][] based on the index of the dot.
-        switch(k) { // p2rack order
-            case 0: loadRack(p2rack[k], [1,4,11]); // [Z,Y,X] ids
-                    gameBoard[0][3][10] = p2rack[0];
-                    break;
-            case 1: loadRack(p2rack[k], [1,5,10]);
-                    gameBoard[0][4][9] = p2rack[1];
-                    break;
-            case 2: loadRack(p2rack[k], [1,4,9]);
-                    gameBoard[0][3][8] = p2rack[2];
-                    break;
-            case 3: loadRack(p2rack[k], [1,5,8]);
-                    gameBoard[0][4][7] = p2rack[3];
-                    break;
-            case 4: loadRack(p2rack[k], [1,3,11]);
-                    gameBoard[0][2][10] = p2rack[4];
-                    break;
-            case 5: loadRack(p2rack[k], [1,4,10]);
-                    gameBoard[0][3][9] = p2rack[5];
-                    break;
+function check_upwd_str1() {
+    result = upwd_str1.match( wordre );
+    if ( result ) {
+        // get word 
+        word = result[0];
+        len = word.length;
+        idx = upwd_str1.indexOf( word );
+        // get word yxCoords for upwd_str1
+        for ( let i = 0; i < word.length; i++ ) {
+            switch (idx) {
+                case 0: yxCoords = '[2,4]'; break;
+                case 1: yxCoords = '[2,5]'; break;
+            }
         }
-        tiles.splice(j, 1); // Delete from tiles.
-        p2rack[i].piece = getPieceImageSource(p2rack[i]);
-    
-// console.log( '' );
-// console.log( 'rePopRack2():' );
-// console.log( 'curPlayer:', curPlayer, 'p2rack:', p2rack, 'ctr:', i, 'dot:', dotcnt, 'rnd:', j, 'index:', k, 'tiles:', tiles );
-    
-        // await sleep(500); // sleep half a second after each tile draw
+        words.push( word + ', ' + yxCoords + ', UP' );
     }
-} // rePopRack2()
+}
+
+function check_upwd_str2() {
+    result = upwd_str2.match( wordre );
+    if ( result ) {
+        // get word 
+        word = result[0];
+        len = word.length;
+        idx = upwd_str2.indexOf( word );
+        // get word yxCoords for upwd_str2
+        for ( let i = 0; i < word.length; i++ ) {
+            switch (idx) {
+                case 0: yxCoords = '[3,5]'; break;
+            }
+        }
+        words.push( word + ', ' + yxCoords + ', UP' );
+    }
+}
+
+/***********************************/
+/* check downward string functions */
+/***********************************/
+
+function check_dnwd_str0() {
+    result = dnwd_str0.match( wordre );
+    if ( result ) {
+        // get word 
+        word = result[0];
+        len = word.length;
+        idx = dnwd_str0.indexOf( word );
+        // get word yxCoords for dnwd_str0
+        for ( let i = 0; i < word.length; i++ ) {
+            switch (idx) {
+                case 0: yxCoords = '[1,5]'; break;
+            }
+        }
+        words.push( word + ', ' + yxCoords + ', DW' );
+    }
+}
+
+function check_dnwd_str1() {
+    result = dnwd_str1.match( wordre );
+    if ( result ) {
+        // get word 
+        word = result[0];
+        len = word.length;
+        idx = dnwd_str1.indexOf( word );
+        // get word yxCoords for dnwd_str1
+        for ( let i = 0; i < word.length; i++ ) {
+            switch (idx) {
+                case 0: yxCoords = '[1,4]'; break;
+                case 1: yxCoords = '[2,5]'; break;
+            }
+        }
+        words.push( word + ', ' + yxCoords + ', DW' );
+    }
+}
+
+function check_dnwd_str2() {
+    result = dnwd_str2.match( wordre );
+    if ( result ) {
+        // get word 
+        word = result[0];
+        len = word.length;
+        idx = dnwd_str2.indexOf( word );
+        // get word yxCoords for dnwd_str2
+        for ( let i = 0; i < word.length; i++ ) {
+            switch (idx) {
+                case 0: yxCoords = '[2,4]'; break;
+            }
+        }
+        words.push( word + ', ' + yxCoords + ', DW' );
+    }
+}
+
+/*******************************/
+/* check down string functions */
+/*******************************/
+
+function check_down_str0() {
+    result = down_str0.match( wordre );
+    if ( result ) {
+        // get word 
+        word = result[0];
+        len = word.length;
+        idx = down_str0.indexOf( word );
+        // get word yxCoords for down_str0
+        for ( let i = 0; i < word.length; i++ ) {
+            switch (idx) {
+                case 0: yxCoords = '[1,4]'; break;
+            }
+        }
+        words.push( word + ', ' + yxCoords + ', DO' );
+    }
+}
+
+function check_down_str1() {
+    result = down_str1.match( wordre );
+    if ( result ) {
+        // get word 
+        word = result[0];
+        len = word.length;
+        idx = down_str1.indexOf( word );
+        // get word yxCoords for down_str1
+        for ( let i = 0; i < word.length; i++ ) {
+            switch (idx) {
+                case 0: yxCoords = '[1,5]'; break;
+                case 1: yxCoords = '[2,5]'; break;
+            }
+        }
+        words.push( word + ', ' + yxCoords + ', DO' );
+    }
+}
+
+function check_down_str2() {
+    result = down_str2.match( wordre );
+    if ( result ) {
+        // get word 
+        word = result[0];
+        len = word.length;
+        idx = down_str2.indexOf( word );
+        // get word yxCoords for down_str2
+        for ( let i = 0; i < word.length; i++ ) {
+            switch (idx) {
+                case 0: yxCoords = '[1,6]'; break;
+            }
+        }
+        words.push( word + ', ' + yxCoords + ', DO' );
+    }
+}
+
+/*******************/
+/* array functions */
+/*******************/
+
+function upwd_lookup( position, idx ) { // string and a number, returns yx_str
+    if ( idx === 0 ) return position;
+    if ( idx === 1 ) {
+        if ( position === '1,4' ) return '1,5'; 
+        if ( position === '2,4' ) return '2,5'; 
+        if ( position === '2,5' ) return '1,6'; 
+        if ( position === '3,5' ) return '2,6'; 
+    }
+    if ( idx === 2 ) return '1,6';
+}
+
+function dnwd_lookup( position, idx ) { // string and a number, returns yx_str
+    if ( idx === 0 ) return position;
+    if ( idx === 1 ) {
+        if ( position === '1,4' ) return '2,5'; 
+        if ( position === '1,5' ) return '1,6'; 
+        if ( position === '2,4' ) return '3,5'; 
+        if ( position === '2,5' ) return '2,6'; 
+    }
+    if ( idx === 2 ) return '2,6';
+}
 
 startGame();
 setPieceHoldEvents();
