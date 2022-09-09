@@ -1204,6 +1204,32 @@ function validateBlackMovement(startingPosition, endingPosition) {
     const boardPiece = curBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
     switch (boardPiece) {
         case 'a':
+                    if ( getTopLetter( endingPosition ) !== 'a' ) {
+                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+    
+// console.log( '' );
+// console.log( 'validateBlackMovement(startingPosition, endingPosition)' );
+// console.log( 'validateBlackMovement() success:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+//                                                  'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+// console.log( 'inRack2(startingPosition):', inRack2(startingPosition) );
+// console.log( 'onBoard(endingPosition):', onBoard(endingPosition) );
+    
+                            return true;
+                        } else { // Error condition
+        
+console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+    
+                            return false;
+                        }
+                    } else { // Error condition
+        
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself.' );
+    
+                    }
+                    break;
         case 'b':
                     if ( getTopLetter( endingPosition ) !== 'b' ) {
                         if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
