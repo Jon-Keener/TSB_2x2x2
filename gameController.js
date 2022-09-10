@@ -1664,7 +1664,9 @@ console.log( 'switchPlayer():' );
 
 
 function calcScore() {
-    let dwb = 0; // double word bonus
+    let fp_bonus = 0; // Flower Power word bonus
+    let po_bonus = 0; // Polination word bonus
+    let st_bonus = 0; // Stacking letter bonus
 
     // 1st: Find the tiles played last turn by diffing prevBoard[][][] and curBoard[][][] back into prevBoard[][][]:
     for (let h = 0; h < 6 ; h++) { // 6 levels
@@ -1685,12 +1687,15 @@ function calcScore() {
         }
     } // prevBoard now contains only the tile(s) played for the last turn
 
-    // check for double-word bonuses
-    if ( prevBoard[0][2][5] !== '.' ) { // Someone played on a double-word bonus
-        dwb = 1;
+    // 2nd: Check for Flower Power and Polination bonuses
+    if ( prevBoard[0][2][5] !== '.' ) { // Someone played on a Flower
+        fp_bonus = 1;
+        if ( ( prevBoard[0][2][5] === 'b' ) || ( prevBoard[0][2][5] === 'q' ) ) {
+	    po_bonus = 1;
+	}
     }
     
-    // 2nd: Use the prevBoard[][][] position(s) to find any new word(s) in curBoard[][][]:
+    // 3rd: Use the prevBoard[][][] position(s) to find any new word(s) in curBoard[][][]:
     for (let h = 0; h < 6 ; h++) { // 6 levels
         for (let i = 0; i < 5 ; i++) { // 5 rows
             for (let j = 0; j < 11; j++) { // 11 columns
@@ -1727,62 +1732,6 @@ function calcScore() {
     
 console.log( 'score_words[]:', score_words );
 // console.log( 'score_words_copy[]:', score_words_copy );
-
-//     ////////////////////////////////////////////////////////////
-//     // 1st, remove any dots in the word_strs of score_words[] //
-//     ////////////////////////////////////////////////////////////
-//     for ( let i = 0; i < score_words.length; ++i ) {
-//         const element = score_words[i];
-//     
-//         // convert the array element to a string
-//         element_str = element + '';
-//         word_str = element_str.substring( 0, element_str.indexOf(',') ); 
-//     
-//         // convert the array element to a string
-//         if ( word_str.indexOf('.') ) {
-// // console.log( 'b_score_words[i]:', score_words[i] );
-//             // remove all '.'s from score_words[i]
-//             score_words[i] = score_words[i].replace(/\./g, '');
-// // console.log( 'a_score_words[i]:', score_words[i] );
-//         }
-//     }
-
-// console.log( 'score_words[]:', score_words );
-// console.log( 'score_words_copy[]:', score_words_copy );
-
-//     ///////////////////////////////////////////////////////////
-//     // 2nd, make a copy of score_words[]                     //
-//     ///////////////////////////////////////////////////////////
-//     // make a copy of score_words[] to help remove everything but the longest word per location and direction
-//     var score_words_copy = JSON.parse(JSON.stringify(score_words));
-
-
-//     ///////////////////////////////////////////////////////////////////////
-//     // 3rd, use only the longest scoring word per position and direction //
-//     ///////////////////////////////////////////////////////////////////////
-//     for ( let i = 0; i < score_words.length; ++i ) {
-//         for ( let j = 0; j < score_words_copy.length; ++j ) {
-//             const a_element = score_words[i];
-//             const b_element = score_words_copy[j];
-//     
-//             // convert the array elements to strings
-//             a_element_str = a_element + '';
-//             b_element_str = b_element + '';
-//     
-//             // get the lead yxCoords from the element strings
-//             a_yx_str = element_str.substring( a_element_str.indexOf(',')+3, a_element_str.indexOf(']') ); 
-//             b_yx_str = element_str.substring( b_element_str.indexOf(',')+3, b_element_str.indexOf(']') ); 
-//     
-//             // get the word directions from the element strings
-//             a_yx_dir = element_str.substring( element_str.length - 2, element_str.length ); 
-//             b_yx_dir = element_str.substring( element_str.length - 2, element_str.length ); 
-//     
-//             // if the position and direction are the same, print it
-//             if ( ( a_yx_str === b_yx_str ) && ( a_yx_dir === b_yx_dir ) ) {
-// console.log( 'matching score_words[i]:', score_words[i] );
-//             }
-//         }
-//     }
 
     //////////////////////////////////////////////////////////////////////////////
     // For every element (word, position, direction) in the score_words[] array, /
@@ -1832,13 +1781,17 @@ console.log( 'An Upwards Word Lookup:' );
 // console.log( 'yx_str:', yx_str, 'new_str:', new_str );
 // console.log( 'letter:', letter, 'letterVal:', letterVal, 'letterLev:', letterLev );
     
-                        // get the stacking multiplier
-                        var sm = letterLev + 1;
+                        // calculate the Stacking bonus for each letter
+                        st_bonus = letterLev + 1;
             
-                        word_score = word_score + sm * letterVal;
+                        word_score = word_score + st_bonus * letterVal;
                     }
-                    // word_score complete, check for a double word bonus 
-                    if ( dwb === 1 ) {
+                    // check for a Flower Power bonus 
+                    if ( fp_bonus === 1 ) {
+                        word_score = word_score * 2;
+                    }
+                    // check for a Polination bonus 
+                    if ( po_bonus === 1 ) {
                         word_score = word_score * 2;
                     }
                     // build the turn ledger and score
@@ -1861,13 +1814,17 @@ console.log( 'A Downwards Word Lookup:' );
 // console.log( 'yx_str:', yx_str, 'new_str:', new_str );
 // console.log( 'letter:', letter, 'letterVal:', letterVal, 'letterLev:', letterLev );
     
-                        // get the stacking multiplier
-                        var sm = letterLev + 1;
+                        // calculate the Stacking bonus for each letter
+                        st_bonus = letterLev + 1;
             
-                        word_score = word_score + sm * letterVal;
+                        word_score = word_score + st_bonus * letterVal;
                     }
-                    // word_score complete, check for a double word bonus 
-                    if ( dwb === 1 ) {
+                    // check for a Flower Power bonus 
+                    if ( fp_bonus === 1 ) {
+                        word_score = word_score * 2;
+                    }
+                    // check for a Polination bonus 
+                    if ( po_bonus === 1 ) {
                         word_score = word_score * 2;
                     }
                     // build the turn ledger and score
@@ -1890,13 +1847,17 @@ console.log( 'A Down Word Lookup:' );
 // console.log( 'yx_str:', yx_str, 'new_str:', new_str );
 // console.log( 'letter:', letter, 'letterVal:', letterVal, 'letterLev:', letterLev );
     
-                        // get the stacking multiplier
-                        var sm = letterLev + 1;
+                        // calculate the Stacking bonus for each letter
+                        st_bonus = letterLev + 1;
             
-                        word_score = word_score + sm * letterVal;
+                        word_score = word_score + st_bonus * letterVal;
                     }
-                    // word_score complete, check for a double word bonus 
-                    if ( dwb === 1 ) {
+                    // check for a Flower Power bonus 
+                    if ( fp_bonus === 1 ) {
+                        word_score = word_score * 2;
+                    }
+                    // check for a Polination bonus 
+                    if ( po_bonus === 1 ) {
                         word_score = word_score * 2;
                     }
                     // build the turn ledger and score
