@@ -4,6 +4,8 @@
 
 var words = [];
 var score_words = [];
+var game_record = [];
+var turn_no = 0;
 
 let curBoard;
 let curPlayer;
@@ -774,8 +776,8 @@ function validateWhiteMovement(startingPosition, endingPosition) {
     const boardPiece = curBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
     switch (boardPiece) {
         case 'a':
-                    if ( getTopLetter( endingPosition ) !== 'a' ) {
-                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+            if ( ( getTopLetter( endingPosition ) !== 'a' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
     
 // console.log( '' );
 // console.log( 'validateWhiteMovement(startingPosition, endingPosition)' );
@@ -784,401 +786,401 @@ function validateWhiteMovement(startingPosition, endingPosition) {
 // console.log( 'inRack1(startingPosition):', inRack1(startingPosition) );
 // console.log( 'onBoard(endingPosition):', onBoard(endingPosition) );
     
-                            return true;
-                        } else { // Error condition
+                    return true;
+                } else { // Error condition
         
 console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
     
-                            return false;
-                        }
-                    } else { // Error condition
+                    return false;
+                }
+            } else { // Error condition
         
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself.' );
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
     
-                    }
-                    break;
+            }
+            break;
         case 'b':
-                    if ( getTopLetter( endingPosition ) !== 'b' ) {
-                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
                     break;
         case 'c':
-                    if ( getTopLetter( endingPosition ) !== 'c' ) {
-                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'c' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'd':
-                    if ( getTopLetter( endingPosition ) !== 'd' ) {
-                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'd' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'e':
-                    if ( getTopLetter( endingPosition ) !== 'e' ) {
-                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'e' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'f':
-                    if ( getTopLetter( endingPosition ) !== 'f' ) {
-                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'f' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'g':
-                    if ( getTopLetter( endingPosition ) !== 'g' ) {
-                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'g' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'h':
-                    if ( getTopLetter( endingPosition ) !== 'h' ) {
-                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'h' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'i':
-                    if ( getTopLetter( endingPosition ) !== 'i' ) {
-                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'i' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'j':
-                    if ( getTopLetter( endingPosition ) !== 'j' ) {
-                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'j' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'k':
-                    if ( getTopLetter( endingPosition ) !== 'k' ) {
-                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'k' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'l':
-                    if ( getTopLetter( endingPosition ) !== 'l' ) {
-                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'l' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'm':
-                    if ( getTopLetter( endingPosition ) !== 'm' ) {
-                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'm' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'n':
-                    if ( getTopLetter( endingPosition ) !== 'n' ) {
-                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'n' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'o':
-                    if ( getTopLetter( endingPosition ) !== 'o' ) {
-                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'o' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'p':
-                    if ( getTopLetter( endingPosition ) !== 'p' ) {
-                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'p' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'q':
-                    if ( getTopLetter( endingPosition ) !== 'q' ) {
-                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'r':
-                    if ( getTopLetter( endingPosition ) !== 'r' ) {
-                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'r' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 's':
-                    if ( getTopLetter( endingPosition ) !== 's' ) {
-                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 's' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 't':
-                    if ( getTopLetter( endingPosition ) !== 't' ) {
-                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 't' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'u':
-                    if ( getTopLetter( endingPosition ) !== 'u' ) {
-                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'u' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'v':
-                    if ( getTopLetter( endingPosition ) !== 'v' ) {
-                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'v' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'w':
-                    if ( getTopLetter( endingPosition ) !== 'w' ) {
-                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'w' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'x':
-                    if ( getTopLetter( endingPosition ) !== 'x' ) {
-                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'x' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'y':
-                    if ( getTopLetter( endingPosition ) !== 'y' ) {
-                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'y' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'z':
-                    if ( getTopLetter( endingPosition ) !== 'z' ) {
-                        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'z' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case ' ':
         case 'R':
-                  if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                      // if the startingPosition is in p1rack and the endingPosition is on the board, and the endingPosition is open, return true 
+            if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                // if the startingPosition is in p1rack and the endingPosition is on the board, and the endingPosition is open, return true 
     
 // console.log( '' );
 // console.log( 'validateWhiteMovement(startingPosition, endingPosition)' );
@@ -1187,8 +1189,8 @@ console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack the same let
 // console.log( 'inRack1(startingPosition):', inRack1(startingPosition) );
 // console.log( 'onBoard(endingPosition):', onBoard(endingPosition) );
     
-                      return true;
-                  } else {
+                return true;
+            } else {
     
 console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
@@ -1196,7 +1198,7 @@ console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
     
                       return false;
-                  }
+            }
     } // switch
 } // validateWhiteMovement(startingPosition, endingPosition)
 
@@ -1204,8 +1206,8 @@ function validateBlackMovement(startingPosition, endingPosition) {
     const boardPiece = curBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
     switch (boardPiece) {
         case 'a':
-                    if ( getTopLetter( endingPosition ) !== 'a' ) {
-                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+            if ( ( getTopLetter( endingPosition ) !== 'a' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
     
 // console.log( '' );
 // console.log( 'validateBlackMovement(startingPosition, endingPosition)' );
@@ -1214,397 +1216,397 @@ function validateBlackMovement(startingPosition, endingPosition) {
 // console.log( 'inRack2(startingPosition):', inRack2(startingPosition) );
 // console.log( 'onBoard(endingPosition):', onBoard(endingPosition) );
     
-                            return true;
-                        } else { // Error condition
+                    return true;
+                } else { // Error condition
         
 console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
     
-                            return false;
-                        }
-                    } else { // Error condition
+                    return false;
+                }
+            } else { // Error condition
         
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself.' );
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
     
-                    }
-                    break;
+            }
+            break;
         case 'b':
-                    if ( getTopLetter( endingPosition ) !== 'b' ) {
-                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'c':
-                    if ( getTopLetter( endingPosition ) !== 'c' ) {
-                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'c' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'd':
-                    if ( getTopLetter( endingPosition ) !== 'd' ) {
-                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'd' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'e':
-                    if ( getTopLetter( endingPosition ) !== 'e' ) {
-                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'e' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'f':
-                    if ( getTopLetter( endingPosition ) !== 'f' ) {
-                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'f' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'g':
-                    if ( getTopLetter( endingPosition ) !== 'g' ) {
-                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'g' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'h':
-                    if ( getTopLetter( endingPosition ) !== 'h' ) {
-                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'h' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'i':
-                    if ( getTopLetter( endingPosition ) !== 'i' ) {
-                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'i' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'j':
-                    if ( getTopLetter( endingPosition ) !== 'j' ) {
-                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'j' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'k':
-                    if ( getTopLetter( endingPosition ) !== 'k' ) {
-                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'k' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'l':
-                    if ( getTopLetter( endingPosition ) !== 'l' ) {
-                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'l' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'm':
-                    if ( getTopLetter( endingPosition ) !== 'm' ) {
-                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'm' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'n':
-                    if ( getTopLetter( endingPosition ) !== 'n' ) {
-                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'n' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'o':
-                    if ( getTopLetter( endingPosition ) !== '0' ) {
-                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'o' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'p':
-                    if ( getTopLetter( endingPosition ) !== 'p' ) {
-                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'p' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'q':
-                    if ( getTopLetter( endingPosition ) !== 'q' ) {
-                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'r':
-                    if ( getTopLetter( endingPosition ) !== 'r' ) {
-                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'r' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 's':
-                    if ( getTopLetter( endingPosition ) !== 's' ) {
-                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 's' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 't':
-                    if ( getTopLetter( endingPosition ) !== 't' ) {
-                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 't' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'u':
-                    if ( getTopLetter( endingPosition ) !== 'u' ) {
-                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'u' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'v':
-                    if ( getTopLetter( endingPosition ) !== 'v' ) {
-                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'v' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'w':
-                    if ( getTopLetter( endingPosition ) !== 'w' ) {
-                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'w' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'x':
-                    if ( getTopLetter( endingPosition ) !== 'x' ) {
-                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'x' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'y':
-                    if ( getTopLetter( endingPosition ) !== 'y' ) {
-                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'y' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case 'z':
-                    if ( getTopLetter( endingPosition ) !== 'z' ) {
-                        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                            return true;
-                        } else { // Error condition
+            if ( ( getTopLetter( endingPosition ) !== 'z' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                    return true;
+                } else { // Error condition
 console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                            return false;
-                        }
-                    } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack the same letter on top of itself' );
-                    }
-                    break;
+                    return false;
+                }
+            } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+            }
+            break;
         case ' ':
         case 'R':
                   if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
@@ -1652,6 +1654,8 @@ function switchPlayer() {
         rePopRack2();
         // backup curBoard to prevBoard
         prevBoard = JSON.parse(JSON.stringify(curBoard));
+        // increment the turn no
+        turn_no++;
         // switch player
         curPlayer = 'white';
     }
@@ -1665,7 +1669,7 @@ console.log( 'switchPlayer():' );
 
 function calcScore() {
     let fp_bonus = 0; // Flower Power word bonus
-    let po_bonus = 0; // Polination word bonus
+    let po_bonus = 0; // Pollination word bonus
     let st_bonus = 0; // Stacking letter bonus
 
     // 1st: Find the tiles played last turn by diffing prevBoard[][][] and curBoard[][][] back into prevBoard[][][]:
@@ -1687,12 +1691,12 @@ function calcScore() {
         }
     } // prevBoard now contains only the tile(s) played for the last turn
 
-    // 2nd: Check for Flower Power and Polination bonuses
+    // 2nd: Check for Flower Power and Pollination bonuses
     if ( prevBoard[0][2][5] !== '.' ) { // Someone played on a Flower
         fp_bonus = 1;
         if ( ( prevBoard[0][2][5] === 'b' ) || ( prevBoard[0][2][5] === 'q' ) ) {
-	    po_bonus = 1;
-	}
+            po_bonus = 1;
+        }
     }
     
     // 3rd: Use the prevBoard[][][] position(s) to find any new word(s) in curBoard[][][]:
@@ -1731,7 +1735,6 @@ function calcScore() {
     var turn_ledger = '';
     
 console.log( 'score_words[]:', score_words );
-// console.log( 'score_words_copy[]:', score_words_copy );
 
     //////////////////////////////////////////////////////////////////////////////
     // For every element (word, position, direction) in the score_words[] array, /
@@ -1790,13 +1793,16 @@ console.log( 'An Upwards Word Lookup:' );
                     if ( fp_bonus === 1 ) {
                         word_score = word_score * 2;
                     }
-                    // check for a Polination bonus 
+                    // check for a Pollination bonus 
                     if ( po_bonus === 1 ) {
-                        word_score = word_score * 2;
+                        word_score = word_score + 10;
                     }
                     // build the turn ledger and score
                     turn_ledger = turn_ledger + word_str + ' ' + word_score + ', ';
                     turn_score = turn_score + word_score;
+
+                    // record log
+                    game_record.push( curPlayer, turn_no, element_str, word_score );
                     break;
 
                 case 'DW': // Downwards Word
@@ -1823,13 +1829,16 @@ console.log( 'A Downwards Word Lookup:' );
                     if ( fp_bonus === 1 ) {
                         word_score = word_score * 2;
                     }
-                    // check for a Polination bonus 
+                    // check for a Pollination bonus 
                     if ( po_bonus === 1 ) {
-                        word_score = word_score * 2;
+                        word_score = word_score + 10;
                     }
                     // build the turn ledger and score
                     turn_ledger = turn_ledger + word_str + ' ' + word_score + ', ';
                     turn_score = turn_score + word_score;
+                    
+                    // record log
+                    game_record.push( curPlayer, turn_no, element_str, word_score );
                     break;
 
                 case 'DO': // Straight-Down Word
@@ -1856,13 +1865,16 @@ console.log( 'A Down Word Lookup:' );
                     if ( fp_bonus === 1 ) {
                         word_score = word_score * 2;
                     }
-                    // check for a Polination bonus 
+                    // check for a Pollination bonus 
                     if ( po_bonus === 1 ) {
-                        word_score = word_score * 2;
+                        word_score = word_score + 10;
                     }
                     // build the turn ledger and score
                     turn_ledger = turn_ledger + word_str + ' ' + word_score + ', ';
                     turn_score = turn_score + word_score;
+
+                    // record log
+                    game_record.push( curPlayer, turn_no, element_str, word_score );
                     break;
 
             }
@@ -1873,6 +1885,8 @@ console.log( 'A Down Word Lookup:' );
 // console.log( 'Turn_Score:', turn_score );
     
     } // for every word in score_words[]
+
+console.log( 'game_record:', game_record );
 
     // turn_ledger now has the individual word scores, and
     // turn_score now has the players total for the turn
@@ -2039,8 +2053,8 @@ function getTopLevel( position ) { // position = string of yxCoords, returns the
     let y = Number(myArray[0]);
     let x = Number(myArray[1]); // position [y,x] is the source for finding the top z level in curBoard[][][]
     
-console.log( '' );
-console.log( 'getTopLevel(', position, '):' );
+// console.log( '' );
+// console.log( 'getTopLevel(', position, '):' );
 // console.log( 'position:', position );
 // console.log( 'y:', y );
 // console.log( 'x:', x );
@@ -2060,8 +2074,8 @@ function getTopLetter( position ) { // return the piece that is on top of the cu
     let x = position[2];
     let top_letter = '';
 
-console.log( 'In getTopLetter:' );
-console.log( 'position:', position, 'z:', z, 'y:', y, 'x:', x );
+// console.log( 'In getTopLetter:' );
+// console.log( 'position:', position, 'z:', z, 'y:', y, 'x:', x );
 
     // get the top letter from curBoard for yxCoord
     for (let level = 5; level >= 0 ; level--) { // 6 levels
@@ -2138,7 +2152,7 @@ function check_upwd_str0() {
         }
         words.push( word + ', ' + yxCoords + ', UP' );
     }
-}
+} // check_upwd_str0()
 
 function check_upwd_str1() {
     result = upwd_str1.match( wordre );
@@ -2156,7 +2170,7 @@ function check_upwd_str1() {
         }
         words.push( word + ', ' + yxCoords + ', UP' );
     }
-}
+} // check_upwd_str1()
 
 function check_upwd_str2() {
     result = upwd_str2.match( wordre );
@@ -2173,7 +2187,7 @@ function check_upwd_str2() {
         }
         words.push( word + ', ' + yxCoords + ', UP' );
     }
-}
+} // check_upwd_str2()
 
 /***********************************/
 /* check downward string functions */
@@ -2194,7 +2208,7 @@ function check_dnwd_str0() {
         }
         words.push( word + ', ' + yxCoords + ', DW' );
     }
-}
+} // check_dnwd_str0()
 
 function check_dnwd_str1() {
     result = dnwd_str1.match( wordre );
@@ -2212,7 +2226,7 @@ function check_dnwd_str1() {
         }
         words.push( word + ', ' + yxCoords + ', DW' );
     }
-}
+} // check_dnwd_str1()
 
 function check_dnwd_str2() {
     result = dnwd_str2.match( wordre );
@@ -2229,7 +2243,7 @@ function check_dnwd_str2() {
         }
         words.push( word + ', ' + yxCoords + ', DW' );
     }
-}
+} // check_dnwd_str2()
 
 /*******************************/
 /* check down string functions */
@@ -2250,7 +2264,7 @@ function check_down_str0() {
         }
         words.push( word + ', ' + yxCoords + ', DO' );
     }
-}
+} // check_down_str0()
 
 function check_down_str1() {
     result = down_str1.match( wordre );
@@ -2268,7 +2282,7 @@ function check_down_str1() {
         }
         words.push( word + ', ' + yxCoords + ', DO' );
     }
-}
+} // check_down_str1()
 
 function check_down_str2() {
     result = down_str2.match( wordre );
@@ -2285,11 +2299,11 @@ function check_down_str2() {
         }
         words.push( word + ', ' + yxCoords + ', DO' );
     }
-}
+} // check_down_str2()
 
-/*******************/
-/* array functions */
-/*******************/
+/********************/
+/* lookup functions */
+/********************/
 
 function upwd_lookup( position, idx ) { // string and a number, returns yx_str
     if ( idx === 0 ) return position;
