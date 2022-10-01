@@ -1,3 +1,21 @@
+New testing 20220924:
+Blank tile replacement is almost working correctly...
+  In pickLetter():
+    replacing the blank tile with the letter_blank works,
+    but removing the original blank tile from the rack doesn't,
+    although the original blank tile appears to be removed:
+
+    Uncaught TypeError: Failed to execute 'removeChild' on 'Node': parameter 1 is not of type 'Node'.
+  
+    I'd like to fix this before saving to GitHub...
+
+
+
+
+
+
+
+
 New testing 20220908:
 I got scoring to work for 3-or-more-letter words and removed the lookup functions,
 but this broke scoring for stacked letters, so I reverted the change.

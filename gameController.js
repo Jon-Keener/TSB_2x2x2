@@ -13,13 +13,13 @@ let curPlayer;
 let curHeldPiece;
 let curHeldPieceStartingPosition;
 
-const wordre = /[a-z]{2,}/; // A word is 2 or more consecutive lower-case letters, used to have A-Z
+const wordre = /[A-Za-z]{2,}/; // A word is 2 or more consecutive lower-case letters, used to have A-Z
     
 const gameBoard = [ // 6 levels of 5 rows of 11 columns, [Z,Y,X]: [0,0,0] - [5,4,10]
 [ ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+  ['.', '.', '.', '.', '^', '.', '^', '.', '.', '.', '.'],
   ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
-  ['.', '.', '.', '.', '.', 'R', '.', '.', '.', '.', '.'],
-  ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+  ['.', '.', '.', '.', '.', '^', '.', '.', '.', '.', '.'],
   ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
 ], // level 0
 [ ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
@@ -115,7 +115,7 @@ function startGame() {
     if (typeof p2rack[0] !== 'undefined') { gameBoard[0][4][7] = p2rack[3] } else { gameBoard[0][4][7] = '.' };
     if (typeof p2rack[3] !== 'undefined') { gameBoard[0][2][10] = p2rack[4] } else { gameBoard[0][2][10] = '.' };
     if (typeof p2rack[2] !== 'undefined') { gameBoard[0][3][9] = p2rack[5] } else { gameBoard[0][3][9] = '.' };
-
+    
     loadPosition(gameBoard, starterPlayer);
     
 } // startGame()
@@ -123,7 +123,7 @@ function startGame() {
 function loadPosition( position, playerToMove ) {
     curBoard = position;
     curPlayer = playerToMove;
-
+    
     // level h, row i and column j
     for (let h = 0; h < 6 ; h++) { // 6 levels
         for (let i = 0; i < 5 ; i++) { // 5 rows
@@ -141,49 +141,99 @@ function loadPosition( position, playerToMove ) {
     }
 } // loadPosition( position, playerToMove )
 
-function loadRack(piece, position) {
+function loadRack( piece, position ) {
     // piece and position, an array of ZYX ids, which concat into the Id
     const squareElement = document.getElementById(`${position[0]}${position[1]}${position[2]}`);
-
+    
     const pieceElement = document.createElement('img');
     pieceElement.classList.add('piece');
     pieceElement.id = piece;
     pieceElement.draggable = true;
     pieceElement.src = getPieceImageSource(piece);
-
+    
     squareElement.appendChild(pieceElement);
-
+    
 // console.log( '' );
-// console.log( 'loadRack(piece, position):' );
-// console.log( 'InRack1:', inRack1( position ), 'InRack2:', inRack2( position ), 'piece:', piece, 'position:', position );
-// console.log( 'pieceElement:', pieceElement );
+// console.log( 'loadRack( piece, position ):' );
+// console.log( 'piece:', piece, 'position:', position, 'squareElement:', squareElement, 'pieceElement:', pieceElement );
+    
+} // loadRack( piece, position )
 
-} // loadRack(piece, position)
+function removeRack( piece, position ) {
+    // piece and position, an array of ZYX ids, which concat into the Id
+    const squareElement = document.getElementById(`${position[0]}${position[1]}${position[2]}`);
+    
+    const pieceElement = document.squareElement.getElementsByClassName('piece');
+    pieceElement.remove();
+    
+// console.log( '' );
+// console.log( 'removeRack( piece, position ):' );
+// console.log( 'piece:', piece, 'position:', position, 'squareElement:', squareElement, 'pieceElement:', pieceElement );
+    
+} // removeRack( piece, position ) 
 
-function loadPiece(piece, position) {
+function loadPiece( piece, position ) {
     // piece and position, an array of ZYX ids, which concat to the Id
     const squareElement = document.getElementById(`${position[0]}${position[1]}${position[2]}`);
-
+    
     const pieceElement = document.createElement('img');
     pieceElement.classList.add('piece');
     pieceElement.id = piece;
     pieceElement.draggable = false;
     pieceElement.src = getPieceImageSource(piece);
-
+    
     squareElement.appendChild(pieceElement);
-
+    
 // console.log( '' );
-// console.log( 'loadPiece(piece, position):' );
-// console.log( 'InRack1:', inRack1( position ), 'InRack2:', inRack2( position ), 'piece:', piece, 'position:', position );
-// console.log( 'pieceElement:', pieceElement );
+// console.log( 'loadPiece( piece, position ):' );
+// console.log( 'piece:', piece, 'position:', position, 'squareElement:', squareElement, 'pieceElement:', pieceElement );
+    
+} // loadPiece( piece, position )
 
-} // loadPiece(piece, position)
+function removePiece( piece, position ) {
+    // piece and position, an array of ZYX ids, which concat into the Id
+    const squareElement = document.getElementById(`${position[0]}${position[1]}${position[2]}`);
+    
+    const pieceElement = document.getElementById( piece );
+    pieceElement.remove();
+    
+console.log( '' );
+console.log( 'removePiece( piece, position ):' );
+console.log( 'piece:', piece, 'position:', position, 'squareElement:', squareElement, 'pieceElement:', pieceElement );
+    
+} // removePiece( piece, position )
 
-function getPieceImageSource(piece) {
+function getPieceImageSource( piece ) {
     switch (piece) {
         case '.': return '';
         case 'null': return '';
-        case 'a': return 'assets/A0.png';
+        case 'A': return 'assets/_A.png'; // Blank tile substitution tiles
+        case 'B': return 'assets/_B.png';
+        case 'C': return 'assets/_C.png';
+        case 'D': return 'assets/_D.png';
+        case 'E': return 'assets/_E.png';
+        case 'F': return 'assets/_F.png';
+        case 'G': return 'assets/_G.png';
+        case 'H': return 'assets/_H.png';
+        case 'I': return 'assets/_I.png';
+        case 'J': return 'assets/_J.png';
+        case 'K': return 'assets/_K.png';
+        case 'L': return 'assets/_L.png';
+        case 'M': return 'assets/_M.png';
+        case 'N': return 'assets/_N.png';
+        case 'O': return 'assets/_O.png';
+        case 'P': return 'assets/_P.png';
+        case 'Q': return 'assets/_Q.png';
+        case 'R': return 'assets/_R.png';
+        case 'S': return 'assets/_S.png';
+        case 'T': return 'assets/_T.png';
+        case 'U': return 'assets/_U.png';
+        case 'V': return 'assets/_V.png';
+        case 'W': return 'assets/_W.png';
+        case 'X': return 'assets/_X.png';
+        case 'Y': return 'assets/_Y.png';
+        case 'Z': return 'assets/_Z.png';
+        case 'a': return 'assets/A0.png'; // Level 0 letter tiles
         case 'b': return 'assets/B0.png';
         case 'c': return 'assets/C0.png';
         case 'd': return 'assets/D0.png';
@@ -210,7 +260,7 @@ function getPieceImageSource(piece) {
         case 'y': return 'assets/Y0.png';
         case 'z': return 'assets/Z0.png';
         case ' ': return 'assets/BLANK0.png';
-        case 'a1': return 'assets/A1.png';
+        case 'a1': return 'assets/A1.png'; // Level 1 letter tiles
         case 'b1': return 'assets/B1.png';
         case 'c1': return 'assets/C1.png';
         case 'd1': return 'assets/D1.png';
@@ -237,7 +287,7 @@ function getPieceImageSource(piece) {
         case 'y1': return 'assets/Y1.png';
         case 'z1': return 'assets/Z1.png';
         case ' 1': return 'assets/BLANK1.png';
-        case 'a2': return 'assets/A2.png';
+        case 'a2': return 'assets/A2.png'; // Level 2 letter tiles
         case 'b2': return 'assets/B2.png';
         case 'c2': return 'assets/C2.png';
         case 'd2': return 'assets/D2.png';
@@ -264,7 +314,7 @@ function getPieceImageSource(piece) {
         case 'y2': return 'assets/Y2.png';
         case 'z2': return 'assets/Z2.png';
         case ' 2': return 'assets/BLANK2.png';
-        case 'a3': return 'assets/A3.png';
+        case 'a3': return 'assets/A3.png'; // Level 3 letter tiles
         case 'b3': return 'assets/B3.png';
         case 'c3': return 'assets/C3.png';
         case 'd3': return 'assets/D3.png';
@@ -291,7 +341,7 @@ function getPieceImageSource(piece) {
         case 'y3': return 'assets/Y3.png';
         case 'z3': return 'assets/Z3.png';
         case ' 3': return 'assets/BLANK3.png';
-        case 'a4': return 'assets/A4.png';
+        case 'a4': return 'assets/A4.png'; // Level 4 letter tiles
         case 'b4': return 'assets/B4.png';
         case 'c4': return 'assets/C4.png';
         case 'd4': return 'assets/D4.png';
@@ -318,7 +368,7 @@ function getPieceImageSource(piece) {
         case 'y4': return 'assets/Y4.png';
         case 'z4': return 'assets/Z4.png';
         case ' 4': return 'assets/BLANK4.png';
-        case 'a5': return 'assets/A5.png';
+        case 'a5': return 'assets/A5.png'; // Level 5 letter tiles
         case 'b5': return 'assets/B5.png';
         case 'c5': return 'assets/C5.png';
         case 'd5': return 'assets/D5.png';
@@ -345,9 +395,9 @@ function getPieceImageSource(piece) {
         case 'y5': return 'assets/Y5.png';
         case 'z5': return 'assets/Z5.png';
         case ' 5': return 'assets/BLANK5.png';
-        case 'R': return 'assets/pink-rose.png';
+        case '^': return 'assets/pink-rose.png';
     }
-} // getPieceImageSource(piece)
+} // getPieceImageSource( piece )
 
 function rePopRack1() {
     // repopulate the p1rack
@@ -469,6 +519,33 @@ function inRack2( position ) { // true if the position [z,y,x] is within the p2r
 // console.log( 'inRack2([0,2,10]):', inRack2([0,2,10]) );
 // console.log( 'inRack2([0,3,9]):', inRack2([0,3,9]) );
 
+function onFlower( position ) { // true if the position [y,x] is on a flower
+    // let z = position[0];
+    let y = position[0];
+    let x = position[1];
+    
+    // if ( (z===0 && y===1 && x===4) || (z===0 && y===1 && x===6) || (z===0 && y===3 && x===5) ) { // flowers
+    if ( (y===1 && x===4) || (y===1 && x===6) || (y===3 && x===5) ) { // flowers
+        return true;
+    } else {
+        return false;
+    }
+} // onFlower( position )
+
+// console.log( 'onFlower( [1,4] ):', onFlower( [1,4] ) );
+// console.log( 'onFlower( [1,5] ):', onFlower( [1,5] ) );
+// console.log( 'onFlower( [1,6] ):', onFlower( [1,6] ) );
+// console.log( 'onFlower( [2,4] ):', onFlower( [2,4] ) );
+// console.log( 'onFlower( [3,5] ):', onFlower( [3,5] ) );
+// console.log( 'onFlower( [2,6] ):', onFlower( [2,6] ) );
+
+// console.log( 'onFlower([0,1,4]):', onFlower([0,1,4] ) );
+// console.log( 'onFlower([0,1,5]):', onFlower([0,1,5] ) );
+// console.log( 'onFlower([0,1,6]):', onFlower([0,1,6] ) );
+// console.log( 'onFlower([0,2,4]):', onFlower([0,2,4] ) );
+// console.log( 'onFlower([0,3,5]):', onFlower([0,3,5] ) );
+// console.log( 'onFlower([0,2,6]):', onFlower([0,2,6] ) );
+
 function onBoard( position ) { // true if the position is on the board
     let z = position[0];
     let y = position[1];
@@ -571,7 +648,7 @@ function setPieceHoldEvents() {
                                                      parseInt(curHeldPieceStringPosition[1],10)-1, 
                                                      Number("" + parseInt(curHeldPieceStringPosition[2],10) + parseInt(curHeldPieceStringPosition[3],10))-1 ]; // Concat the 3rd and 4th digits.
                 }
-
+    
 // console.warn( 'curHeldPieceStringPosition:', curHeldPieceStringPosition );
 // console.warn( '[parseInt(curHeldPieceStringPosition[0],10):', parseInt(curHeldPieceStringPosition[0],10) );
 // console.warn( '[parseInt(curHeldPieceStringPosition[1],10):', parseInt(curHeldPieceStringPosition[1],10) );
@@ -613,7 +690,7 @@ function setPieceHoldEvents() {
                     } else {
                         var yPosition = Math.floor((mousePositionOnBoardY - boardBorderSize) / document.getElementsByClassName('square')[0].offsetHeight*0.77); // was 0.666, then 0.75
                     }
-
+    
                     var zPosition = 0;
                     const pieceReleasePosition = [zPosition, yPosition, xPosition];
     
@@ -646,16 +723,17 @@ function setPieceHoldEvents() {
     });
 } // setPieceHoldEvents()
 
-function movePiece(piece, startingPosition, endingPosition) {
+function movePiece( piece, startingPosition, endingPosition ) {
     const boardPiece = curBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
     
     // If the boardPiece is not empty 
     if ( boardPiece !== '.' ) {
     // If the boardPiece is not empty AND the top rung is empty
     // if ( (boardPiece !== '.') && ( curBoard[endingPosition[0]+5][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
-
+    
         // move the piece
-        curBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]] = '.'; // clear the startingPosition and remove the sourceSquare's child(piece)
+        curBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]] = '.'; // clear the startingPosition and 
+        // remove the sourceSquare's child(piece)
         const sourceSquare = document.getElementById(`${startingPosition[0] + 1}${startingPosition[1] + 1}${startingPosition[2] + 1}`);
         sourceSquare.removeChild(piece);
     
@@ -668,6 +746,7 @@ function movePiece(piece, startingPosition, endingPosition) {
         if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 3 ) { p1rack[3] = '.'; }
         if ( startingPosition[0] === 0 && startingPosition[1] === 1 && startingPosition[2] === 0 ) { p1rack[4] = '.'; }
         if ( startingPosition[0] === 0 && startingPosition[1] === 1 && startingPosition[2] === 1 ) { p1rack[5] = '.'; }
+    
         if ( startingPosition[0] === 0 && startingPosition[1] === 3 && startingPosition[2] === 10 ) { p2rack[0] = '.'; } // clear the tile from the p2rack
         if ( startingPosition[0] === 0 && startingPosition[1] === 4 && startingPosition[2] === 9 ) { p2rack[1] = '.'; }
         if ( startingPosition[0] === 0 && startingPosition[1] === 3 && startingPosition[2] === 8 ) { p2rack[2] = '.'; }
@@ -675,7 +754,7 @@ function movePiece(piece, startingPosition, endingPosition) {
         if ( startingPosition[0] === 0 && startingPosition[1] === 2 && startingPosition[2] === 10 ) { p2rack[4] = '.'; }
         if ( startingPosition[0] === 0 && startingPosition[1] === 3 && startingPosition[2] === 9 ) { p2rack[5] = '.'; }
     
-        if ( !( curBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]].includes(".") ) && !( curBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]].includes("R") ) ) {
+        if ( !( curBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]].includes(".") ) && !( curBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]].includes("^") ) ) {
             // level 0 is not empty AND level 0 is not R, check next level
             if (!( curBoard[endingPosition[0]+1][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
                 // level 1 is not empty, check next level
@@ -688,81 +767,87 @@ function movePiece(piece, startingPosition, endingPosition) {
                             if (!( curBoard[endingPosition[0]+5][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
                                 // level 5 is not empty, no more levels, this needs to be prevented
     
-console.error("No more levels");
+console.warn("No more levels available.");
     
                             } else {
                                 curBoard[endingPosition[0]+5][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 5
                                 const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
                                 destinationSquare.textContent = '';
-
+    
                                 // build a new pieceElement and append it to the destinationSquare
                                 const pieceElement = document.createElement('img');
                                 pieceElement.classList.add('piece');
                                 pieceElement.id = boardPiece;
                                 pieceElement.draggable = false;
                                 pieceElement.src = getPieceImageSource(boardPiece+'5');
+// pieceElement.position = static;
                                 destinationSquare.appendChild(pieceElement);
                             }
                         } else {
                             curBoard[endingPosition[0]+4][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 4
                             const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
                             destinationSquare.textContent = '';
-
+    
                             // build a new pieceElement and append it to the destinationSquare
                             const pieceElement = document.createElement('img');
                             pieceElement.classList.add('piece');
                             pieceElement.id = boardPiece;
                             pieceElement.draggable = false;
                             pieceElement.src = getPieceImageSource(boardPiece+'4');
+// pieceElement.position = static;
                             destinationSquare.appendChild(pieceElement);
                         }
                     } else {
                         curBoard[endingPosition[0]+3][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 3
                         const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
                         destinationSquare.textContent = '';
-
+    
                         // build a new pieceElement and append it to the destinationSquare
                         const pieceElement = document.createElement('img');
                         pieceElement.classList.add('piece');
                         pieceElement.id = boardPiece;
                         pieceElement.draggable = false;
                         pieceElement.src = getPieceImageSource(boardPiece+'3');
+// pieceElement.position = static;
                         destinationSquare.appendChild(pieceElement);
                     }
                 } else {
                     curBoard[endingPosition[0]+2][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 2
                     const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
                     destinationSquare.textContent = '';
-
+    
                     // build a new pieceElement and append it to the destinationSquare
                     const pieceElement = document.createElement('img');
                     pieceElement.classList.add('piece');
                     pieceElement.id = boardPiece;
                     pieceElement.draggable = false;
                     pieceElement.src = getPieceImageSource(boardPiece+'2');
+// pieceElement.position = static;
                     destinationSquare.appendChild(pieceElement);
                 }
             } else {
                 curBoard[endingPosition[0]+1][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 1
                 const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
                 destinationSquare.textContent = '';
-
+    
                 // build a new pieceElement and append it to the destinationSquare
                 const pieceElement = document.createElement('img');
                 pieceElement.classList.add('piece');
                 pieceElement.id = boardPiece;
                 pieceElement.draggable = false;
                 pieceElement.src = getPieceImageSource(boardPiece+'1');
+// pieceElement.position = static;
                 destinationSquare.appendChild(pieceElement);
             }
         } else {
             curBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 0
             const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
             destinationSquare.textContent = '';
+// pieceElement.position = static;
             destinationSquare.appendChild(piece);
         }
     }
-
+    
 // console.log( '' );
 // console.log( 'movePiece():' );
 // console.log( 'curPlayer:', curPlayer, 'moves a:"', piece.id, '" from startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
@@ -770,415 +855,95 @@ console.error("No more levels");
 // console.log( 'p1rack:', p1rack, 'p1rack.dot_count:', p1rack.filter(x => x === '.').length );
 // console.log( 'p2rack:', p2rack, 'p2rack.dot_count:', p2rack.filter(x => x === '.').length );
     
-} // movePiece(piece, startingPosition, endingPosition)
+} // movePiece( piece, startingPosition, endingPosition )
 
-function validateWhiteMovement(startingPosition, endingPosition) {
+function validateWhiteMovement( startingPosition, endingPosition ) {
     const boardPiece = curBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
     switch (boardPiece) {
         case 'a':
-            if ( ( getTopLetter( endingPosition ) !== 'a' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-    
-// console.log( '' );
-// console.log( 'validateWhiteMovement(startingPosition, endingPosition)' );
-// console.log( 'validateWhiteMovement() success:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-//                                                  'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-// console.log( 'inRack1(startingPosition):', inRack1(startingPosition) );
-// console.log( 'onBoard(endingPosition):', onBoard(endingPosition) );
-    
-                    return true;
-                } else { // Error condition
-        
-console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-    
-                    return false;
-                }
-            } else { // Error condition
-        
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-    
-            }
+            return testWhiteLetter( startingPosition, endingPosition, 'a' );
             break;
         case 'b':
-            if ( ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
-                    break;
+            return testWhiteLetter( startingPosition, endingPosition, 'b' );
+            break;
         case 'c':
-            if ( ( getTopLetter( endingPosition ) !== 'c' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testWhiteLetter( startingPosition, endingPosition, 'c' );
             break;
         case 'd':
-            if ( ( getTopLetter( endingPosition ) !== 'd' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testWhiteLetter( startingPosition, endingPosition, 'd' );
             break;
         case 'e':
-            if ( ( getTopLetter( endingPosition ) !== 'e' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testWhiteLetter( startingPosition, endingPosition, 'e' );
             break;
         case 'f':
-            if ( ( getTopLetter( endingPosition ) !== 'f' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testWhiteLetter( startingPosition, endingPosition, 'f' );
             break;
         case 'g':
-            if ( ( getTopLetter( endingPosition ) !== 'g' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testWhiteLetter( startingPosition, endingPosition, 'g' );
             break;
         case 'h':
-            if ( ( getTopLetter( endingPosition ) !== 'h' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testWhiteLetter( startingPosition, endingPosition, 'h' );
             break;
         case 'i':
-            if ( ( getTopLetter( endingPosition ) !== 'i' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testWhiteLetter( startingPosition, endingPosition, 'i' );
             break;
         case 'j':
-            if ( ( getTopLetter( endingPosition ) !== 'j' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testWhiteLetter( startingPosition, endingPosition, 'j' );
             break;
         case 'k':
-            if ( ( getTopLetter( endingPosition ) !== 'k' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testWhiteLetter( startingPosition, endingPosition, 'k' );
             break;
         case 'l':
-            if ( ( getTopLetter( endingPosition ) !== 'l' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testWhiteLetter( startingPosition, endingPosition, 'l' );
             break;
         case 'm':
-            if ( ( getTopLetter( endingPosition ) !== 'm' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testWhiteLetter( startingPosition, endingPosition, 'm' );
             break;
         case 'n':
-            if ( ( getTopLetter( endingPosition ) !== 'n' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testWhiteLetter( startingPosition, endingPosition, 'n' );
             break;
         case 'o':
-            if ( ( getTopLetter( endingPosition ) !== 'o' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testWhiteLetter( startingPosition, endingPosition, 'o' );
             break;
         case 'p':
-            if ( ( getTopLetter( endingPosition ) !== 'p' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testWhiteLetter( startingPosition, endingPosition, 'p' );
             break;
         case 'q':
-            if ( ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testWhiteLetter( startingPosition, endingPosition, 'q' );
             break;
         case 'r':
-            if ( ( getTopLetter( endingPosition ) !== 'r' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testWhiteLetter( startingPosition, endingPosition, 'r' );
             break;
         case 's':
-            if ( ( getTopLetter( endingPosition ) !== 's' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testWhiteLetter( startingPosition, endingPosition, 's' );
             break;
         case 't':
-            if ( ( getTopLetter( endingPosition ) !== 't' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testWhiteLetter( startingPosition, endingPosition, 't' );
             break;
         case 'u':
-            if ( ( getTopLetter( endingPosition ) !== 'u' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testWhiteLetter( startingPosition, endingPosition, 'u' );
             break;
         case 'v':
-            if ( ( getTopLetter( endingPosition ) !== 'v' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testWhiteLetter( startingPosition, endingPosition, 'v' );
             break;
         case 'w':
-            if ( ( getTopLetter( endingPosition ) !== 'w' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testWhiteLetter( startingPosition, endingPosition, 'w' );
             break;
         case 'x':
-            if ( ( getTopLetter( endingPosition ) !== 'x' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testWhiteLetter( startingPosition, endingPosition, 'x' );
             break;
         case 'y':
-            if ( ( getTopLetter( endingPosition ) !== 'y' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testWhiteLetter( startingPosition, endingPosition, 'y' );
             break;
         case 'z':
-            if ( ( getTopLetter( endingPosition ) !== 'z' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testWhiteLetter( startingPosition, endingPosition, 'z' );
             break;
         case ' ':
-        case 'R':
+            if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+                pickLetter( startingPosition, endingPosition );
+            }
+            break;
+        case '^':
             if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
                 // if the startingPosition is in p1rack and the endingPosition is on the board, and the endingPosition is open, return true 
     
@@ -1200,415 +965,95 @@ console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
                       return false;
             }
     } // switch
-} // validateWhiteMovement(startingPosition, endingPosition)
+} // validateWhiteMovement( startingPosition, endingPosition )
 
-function validateBlackMovement(startingPosition, endingPosition) {
+function validateBlackMovement( startingPosition, endingPosition ) {
     const boardPiece = curBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
     switch (boardPiece) {
         case 'a':
-            if ( ( getTopLetter( endingPosition ) !== 'a' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-    
-// console.log( '' );
-// console.log( 'validateBlackMovement(startingPosition, endingPosition)' );
-// console.log( 'validateBlackMovement() success:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-//                                                  'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-// console.log( 'inRack2(startingPosition):', inRack2(startingPosition) );
-// console.log( 'onBoard(endingPosition):', onBoard(endingPosition) );
-    
-                    return true;
-                } else { // Error condition
-        
-console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-    
-                    return false;
-                }
-            } else { // Error condition
-        
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-    
-            }
+            return testBlackLetter( startingPosition, endingPosition, 'a' );
             break;
         case 'b':
-            if ( ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testBlackLetter( startingPosition, endingPosition, 'b' );
             break;
         case 'c':
-            if ( ( getTopLetter( endingPosition ) !== 'c' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testBlackLetter( startingPosition, endingPosition, 'c' );
             break;
         case 'd':
-            if ( ( getTopLetter( endingPosition ) !== 'd' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testBlackLetter( startingPosition, endingPosition, 'd' );
             break;
         case 'e':
-            if ( ( getTopLetter( endingPosition ) !== 'e' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testBlackLetter( startingPosition, endingPosition, 'e' );
             break;
         case 'f':
-            if ( ( getTopLetter( endingPosition ) !== 'f' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testBlackLetter( startingPosition, endingPosition, 'f' );
             break;
         case 'g':
-            if ( ( getTopLetter( endingPosition ) !== 'g' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testBlackLetter( startingPosition, endingPosition, 'g' );
             break;
         case 'h':
-            if ( ( getTopLetter( endingPosition ) !== 'h' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testBlackLetter( startingPosition, endingPosition, 'h' );
             break;
         case 'i':
-            if ( ( getTopLetter( endingPosition ) !== 'i' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testBlackLetter( startingPosition, endingPosition, 'i' );
             break;
         case 'j':
-            if ( ( getTopLetter( endingPosition ) !== 'j' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testBlackLetter( startingPosition, endingPosition, 'j' );
             break;
         case 'k':
-            if ( ( getTopLetter( endingPosition ) !== 'k' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testBlackLetter( startingPosition, endingPosition, 'k' );
             break;
         case 'l':
-            if ( ( getTopLetter( endingPosition ) !== 'l' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testBlackLetter( startingPosition, endingPosition, 'l' );
             break;
         case 'm':
-            if ( ( getTopLetter( endingPosition ) !== 'm' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testBlackLetter( startingPosition, endingPosition, 'm' );
             break;
         case 'n':
-            if ( ( getTopLetter( endingPosition ) !== 'n' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testBlackLetter( startingPosition, endingPosition, 'n' );
             break;
         case 'o':
-            if ( ( getTopLetter( endingPosition ) !== 'o' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testBlackLetter( startingPosition, endingPosition, 'o' );
             break;
         case 'p':
-            if ( ( getTopLetter( endingPosition ) !== 'p' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testBlackLetter( startingPosition, endingPosition, 'p' );
             break;
         case 'q':
-            if ( ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testBlackLetter( startingPosition, endingPosition, 'q' );
             break;
         case 'r':
-            if ( ( getTopLetter( endingPosition ) !== 'r' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testBlackLetter( startingPosition, endingPosition, 'r' );
             break;
         case 's':
-            if ( ( getTopLetter( endingPosition ) !== 's' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testBlackLetter( startingPosition, endingPosition, 's' );
             break;
         case 't':
-            if ( ( getTopLetter( endingPosition ) !== 't' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testBlackLetter( startingPosition, endingPosition, 't' );
             break;
         case 'u':
-            if ( ( getTopLetter( endingPosition ) !== 'u' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testBlackLetter( startingPosition, endingPosition, 'u' );
             break;
         case 'v':
-            if ( ( getTopLetter( endingPosition ) !== 'v' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testBlackLetter( startingPosition, endingPosition, 'v' );
             break;
         case 'w':
-            if ( ( getTopLetter( endingPosition ) !== 'w' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testBlackLetter( startingPosition, endingPosition, 'w' );
             break;
         case 'x':
-            if ( ( getTopLetter( endingPosition ) !== 'x' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testBlackLetter( startingPosition, endingPosition, 'x' );
             break;
         case 'y':
-            if ( ( getTopLetter( endingPosition ) !== 'y' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testBlackLetter( startingPosition, endingPosition, 'y' );
             break;
         case 'z':
-            if ( ( getTopLetter( endingPosition ) !== 'z' ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-                if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
-                    return true;
-                } else { // Error condition
-console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                    return false;
-                }
-            } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-            }
+            return testBlackLetter( startingPosition, endingPosition, 'z' );
             break;
         case ' ':
-        case 'R':
+            if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+                pickLetter( startingPosition, endingPosition );
+            }
+            break;
+        case '^':
                   if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
 // console.log( '' );
 // console.log( 'validateBlackMovement(startingPosition, endingPosition)' );
@@ -1618,6 +1063,7 @@ console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on 
 // console.log( 'onBoard(endingPosition):', onBoard(endingPosition) );
                       return true;
                   } else {
+    
 console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
@@ -1626,8 +1072,85 @@ console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
                       return false;
                   }
     } // switch
-} // validateBlackMovement(startingPosition, endingPosition)
+} // validateBlackMovement( startingPosition, endingPosition )
 
+function testWhiteLetter( startingPosition, endingPosition, piece ) {
+    if ( ( getTopLetter( endingPosition ) !== piece ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+            return true;
+        } else { // Error condition
+console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+            return false;
+        }
+    } else { // Error condition
+console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+        return false;
+    }
+} // testWhiteLetter( startingPosition, endingPosition, piece )
+
+function testBlackLetter( startingPosition, endingPosition, piece ) {
+    if ( ( getTopLetter( endingPosition ) !== piece ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+            return true;
+        } else { // Error condition
+console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
+console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+            return false;
+        }
+    } else { // Error condition
+console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+        return false;
+    }
+} // testBlackLetter( startingPosition, endingPosition, piece )
+
+function pickLetter( startingPosition, endingPosition ) {
+    let c = startingPosition[0];
+    let b = startingPosition[1];
+    let a = startingPosition[2];
+    
+    let z = endingPosition[0];
+    let y = endingPosition[1];
+    let x = endingPosition[2];
+    
+    // Choose a letter and convert to uppercase
+    var blank = prompt( 'Choose a letter (A - Z):' );
+    blank = blank.toUpperCase(); // the letter_blanks are UpperCase
+    
+// console.log( 'startingPosition:', startingPosition );
+// console.log( 'endingPosition:', endingPosition );
+// console.log( 'blank:', blank );
+    
+    // replace the blank tile with the zero-point letter_blank at the endingPosition
+    loadPiece( blank, [z+1,y+1,x+1] );
+    // put the piece in curBoard
+    curBoard[z][y][x] = blank;
+    
+    // remove the original blank tile from the DOM, curBoard and the rack
+    removePiece( ' ', startingPosition );
+    curBoard[c][b][a] = '.';
+    
+    // clear the blank tile from the p1rack
+    if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 0 ) { p1rack[0] = '.'; } 
+    if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 1 ) { p1rack[1] = '.'; }
+    if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 2 ) { p1rack[2] = '.'; }
+    if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 3 ) { p1rack[3] = '.'; }
+    if ( startingPosition[0] === 0 && startingPosition[1] === 1 && startingPosition[2] === 0 ) { p1rack[4] = '.'; }
+    if ( startingPosition[0] === 0 && startingPosition[1] === 1 && startingPosition[2] === 1 ) { p1rack[5] = '.'; }
+    
+    // clear the blank tile from the p2rack
+    if ( startingPosition[0] === 0 && startingPosition[1] === 3 && startingPosition[2] === 10 ) { p2rack[0] = '.'; }
+    if ( startingPosition[0] === 0 && startingPosition[1] === 4 && startingPosition[2] === 9 ) { p2rack[1] = '.'; }
+    if ( startingPosition[0] === 0 && startingPosition[1] === 3 && startingPosition[2] === 8 ) { p2rack[2] = '.'; }
+    if ( startingPosition[0] === 0 && startingPosition[1] === 4 && startingPosition[2] === 7 ) { p2rack[3] = '.'; }
+    if ( startingPosition[0] === 0 && startingPosition[1] === 2 && startingPosition[2] === 10 ) { p2rack[4] = '.'; }
+    if ( startingPosition[0] === 0 && startingPosition[1] === 3 && startingPosition[2] === 9 ) { p2rack[5] = '.'; }
+    
+} // pickLetter( startingPosition, endingPosition )
 
 function switchPlayer() {
     // called by the $ onclick button:
@@ -1665,13 +1188,21 @@ console.log( 'switchPlayer():' );
     
 } // switchPlayer()
 
-
-
 function calcScore() {
-    let fp_bonus = 0; // Flower Power word bonus
-    let po_bonus = 0; // Pollination word bonus
-    let st_bonus = 0; // Stacking letter bonus
+    
+    findWords(); // populate the score_words[] array
+    
+    // if ( !checkWords() ) {
+// console.warn( 'checkWords():', checkWords() );
+// console.warn( 'Rollback the move' );
+        // there was a problem with a word, rollback the entire move
+    // }
+    
+    scoreWords(); // score the words in the score_words[] array
+    
+} // calcScore()
 
+function findWords() {
     // 1st: Find the tiles played last turn by diffing prevBoard[][][] and curBoard[][][] back into prevBoard[][][]:
     for (let h = 0; h < 6 ; h++) { // 6 levels
         for (let i = 0; i < 5 ; i++) { // 5 rows
@@ -1690,42 +1221,130 @@ function calcScore() {
             }
         }
     } // prevBoard now contains only the tile(s) played for the last turn
-
-    // 2nd: Check for Flower Power and Pollination bonuses
-    if ( prevBoard[0][2][5] !== '.' ) { // Someone played on a Flower
-        fp_bonus = 1;
-        if ( ( prevBoard[0][2][5] === 'b' ) || ( prevBoard[0][2][5] === 'q' ) ) {
-            po_bonus = 1;
-        }
-    }
     
-    // 3rd: Use the prevBoard[][][] position(s) to find any new word(s) in curBoard[][][]:
+    // 2nd: Use the prevBoard[][][] position(s) to find any new word(s) in curBoard[][][]:
     for (let h = 0; h < 6 ; h++) { // 6 levels
         for (let i = 0; i < 5 ; i++) { // 5 rows
             for (let j = 0; j < 11; j++) { // 11 columns
     
                 // If the position is on the board
                 if ( onBoard([h,i,j]) ) {
-
+    
                     // If its a new tile on the board, use that position to check for any words
                     if ( prevBoard[h][i][j] !== '.' ) {
-
+    
 // console.log( 'new tile position:', '[' + h + '][' + i + '][' + j + ']' );
-
+    
                         // the score_words[] array is reset by switchPlayer()
-                        score_words = wordCheck([h,i,j]); // e.g. ['it, [2, 4], UP']
-
-                        // wordCheck returns an array of unique words to score
+                        score_words = wordFinder([h,i,j]); // e.g. ['it, [2, 4], UP']
+    
+                        // wordFinder() returns an array of unique words to score
                         // an element = the word, the word position, and the direction
                     }
                 }
             }
         }
+    } // score_words[] now contains the words to score
+    
+} // findWords()
+
+function checkWords() {
+    //////////////////////////////////////////////////////////////////////////////
+    // Validate every word in the score_words[] array                            /
+    //////////////////////////////////////////////////////////////////////////////
+    for ( let index = 0; index < score_words.length; ++index ) {
+        const element = score_words[index];
+    
+        // convert the array element into a string
+        element_str = element + '';
+    
+        // get the word from the element string
+        word_str = element_str.substring( 0, element_str.indexOf(',') ); 
+    
+        // get the lead yxCoord from the element string
+        yx_str = element_str.substring( element_str.indexOf(',')+3, element_str.indexOf(']') ); 
+    
+        y = yx_str.substring(0, yx_str.indexOf(',') );
+        x = yx_str.substring(yx_str.indexOf(',')+1 );
+        y = Number(y); // convert to a number
+        x = Number(x); // convert to a number
+    
+        // get the word direction from the element string
+        yx_dir = element_str.substring( element_str.length - 2, element_str.length ); 
+    
+// console.log( 'word_str:', word_str, 'yx_str:', yx_str, 'yx_dir:', yx_dir );
+    
+        // check that the word is a word
+        // if ( word_str.length < 2 ) {
+        //     return 0;
+        // }
+    
+        // check that the first word is on a flower
+        if ( ( turn_no === 0 ) && ( curPlayer === 'white' ) ) {
+            // for every letter position in word_str, check if its on a flower
+    
+            var flower = 0;
+            switch ( yx_dir ) {
+                case 'UP': // Upwards Word
+console.log( 'An Upwards Word Checkup:' );
+                    // for every letter in word_str, check for a flower
+                    for ( var i = 0; i < word_str.length; i++ ) {
+                        coords = upwd_lookup( yx_str, i ); // get yxCoords and convert to an array
+                        coord_array = coords.split(',').map(element => { return Number(element); } );
+                        if ( onFlower( coord_array ) ) {
+                            flower = 1;
+                        }
+                    }
+                    return flower;
+                break;
+    
+                case 'DW': // Downwards Word
+console.log( 'A Downwards Word Checkup:' );
+                    // for every letter in word_str, check for a flower
+                    for ( var i = 0; i < word_str.length; i++ ) {
+                        coords = dnwd_lookup( yx_str, i ); // get yxCoords and convert to an array
+                        coord_array = coords.split(',').map(element => { return Number(element); } );
+                        if ( onFlower( coord_array ) ) {
+                            flower = 1;
+                        }
+                    }
+                    return flower;
+                break;
+    
+                case 'DO': // Down Word
+console.log( 'A Down Word Checkup:' );
+                    // for every letter in word_str, check for a flower
+                    for ( var i = 0; i < word_str.length; i++ ) {
+                        coords = (y + i)+','+x; // get yxCoords and convert to an array
+                        coord_array = coords.split(',').map(element => { return Number(element); } );
+                        if ( onFlower( coord_array ) ) {
+                            flower = 1;
+                        }
+                    }
+                    return flower;
+                break;
+            }
+        }
     }
-    // score_words[] now contains the words to score, but needs to only keep the longest word per location and direction
+} // checkWords()
+
+function scoreWords() {
+    let fp_bonus = 0; // Flower Power word bonus
+    let po_bonus = 0; // Pollination word bonus
+    let st_bonus = 0; // Stacking letter bonus
+    
+    // Check for Flower Power and Pollination bonuses
+    if ( ( prevBoard[0][1][4] !== '.' ) || ( prevBoard[0][1][6] !== '.' ) || ( prevBoard[0][3][5] !== '.' ) ) { // Someone played on a Flower
+        fp_bonus = 1;
+        if ( ( prevBoard[0][1][4] === 'b' ) || ( prevBoard[0][1][4] === 'q' ) || 
+             ( prevBoard[0][1][6] === 'b' ) || ( prevBoard[0][1][6] === 'q' ) ||
+             ( prevBoard[0][3][5] === 'b' ) || ( prevBoard[0][3][5] === 'q' ) ) {
+            po_bonus = 1;
+        }
+    }
     
 // console.log( 'score_words:', score_words ); 
-
+    
     // score score_words[]
     var word_score = 0;
     var turn_score = 0;
@@ -1735,22 +1354,22 @@ function calcScore() {
     var turn_ledger = '';
     
 console.log( 'score_words[]:', score_words );
-
+    
     //////////////////////////////////////////////////////////////////////////////
     // For every element (word, position, direction) in the score_words[] array, /
     // calculate the word score                                                  /
     //////////////////////////////////////////////////////////////////////////////
     for ( let index = 0; index < score_words.length; ++index ) {
         const element = score_words[index];
-
+    
         word_score = 0;
     
         // convert the array element into a string
         element_str = element + '';
-
+    
         // get the word from the element string
         word_str = element_str.substring( 0, element_str.indexOf(',') ); 
-
+    
         // get the lead yxCoord from the element string
         yx_str = element_str.substring( element_str.indexOf(',')+3, element_str.indexOf(']') ); 
 // console.log( 'yx_str:', yx_str  );
@@ -1760,15 +1379,15 @@ console.log( 'score_words[]:', score_words );
         x = Number(x); // convert to a number
 // console.log( 'y:', y );
 // console.log( 'x:', x );
-
+    
         // get the word direction from the element string
         yx_dir = element_str.substring( element_str.length - 2, element_str.length ); 
 // console.log( 'yx_dir:', yx_dir  );
-
+    
         if ( curWord_str !== word_str ) { // a new word to score
-
+    
             switch ( yx_dir ) {
-
+    
                 case 'UP': // Upwards Word
 console.log( 'An Upwards Word Lookup:' );
                     // for every letter in word_str, sum the individual values 
@@ -1780,9 +1399,9 @@ console.log( 'An Upwards Word Lookup:' );
                         // get the letter level using the position of the next character in the string
                         new_str = upwd_lookup( yx_str, i ); // lookup new yxCoords
                         letterLev = getTopLevel( new_str ); // use the yxCoords from the lookup
-
-// console.log( 'yx_str:', yx_str, 'new_str:', new_str );
-// console.log( 'letter:', letter, 'letterVal:', letterVal, 'letterLev:', letterLev );
+    
+console.log( 'yx_str:', yx_str, 'new_str:', new_str );
+console.log( 'letter:', letter, 'letterVal:', letterVal, 'letterLev:', letterLev );
     
                         // calculate the Stacking bonus for each letter
                         st_bonus = letterLev + 1;
@@ -1800,11 +1419,11 @@ console.log( 'An Upwards Word Lookup:' );
                     // build the turn ledger and score
                     turn_ledger = turn_ledger + word_str + ' ' + word_score + ', ';
                     turn_score = turn_score + word_score;
-
+    
                     // record log
                     game_record.push( curPlayer, turn_no, element_str, word_score );
                     break;
-
+    
                 case 'DW': // Downwards Word
 console.log( 'A Downwards Word Lookup:' );
                     // for every letter in word_str, sum the individual values 
@@ -1816,7 +1435,7 @@ console.log( 'A Downwards Word Lookup:' );
                         // get the letter level using the position of the next character in the string
                         new_str = dnwd_lookup( yx_str, i ); // lookup new yxCoords
                         letterLev = getTopLevel( new_str ); // use the yxCoords from the lookup
-
+    
 // console.log( 'yx_str:', yx_str, 'new_str:', new_str );
 // console.log( 'letter:', letter, 'letterVal:', letterVal, 'letterLev:', letterLev );
     
@@ -1840,7 +1459,7 @@ console.log( 'A Downwards Word Lookup:' );
                     // record log
                     game_record.push( curPlayer, turn_no, element_str, word_score );
                     break;
-
+    
                 case 'DO': // Straight-Down Word
 console.log( 'A Down Word Lookup:' );
                     // for every letter in word_str, sum the individual values 
@@ -1872,34 +1491,34 @@ console.log( 'A Down Word Lookup:' );
                     // build the turn ledger and score
                     turn_ledger = turn_ledger + word_str + ' ' + word_score + ', ';
                     turn_score = turn_score + word_score;
-
+    
                     // record log
                     game_record.push( curPlayer, turn_no, element_str, word_score );
                     break;
-
+    
             }
         }
         curWord_str = word_str;
-
+    
 // console.log( 'Word:', element, 'Value:', word_score );
 // console.log( 'Turn_Score:', turn_score );
     
     } // for every word in score_words[]
-
+    
 console.log( 'game_record:', game_record );
-
+    
     // turn_ledger now has the individual word scores, and
     // turn_score now has the players total for the turn
-
+    
     // remove trailing ', ' from turn_ledger
     turn_ledger = turn_ledger.replace(/, $/, '');
-
+    
     if (curPlayer === 'white') {
         p1score = p1score + turn_score;
         const p1scoreDiv = document.getElementById('p1score');
         p1scoreText = p1scoreText + 'Player 1: ' + turn_ledger + ' = ' + p1score + '\n';
         p1scoreDiv.innerHTML = p1scoreText;
-
+    
 console.log( p1scoreDiv.innerHTML );
     
     } else {
@@ -1907,101 +1526,98 @@ console.log( p1scoreDiv.innerHTML );
         const p2scoreDiv = document.getElementById('p2score');
         p2scoreText = p2scoreText + 'Player 2: ' + turn_ledger + ' = ' + p2score + '\n';
         p2scoreDiv.innerHTML = p2scoreText;
-
+    
 console.log( p2scoreDiv.innerHTML );
     
     }
-} // calcScore()
+} // scoreWords()
 
-
-
-function wordCheck( position ) { // position = an array of numbers
-                                 // If a word is found, return a record: ['it, [2, 4], UP']
-                                 // [ the word, its position, and its direction ]
+function wordFinder( position ) { // position = an array of numbers
+                                  // If a word is found, return a record: ['it, [2, 4], UP']
+                                  // [ the word, its position, and its direction ]
     let z = position[0];
     let y = position[1];
     let x = position[2]; 
     // the [z] coordinate is unused, the source curBoard[][][] is flattened into flatBoard[][]
-
+    
     var str = '';
-
+    
     flattenBoard(); // flattens global curBoard[z][y][x] into the global flatBoard[y][x]
-
+    
     if ( onBoard( position ) ) { // only process valid board positions
-
+    
 // console.log( '' );
-// console.log( 'wordCheck( position ):' );
+// console.log( 'wordFinder( position ):' );
 // console.log( 'position:', position );
 // console.log( 'y:', y );
 // console.log( 'x:', x );
-
+    
         ///////////////////////////////////////////////////////////////////////
         // build and number all possible Upward strings on flatBoard[][]      /
         ///////////////////////////////////////////////////////////////////////
         upwd_str0=flatBoard[1][4]+flatBoard[1][5];
         upwd_str1=flatBoard[2][4]+flatBoard[2][5]+flatBoard[1][6];
         upwd_str2=flatBoard[3][5]+flatBoard[2][6];
-
+    
         ///////////////////////////////////////////////////////////////////////
         // build and number all possible Downward strings on flatBoard[][]    /
         ///////////////////////////////////////////////////////////////////////
         dnwd_str0=flatBoard[1][5]+flatBoard[1][6];
         dnwd_str1=flatBoard[1][4]+flatBoard[2][5]+flatBoard[2][6];
         dnwd_str2=flatBoard[2][4]+flatBoard[3][5];
-
+    
         ///////////////////////////////////////////////////////////////////////
         // build and number all possible Down strings on flatBoard[][]        /
         ///////////////////////////////////////////////////////////////////////
         down_str0=flatBoard[1][4]+flatBoard[2][4];
         down_str1=flatBoard[1][5]+flatBoard[2][5]+flatBoard[3][5];
         down_str2=flatBoard[1][6]+flatBoard[2][6];
-
+    
         yandx_str = '' + y + x;
 // console.log( 'yandx_str:', yandx_str );
         switch ( yandx_str ) {
-
+    
             case '14':
 // console.log( 'in case 14' );
             check_upwd_str0();
             check_dnwd_str1();
             check_down_str0();
             break;
-
+    
             case '15':
 // console.log( 'in case 15' );
             check_upwd_str0();
             check_dnwd_str0();
             check_down_str1();
             break;
-
-            case '24':
+    
 // console.log( 'in case 24' );
             check_upwd_str1();
             check_dnwd_str2();
             check_down_str0();
             break;
-
+    
             case '25':
 // console.log( 'in case 25' );
             check_upwd_str1();
             check_dnwd_str1();
             check_down_str1();
             break;
-
+    
             case '16':
 // console.log( 'in case 16' );
             check_upwd_str1();
             check_dnwd_str0();
             check_down_str2();
             break;
-
+    
             case '35':
 // console.log( 'in case 35' );
             check_upwd_str2();
             check_dnwd_str2();
             check_down_str1();
             break;
-
+    
             case '26':
 // console.log( 'in case 26' );
             check_upwd_str2();
@@ -2013,21 +1629,21 @@ function wordCheck( position ) { // position = an array of numbers
     
     // a well-formed element in words[]: ['an, [1,4], UP']
     // an element = the word, the position, and the direction
-
+    
 // console.log( 'words[]:', words );
     
     let unique_words = [... new Set(words)]; // this makes unique_words[] unique
     
 // console.log( 'unique_words[]:', unique_words );
-
+    
     return unique_words; // e.g. ['it, [2, 4]', UP']
-
+    
     // empty words
     while( words.length > 0 ) {
         words.pop();
     }
-
-}; // wordCheck( position )
+    
+}; // wordFinder( position )
 
 function flattenBoard() {
     // This function flattens the curBoard[][][] into flatBoard[][]
@@ -2038,7 +1654,7 @@ function flattenBoard() {
         for (let i = 0; i < 5 ; i++) { // 5 rows
             for (let j = 0; j < 11; j++) { // 11 columns
                 // Iterate over every curBoard element
-                if ( ( curBoard[h][i][j] !== '.' ) && ( curBoard[h][i][j] !== 'R' ) ) {
+                if ( ( curBoard[h][i][j] !== '.' ) && ( curBoard[h][i][j] !== '^' ) ) {
                     // flatBoard will contain the highest letter tile in curBoard
                     flatBoard[i][j] = curBoard[h][i][j];
                 }
@@ -2073,10 +1689,10 @@ function getTopLetter( position ) { // return the piece that is on top of the cu
     let y = position[1]; // use the yxCoords
     let x = position[2];
     let top_letter = '';
-
+    
 // console.log( 'In getTopLetter:' );
 // console.log( 'position:', position, 'z:', z, 'y:', y, 'x:', x );
-
+    
     // get the top letter from curBoard for yxCoord
     for (let level = 5; level >= 0 ; level--) { // 6 levels
         if ( curBoard[level][y][x] !== '.' ) {
@@ -2084,13 +1700,39 @@ function getTopLetter( position ) { // return the piece that is on top of the cu
             break;
         }
     }
-    return top_letter;
+    return top_letter.toLowerCase();
 } // getTopLetter( position )
 
-function getLetterValue( boardPiece ) {
-    // Return the value of the given boardPiece.
-    switch (boardPiece) {
+function getLetterValue( piece ) {
+    // Return the value of the given piece.
+    switch (piece) {
         case ' ':
+        case 'A':
+        case 'B':
+        case 'C':
+        case 'D':
+        case 'E':
+        case 'F':
+        case 'G':
+        case 'H':
+        case 'I':
+        case 'J':
+        case 'K':
+        case 'L':
+        case 'M':
+        case 'N':
+        case 'O':
+        case 'P':
+        case 'Q':
+        case 'R':
+        case 'S':
+        case 'T':
+        case 'U':
+        case 'V':
+        case 'W':
+        case 'X':
+        case 'Y':
+        case 'Z':
                   return 0;
                   break;
         case 'a':
@@ -2131,7 +1773,7 @@ function getLetterValue( boardPiece ) {
                   break;
     
     }
-} // getLetterValue( boardPiece )
+} // getLetterValue( piece )
 
 /*********************************/
 /* check upward string functions */
@@ -2314,7 +1956,7 @@ function upwd_lookup( position, idx ) { // string and a number, returns yx_str
         if ( position === '3,5' ) return '2,6'; 
     }
     if ( idx === 2 ) return '1,6';
-}
+} // upwd_lookup( position, idx )
 
 function dnwd_lookup( position, idx ) { // string and a number, returns yx_str
     if ( idx === 0 ) return position;
@@ -2325,7 +1967,7 @@ function dnwd_lookup( position, idx ) { // string and a number, returns yx_str
         if ( position === '2,5' ) return '2,6'; 
     }
     if ( idx === 2 ) return '2,6';
-}
+} // dnwd_lookup( position, idx )
 
 startGame();
 setPieceHoldEvents();
