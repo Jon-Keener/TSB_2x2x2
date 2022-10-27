@@ -6,20 +6,21 @@ var words = [];
 var score_words = [];
 var game_record = [];
 var turn_no = 0;
+var blank_no = 0;
 
-let curBoard;
-let curPlayer;
+let currBoard;
+let currPlayer;
 
-let curHeldPiece;
-let curHeldPieceStartingPosition;
+let currHeldPiece;
+let currHeldPieceStartingPosition;
 
-const wordre = /[A-Za-z]{2,}/; // A word is 2 or more consecutive lower-case letters, used to have A-Z
+const wordre = /[A-Za-z]{2,}/; // A word is 2 or more consecutive letters
     
 const gameBoard = [ // 6 levels of 5 rows of 11 columns, [Z,Y,X]: [0,0,0] - [5,4,10]
 [ ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
-  ['.', '.', '.', '.', '^', '.', '^', '.', '.', '.', '.'],
+  ['.', '.', '.', '.', '^0', '.', '^1', '.', '.', '.', '.'],
   ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
-  ['.', '.', '.', '.', '.', '^', '.', '.', '.', '.', '.'],
+  ['.', '.', '.', '.', '.', '^2', '.', '.', '.', '.', '.'],
   ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
 ], // level 0
 [ ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
@@ -56,7 +57,7 @@ const gameBoard = [ // 6 levels of 5 rows of 11 columns, [Z,Y,X]: [0,0,0] - [5,4
 
 var prevBoard = JSON.parse(JSON.stringify(gameBoard));
 
-var flatBoard = [ // 5 rows of 11 columns, [Y,X]: [0,0] - [4,10]
+var flatBoard = [ // 1 level of 5 rows of 11 columns, [Z,Y,X]: [0,0,0] - [0,4,10]
 ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
 ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
 ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
@@ -64,11 +65,11 @@ var flatBoard = [ // 5 rows of 11 columns, [Y,X]: [0,0] - [4,10]
 ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'] ];
 
 // Initialize the letter tiles, the player racks and scores.
-var tiles = ['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'b', 'b', 'b', 'c', 'c', 'd', 'd', 'd', 'd', 'e', 'e',
-             'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'f', 'f', 'g', 'g', 'g', 'h', 'h', 'i', 'i', 'i', 'i', 
-             'i', 'i', 'i', 'i', 'i', 'j', 'k', 'l', 'l', 'l', 'l', 'm', 'm', 'n', 'n', 'n', 'n', 'n', 'n', 'o', 
-             'o', 'o', 'o', 'o', 'o', 'o', 'o', 'p', 'p', 'q', 'r', 'r', 'r', 'r', 'r', 'r', 's', 's', 's', 's', 
-             't', 't', 't', 't', 't', 't', 'u', 'u', 'u', 'u', 'v', 'v', 'w', 'w', 'x', 'y', 'y', 'z', ' ', ' '];
+var tiles = ['a0', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8', 'b0', 'b1', 'b2', 'c0', 'c1', 'd0', 'd1', 'd2', 'd3', 'e0', 'e1',
+             'e2', 'e3', 'e4', 'e5', 'e6', 'e7', 'e8', 'e9', 'e10', 'f0', 'f1', 'g0', 'g1', 'g2', 'h0', 'h1', 'i0', 'i1', 'i2', 'i3', 
+             'i4', 'i5', 'i6', 'i7', 'i8', 'j0', 'k0', 'l0', 'l1', 'l2', 'l3', 'm0', 'm1', 'n0', 'n1', 'n2', 'n3', 'n4', 'n5', 'o0', 
+             'o1', 'o2', 'o3', 'o4', 'o5', 'o6', 'o7', 'p0', 'p1', 'q0', 'r0', 'r1', 'r2', 'r3', 'r4', 'r5', 's0', 's1', 's2', 's3', 
+             't0', 't1', 't2', 't3', 't4', 't5', 'u0', 'u1', 'u2', 'u3', 'v0', 'v1', 'w0', 'w1', 'x0', 'y0', 'y1', 'z0', ' 0', ' 1'];
 var p1rack = ['.', '.', '.', '.', '.', '.'];
 var p2rack = ['.', '.', '.', '.', '.', '.'];
 var p1score = 0;
@@ -79,18 +80,28 @@ var p2scoreText = '';
 /* game functions */
 
 function startGame() {
+    // Draw tiles for the players' racks by alternating draws.
     
-    // Draw letter tiles for the players by alternating.
     for (let i = 0; i < p1rack.length; i++) {
               
         let j = Math.floor(Math.random() * tiles.length); // Random draw from the remaining tiles.
-        p1rack[i] = tiles[j]; // Assign to the p1rack.
-        p1rack[i].piece = getPieceImageSource(p1rack[i]);
+        p1rack[i] = tiles[j]; // Assign the tile, level to the p1rack.
+        let tileandtier = p1rack[i].replace(/\d/g, '') + '0'; // Tile and tier
+
+// console.log( 'tileandtier', tileandtier );
+        // p1rack[i].piece = getPieceImageSource(p1rack[i]);
+        // p1rack[i].piece = getPieceImageSource( p1rack[i].replace(/\d,/g, '') ); // Replace tile number with level number.
+        p1rack[i].piece = getPieceImageSource( tileandtier ); // Replace tile id with the tile and tier.
         tiles.splice(j, 1); // Delete from tiles.
     
         j = Math.floor(Math.random() * tiles.length); // Random draw from the remaining tiles.
-        p2rack[i] = tiles[j]; // Assign to the p2rack.
-        p2rack[i].piece = getPieceImageSource(p2rack[i]);
+        p2rack[i] = tiles[j]; // Assign the tile, level to the p2rack.
+        tileandtier = p2rack[i].replace(/\d/g, '') + '0'; // Tile and tier
+
+// console.log( 'tileandtier', tileandtier );
+        // p2rack[i].piece = getPieceImageSource(p2rack[i]);
+        // p2rack[i].piece = getPieceImageSource( p2rack[i].replace(/\d,/g, '') ); // Replace tile number with level number.
+        p2rack[i].piece = getPieceImageSource( tileandtier ); // Replace tile id with the tile and tier.
         tiles.splice(j, 1); // Delete from tiles.
     }
     
@@ -100,29 +111,15 @@ function startGame() {
     
     const starterPlayer = 'white';
     
-    // Add p1rack to the gameBoard, unless undefined.
-    if (typeof p1rack[0] !== 'undefined') { gameBoard[0][0][0] = p1rack[0] } else { gameBoard[0][0][0] = '.' };
-    if (typeof p1rack[1] !== 'undefined') { gameBoard[0][0][1] = p1rack[1] } else { gameBoard[0][0][1] = '.' };
-    if (typeof p1rack[4] !== 'undefined') { gameBoard[0][0][2] = p1rack[2] } else { gameBoard[0][0][2] = '.' };
-    if (typeof p1rack[5] !== 'undefined') { gameBoard[0][0][3] = p1rack[3] } else { gameBoard[0][0][3] = '.' };
-    if (typeof p1rack[2] !== 'undefined') { gameBoard[0][1][0] = p1rack[4] } else { gameBoard[0][1][0] = '.' };
-    if (typeof p1rack[3] !== 'undefined') { gameBoard[0][1][1] = p1rack[5] } else { gameBoard[0][1][1] = '.' };
-    
-    // Add p2rack to the gameBoard, unless undefined.
-    if (typeof p2rack[5] !== 'undefined') { gameBoard[0][3][10] = p2rack[0] } else { gameBoard[0][3][10] = '.' };
-    if (typeof p2rack[4] !== 'undefined') { gameBoard[0][4][9] = p2rack[1] } else { gameBoard[0][4][9] = '.' };
-    if (typeof p2rack[1] !== 'undefined') { gameBoard[0][3][8] = p2rack[2] } else { gameBoard[0][3][8] = '.' };
-    if (typeof p2rack[0] !== 'undefined') { gameBoard[0][4][7] = p2rack[3] } else { gameBoard[0][4][7] = '.' };
-    if (typeof p2rack[3] !== 'undefined') { gameBoard[0][2][10] = p2rack[4] } else { gameBoard[0][2][10] = '.' };
-    if (typeof p2rack[2] !== 'undefined') { gameBoard[0][3][9] = p2rack[5] } else { gameBoard[0][3][9] = '.' };
-    
+    updateGameBoard();
+
     loadPosition(gameBoard, starterPlayer);
     
 } // startGame()
 
 function loadPosition( position, playerToMove ) {
-    curBoard = position;
-    curPlayer = playerToMove;
+    currBoard = position;
+    currPlayer = playerToMove;
     
     // level h, row i and column j
     for (let h = 0; h < 6 ; h++) { // 6 levels
@@ -143,28 +140,68 @@ function loadPosition( position, playerToMove ) {
 
 function loadRack( piece, position ) {
     // piece and position, an array of ZYX ids, which concat into the Id
+    
+    // Get the squareElement
     const squareElement = document.getElementById(`${position[0]}${position[1]}${position[2]}`);
     
+    // Create the pieceElement
     const pieceElement = document.createElement('img');
     pieceElement.classList.add('piece');
     pieceElement.id = piece;
     pieceElement.draggable = true;
-    pieceElement.src = getPieceImageSource(piece);
+    pieceElement.style = "position: static;"; // top: 245px; left: 672px;"; // new code, this seemed to be required but it didn't help
     
+    let tileandtier = piece.replace(/\d/g, '') + '0'; // Tile and tier
+    pieceElement.src = getPieceImageSource( tileandtier );
+    
+    // Append the pieceElement to the squareElement
     squareElement.appendChild(pieceElement);
     
-// console.log( '' );
-// console.log( 'loadRack( piece, position ):' );
-// console.log( 'piece:', piece, 'position:', position, 'squareElement:', squareElement, 'pieceElement:', pieceElement );
+    updateGameBoard();
+    
+console.log( '' );
+console.log( 'loadRack( piece, position ):' );
+console.log( 'piece:', piece, 'position:', position, 'squareElement:', squareElement, 'pieceElement:', pieceElement );
     
 } // loadRack( piece, position )
 
-function removeRack( piece, position ) {
-    // piece and position, an array of ZYX ids, which concat into the Id
+function loadPiece( piece, position ) {
+    // piece and position, an array of ZYX ids, which concat to the Id
+    
+    // Get the squareElement
     const squareElement = document.getElementById(`${position[0]}${position[1]}${position[2]}`);
     
+    // Create the pieceElement
+    const pieceElement = document.createElement('img');
+    pieceElement.classList.add('piece');
+    pieceElement.id = piece;
+    pieceElement.draggable = false;
+    
+    let tileandtier = piece.replace(/\d/g, '') + '0'; // Tile and tier
+    pieceElement.src = getPieceImageSource( tileandtier );
+    
+    // Append the pieceElement to the squareElement
+    squareElement.appendChild(pieceElement);
+    
+    updateGameBoard();
+    
+console.log( '' );
+console.log( 'loadPiece( piece, position ):' );
+console.log( 'piece:', piece, 'position:', position, 'squareElement:', squareElement, 'pieceElement:', pieceElement );
+    
+} // loadPiece( piece, position )
+
+function removeRack( piece, position ) {
+    // piece and position, an array of ZYX ids, which concat into the Id
+    
+    // Get the squareElement
+    const squareElement = document.getElementById(`${position[0]}${position[1]}${position[2]}`);
+    
+    // Get the pieceElement
     const pieceElement = document.squareElement.getElementsByClassName('piece');
     pieceElement.remove();
+    
+    updateGameBoard();
     
 // console.log( '' );
 // console.log( 'removeRack( piece, position ):' );
@@ -172,39 +209,47 @@ function removeRack( piece, position ) {
     
 } // removeRack( piece, position ) 
 
-function loadPiece( piece, position ) {
-    // piece and position, an array of ZYX ids, which concat to the Id
-    const squareElement = document.getElementById(`${position[0]}${position[1]}${position[2]}`);
-    
-    const pieceElement = document.createElement('img');
-    pieceElement.classList.add('piece');
-    pieceElement.id = piece;
-    pieceElement.draggable = false;
-    pieceElement.src = getPieceImageSource(piece);
-    
-    squareElement.appendChild(pieceElement);
-    
-// console.log( '' );
-// console.log( 'loadPiece( piece, position ):' );
-// console.log( 'piece:', piece, 'position:', position, 'squareElement:', squareElement, 'pieceElement:', pieceElement );
-    
-} // loadPiece( piece, position )
 
 function removePiece( piece, position ) {
     // piece and position, an array of ZYX ids, which concat into the Id
+    
+    // Get the squareElement
     const squareElement = document.getElementById(`${position[0]}${position[1]}${position[2]}`);
     
-    const pieceElement = document.getElementById( piece );
-    pieceElement.remove();
+    // Get the pieceElement
+    const pieceElement = document.getElementById( piece ); // This now works for every tile on the board due to unique tiles.
     
 console.log( '' );
-console.log( 'removePiece( piece, position ):' );
+console.log( 'removePiece(', '"'+piece+'"', position, '):' );
 console.log( 'piece:', piece, 'position:', position, 'squareElement:', squareElement, 'pieceElement:', pieceElement );
+    
+    // Remove the pieceElement
+    pieceElement.remove();
     
 } // removePiece( piece, position )
 
+
+function updateGameBoard() {
+    // Add p1rack to the gameBoard, unless undefined.
+    if (typeof p1rack[0] !== 'undefined') { gameBoard[0][0][0] = p1rack[0] } else { gameBoard[0][0][0] = '.' };
+    if (typeof p1rack[1] !== 'undefined') { gameBoard[0][0][1] = p1rack[1] } else { gameBoard[0][0][1] = '.' };
+    if (typeof p1rack[2] !== 'undefined') { gameBoard[0][0][2] = p1rack[2] } else { gameBoard[0][0][2] = '.' };
+    if (typeof p1rack[3] !== 'undefined') { gameBoard[0][0][3] = p1rack[3] } else { gameBoard[0][0][3] = '.' };
+    if (typeof p1rack[4] !== 'undefined') { gameBoard[0][1][0] = p1rack[4] } else { gameBoard[0][1][0] = '.' };
+    if (typeof p1rack[5] !== 'undefined') { gameBoard[0][1][1] = p1rack[5] } else { gameBoard[0][1][1] = '.' };
+    // Add p2rack to the gameBoard, unless undefined.
+    if (typeof p2rack[0] !== 'undefined') { gameBoard[0][3][10] = p2rack[0] } else { gameBoard[0][3][10] = '.' };
+    if (typeof p2rack[1] !== 'undefined') { gameBoard[0][4][9]  = p2rack[1] } else { gameBoard[0][4][9] = '.' };
+    if (typeof p2rack[2] !== 'undefined') { gameBoard[0][3][8]  = p2rack[2] } else { gameBoard[0][3][8] = '.' };
+    if (typeof p2rack[3] !== 'undefined') { gameBoard[0][4][7]  = p2rack[3] } else { gameBoard[0][4][7] = '.' };
+    if (typeof p2rack[4] !== 'undefined') { gameBoard[0][2][10] = p2rack[4] } else { gameBoard[0][2][10] = '.' };
+    if (typeof p2rack[5] !== 'undefined') { gameBoard[0][3][9]  = p2rack[5] } else { gameBoard[0][3][9] = '.' };
+}
+
 function getPieceImageSource( piece ) {
-    switch (piece) {
+    // piece is tileandtier
+
+    switch ( piece ) {
         case '.': return '';
         case 'null': return '';
         case 'A': return 'assets/_A.png'; // Blank tile substitution tiles
@@ -233,33 +278,59 @@ function getPieceImageSource( piece ) {
         case 'X': return 'assets/_X.png';
         case 'Y': return 'assets/_Y.png';
         case 'Z': return 'assets/_Z.png';
-        case 'a': return 'assets/A0.png'; // Level 0 letter tiles
-        case 'b': return 'assets/B0.png';
-        case 'c': return 'assets/C0.png';
-        case 'd': return 'assets/D0.png';
-        case 'e': return 'assets/E0.png';
-        case 'f': return 'assets/F0.png';
-        case 'g': return 'assets/G0.png';
-        case 'h': return 'assets/H0.png';
-        case 'i': return 'assets/I0.png';
-        case 'j': return 'assets/J0.png';
-        case 'k': return 'assets/K0.png';
-        case 'l': return 'assets/L0.png';
-        case 'm': return 'assets/M0.png';
-        case 'n': return 'assets/N0.png';
-        case 'o': return 'assets/O0.png';
-        case 'p': return 'assets/P0.png';
-        case 'q': return 'assets/Q0.png';
-        case 'r': return 'assets/R0.png';
-        case 's': return 'assets/S0.png';
-        case 't': return 'assets/T0.png';
-        case 'u': return 'assets/U0.png';
-        case 'v': return 'assets/V0.png';
-        case 'w': return 'assets/W0.png';
-        case 'x': return 'assets/X0.png';
-        case 'y': return 'assets/Y0.png';
-        case 'z': return 'assets/Z0.png';
-        case ' ': return 'assets/BLANK0.png';
+        case 'A0': return 'assets/_A.png'; // Blank tile substitution tiles
+        case 'B0': return 'assets/_B.png';
+        case 'C0': return 'assets/_C.png';
+        case 'D0': return 'assets/_D.png';
+        case 'E0': return 'assets/_E.png';
+        case 'F0': return 'assets/_F.png';
+        case 'G0': return 'assets/_G.png';
+        case 'H0': return 'assets/_H.png';
+        case 'I0': return 'assets/_I.png';
+        case 'J0': return 'assets/_J.png';
+        case 'K0': return 'assets/_K.png';
+        case 'L0': return 'assets/_L.png';
+        case 'M0': return 'assets/_M.png';
+        case 'N0': return 'assets/_N.png';
+        case 'O0': return 'assets/_O.png';
+        case 'P0': return 'assets/_P.png';
+        case 'Q0': return 'assets/_Q.png';
+        case 'R0': return 'assets/_R.png';
+        case 'S0': return 'assets/_S.png';
+        case 'T0': return 'assets/_T.png';
+        case 'U0': return 'assets/_U.png';
+        case 'V0': return 'assets/_V.png';
+        case 'W0': return 'assets/_W.png';
+        case 'X0': return 'assets/_X.png';
+        case 'Y0': return 'assets/_Y.png';
+        case 'Z0': return 'assets/_Z.png';
+        case 'a0': return 'assets/A0.png'; // Level 0 letter tiles
+        case 'b0': return 'assets/B0.png';
+        case 'c0': return 'assets/C0.png';
+        case 'd0': return 'assets/D0.png';
+        case 'e0': return 'assets/E0.png';
+        case 'f0': return 'assets/F0.png';
+        case 'g0': return 'assets/G0.png';
+        case 'h0': return 'assets/H0.png';
+        case 'i0': return 'assets/I0.png';
+        case 'j0': return 'assets/J0.png';
+        case 'k0': return 'assets/K0.png';
+        case 'l0': return 'assets/L0.png';
+        case 'm0': return 'assets/M0.png';
+        case 'n0': return 'assets/N0.png';
+        case 'o0': return 'assets/O0.png';
+        case 'p0': return 'assets/P0.png';
+        case 'q0': return 'assets/Q0.png';
+        case 'r0': return 'assets/R0.png';
+        case 's0': return 'assets/S0.png';
+        case 't0': return 'assets/T0.png';
+        case 'u0': return 'assets/U0.png';
+        case 'v0': return 'assets/V0.png';
+        case 'w0': return 'assets/W0.png';
+        case 'x0': return 'assets/X0.png';
+        case 'y0': return 'assets/Y0.png';
+        case 'z0': return 'assets/Z0.png';
+        case ' 0': return 'assets/BLANK0.png';
         case 'a1': return 'assets/A1.png'; // Level 1 letter tiles
         case 'b1': return 'assets/B1.png';
         case 'c1': return 'assets/C1.png';
@@ -396,6 +467,9 @@ function getPieceImageSource( piece ) {
         case 'z5': return 'assets/Z5.png';
         case ' 5': return 'assets/BLANK5.png';
         case '^': return 'assets/pink-rose.png';
+        case '^0': return 'assets/pink-rose.png';
+        case '^1': return 'assets/pink-rose.png';
+        case '^2': return 'assets/pink-rose.png';
     }
 } // getPieceImageSource( piece )
 
@@ -411,30 +485,30 @@ function rePopRack1() {
         // Update p1rack[] and gameBoard[][][] based on the index of the dot.
         switch(k) { // p1rack order
             case 0: loadRack(p1rack[k], [1,1,1]); // [Z,Y,X] ids
-                    gameBoard[0][0][0] = p1rack[0];
+                    // gameBoard[0][0][0] = p1rack[0];
                     break;
             case 1: loadRack(p1rack[k], [1,1,2]);
-                    gameBoard[0][0][1] = p1rack[1];
+                    // gameBoard[0][0][1] = p1rack[1];
                     break;
             case 2: loadRack(p1rack[k], [1,1,3]);
-                    gameBoard[0][0][2] = p1rack[2];
+                    // gameBoard[0][0][2] = p1rack[2];
                     break;
             case 3: loadRack(p1rack[k], [1,1,4]);
-                    gameBoard[0][0][3] = p1rack[3];
+                    // gameBoard[0][0][3] = p1rack[3];
                     break;
             case 4: loadRack(p1rack[k], [1,2,1]);
-                    gameBoard[0][1][0] = p1rack[4];
+                    // gameBoard[0][1][0] = p1rack[4];
                     break;
             case 5: loadRack(p1rack[k], [1,2,2]);
-                    gameBoard[0][1][1] = p1rack[5];
+                    // gameBoard[0][1][1] = p1rack[5];
                     break;
         }
         tiles.splice(j, 1); // Delete from tiles.
-        p1rack[i].piece = getPieceImageSource(p1rack[i]);
-    
+        p1rack[i].piece = getPieceImageSource( p1rack[i].replace(/\d/g, '')+'0' ); // Replace tile id with the tier
+
 // console.log( '' );
 // console.log( 'rePopRack1():' );
-// console.log( 'curPlayer:', curPlayer, 'p1rack:', p1rack, 'ctr:', i, 'dot:', dotcnt, 'rnd:', j, 'index:', k, 'tiles:', tiles );
+// console.log( 'currPlayer:', currPlayer, 'p1rack:', p1rack, 'ctr:', i, 'dot:', dotcnt, 'rnd:', j, 'index:', k, 'tiles:', tiles );
     
     }
 } // rePopRack1()
@@ -451,30 +525,30 @@ function rePopRack2() {
         // Update p2rack[] and gameBoard[][][] based on the index of the dot.
         switch(k) { // p2rack order
             case 0: loadRack(p2rack[k], [1,4,11]); // [Z,Y,X] ids
-                    gameBoard[0][3][10] = p2rack[0];
+                    // gameBoard[0][3][10] = p2rack[0];
                     break;
             case 1: loadRack(p2rack[k], [1,5,10]);
-                    gameBoard[0][4][9] = p2rack[1];
+                    // gameBoard[0][4][9] = p2rack[1];
                     break;
             case 2: loadRack(p2rack[k], [1,4,9]);
-                    gameBoard[0][3][8] = p2rack[2];
+                    // gameBoard[0][3][8] = p2rack[2];
                     break;
             case 3: loadRack(p2rack[k], [1,5,8]);
-                    gameBoard[0][4][7] = p2rack[3];
+                    // gameBoard[0][4][7] = p2rack[3];
                     break;
             case 4: loadRack(p2rack[k], [1,3,11]);
-                    gameBoard[0][2][10] = p2rack[4];
+                    // gameBoard[0][2][10] = p2rack[4];
                     break;
             case 5: loadRack(p2rack[k], [1,4,10]);
-                    gameBoard[0][3][9] = p2rack[5];
+                    // gameBoard[0][3][9] = p2rack[5];
                     break;
         }
         tiles.splice(j, 1); // Delete from tiles.
-        p2rack[i].piece = getPieceImageSource(p2rack[i]);
+        p2rack[i].piece = getPieceImageSource( p2rack[i].replace(/\d/g, '')+'0' ); // Replace tile id with the tier
     
 // console.log( '' );
 // console.log( 'rePopRack2():' );
-// console.log( 'curPlayer:', curPlayer, 'p2rack:', p2rack, 'ctr:', i, 'dot:', dotcnt, 'rnd:', j, 'index:', k, 'tiles:', tiles );
+// console.log( 'currPlayer:', currPlayer, 'p2rack:', p2rack, 'ctr:', i, 'dot:', dotcnt, 'rnd:', j, 'index:', k, 'tiles:', tiles );
     
     }
 } // rePopRack2()
@@ -518,33 +592,6 @@ function inRack2( position ) { // true if the position [z,y,x] is within the p2r
 // console.log( 'inRack2([0,4,7]):', inRack2([0,4,7]) );
 // console.log( 'inRack2([0,2,10]):', inRack2([0,2,10]) );
 // console.log( 'inRack2([0,3,9]):', inRack2([0,3,9]) );
-
-function onFlower( position ) { // true if the position [y,x] is on a flower
-    // let z = position[0];
-    let y = position[0];
-    let x = position[1];
-    
-    // if ( (z===0 && y===1 && x===4) || (z===0 && y===1 && x===6) || (z===0 && y===3 && x===5) ) { // flowers
-    if ( (y===1 && x===4) || (y===1 && x===6) || (y===3 && x===5) ) { // flowers
-        return true;
-    } else {
-        return false;
-    }
-} // onFlower( position )
-
-// console.log( 'onFlower( [1,4] ):', onFlower( [1,4] ) );
-// console.log( 'onFlower( [1,5] ):', onFlower( [1,5] ) );
-// console.log( 'onFlower( [1,6] ):', onFlower( [1,6] ) );
-// console.log( 'onFlower( [2,4] ):', onFlower( [2,4] ) );
-// console.log( 'onFlower( [3,5] ):', onFlower( [3,5] ) );
-// console.log( 'onFlower( [2,6] ):', onFlower( [2,6] ) );
-
-// console.log( 'onFlower([0,1,4]):', onFlower([0,1,4] ) );
-// console.log( 'onFlower([0,1,5]):', onFlower([0,1,5] ) );
-// console.log( 'onFlower([0,1,6]):', onFlower([0,1,6] ) );
-// console.log( 'onFlower([0,2,4]):', onFlower([0,2,4] ) );
-// console.log( 'onFlower([0,3,5]):', onFlower([0,3,5] ) );
-// console.log( 'onFlower([0,2,6]):', onFlower([0,2,6] ) );
 
 function onBoard( position ) { // true if the position is on the board
     let z = position[0];
@@ -614,6 +661,45 @@ function onBoard( position ) { // true if the position is on the board
 // console.log( 'onBoard([0,4,9]):', onBoard([0,4,9] ) );
 // console.log( 'onBoard([0,4,10]):', onBoard([0,4,10]) );
 
+function onFlower( position ) { // true if the position [y,x] is on a flower
+    // let z = position[0];
+    let y = position[0];
+    let x = position[1];
+    
+    // if ( (z===0 && y===1 && x===4) || (z===0 && y===1 && x===6) || (z===0 && y===3 && x===5) ) { // flowers
+    if ( (y===1 && x===4) || (y===1 && x===6) || (y===3 && x===5) ) { // flowers
+        return true;
+    } else {
+        return false;
+    }
+} // onFlower( position )
+
+function onPerimeter( position ) { // true if the position [y,x] is on the perimeter
+    // let z = position[0];
+    let y = position[0];
+    let x = position[1];
+    
+    if ( (y===1 && x===4) || (y===1 && x===5) || (y===1 && x===6) || (y===1 && x===6) || (y===2 && x===6) || (y===3 && x===5) || (y===2 && x===4) ) { // perimeter
+        return true;
+    } else {
+        return false;
+    }
+} // onPerimeter( position )
+
+// console.log( 'onPerimeter( [1,4] ):', onPerimeter( [1,4] ) );
+// console.log( 'onPerimeter( [1,5] ):', onPerimeter( [1,5] ) );
+// console.log( 'onPerimeter( [1,6] ):', onPerimeter( [1,6] ) );
+// console.log( 'onPerimeter( [2,4] ):', onPerimeter( [2,4] ) );
+// console.log( 'onPerimeter( [3,5] ):', onPerimeter( [3,5] ) );
+// console.log( 'onPerimeter( [2,6] ):', onPerimeter( [2,6] ) );
+
+// console.log( 'onPerimeter([0,1,4]):', onPerimeter([0,1,4] ) );
+// console.log( 'onPerimeter([0,1,5]):', onPerimeter([0,1,5] ) );
+// console.log( 'onPerimeter([0,1,6]):', onPerimeter([0,1,6] ) );
+// console.log( 'onPerimeter([0,2,4]):', onPerimeter([0,2,4] ) );
+// console.log( 'onPerimeter([0,3,5]):', onPerimeter([0,3,5] ) );
+// console.log( 'onPerimeter([0,2,6]):', onPerimeter([0,2,6] ) );
+
 /* movement functions */
 
 function setPieceHoldEvents() {
@@ -636,26 +722,26 @@ function setPieceHoldEvents() {
             if (hasIntervalStarted === false) {
                 piece.style.position = 'absolute';
     
-                curHeldPiece = piece;
-                const curHeldPieceStringPosition = piece.parentElement.id.split('');
+                currHeldPiece = piece;
+                const currHeldPieceStringPosition = piece.parentElement.id.split('');
     
-                if (isNaN(parseInt(curHeldPieceStringPosition[3],10))) { // If the 4th digit is NaN then don't use it.
-                    curHeldPieceStartingPosition = [ parseInt(curHeldPieceStringPosition[0],10)-1,
-                                                     parseInt(curHeldPieceStringPosition[1],10)-1,
-                                                     parseInt(curHeldPieceStringPosition[2],10)-1 ];
+                if (isNaN(parseInt(currHeldPieceStringPosition[3],10))) { // If the 4th digit is NaN then don't use it.
+                    currHeldPieceStartingPosition = [ parseInt(currHeldPieceStringPosition[0],10)-1,
+                                                     parseInt(currHeldPieceStringPosition[1],10)-1,
+                                                     parseInt(currHeldPieceStringPosition[2],10)-1 ];
                 } else {
-                    curHeldPieceStartingPosition = [ parseInt(curHeldPieceStringPosition[0],10)-1,
-                                                     parseInt(curHeldPieceStringPosition[1],10)-1, 
-                                                     Number("" + parseInt(curHeldPieceStringPosition[2],10) + parseInt(curHeldPieceStringPosition[3],10))-1 ]; // Concat the 3rd and 4th digits.
+                    currHeldPieceStartingPosition = [ parseInt(currHeldPieceStringPosition[0],10)-1,
+                                                     parseInt(currHeldPieceStringPosition[1],10)-1, 
+                                                     Number("" + parseInt(currHeldPieceStringPosition[2],10) + parseInt(currHeldPieceStringPosition[3],10))-1 ]; // Concat the 3rd and 4th digits.
                 }
     
-// console.warn( 'curHeldPieceStringPosition:', curHeldPieceStringPosition );
-// console.warn( '[parseInt(curHeldPieceStringPosition[0],10):', parseInt(curHeldPieceStringPosition[0],10) );
-// console.warn( '[parseInt(curHeldPieceStringPosition[1],10):', parseInt(curHeldPieceStringPosition[1],10) );
-// console.warn( '[parseInt(curHeldPieceStringPosition[2],10):', parseInt(curHeldPieceStringPosition[2],10) );
-// console.warn( '[parseInt(curHeldPieceStringPosition[3],10):', parseInt(curHeldPieceStringPosition[3],10) );
-// console.warn( '[parseInt(curHeldPieceStringPosition[2],10)+parseInt(curHeldPieceStrringPosition[3],10):', Number(""+parseInt(curHeldPieceStringPosition[2],10)+parseInt(curHeldPieceStringPosition[3],10)) );
-// console.warn( 'curHeldPieceStartingPosition:', curHeldPieceStartingPosition );
+// console.warn( 'currHeldPieceStringPosition:', currHeldPieceStringPosition );
+// console.warn( '[parseInt(currHeldPieceStringPosition[0],10):', parseInt(currHeldPieceStringPosition[0],10) );
+// console.warn( '[parseInt(currHeldPieceStringPosition[1],10):', parseInt(currHeldPieceStringPosition[1],10) );
+// console.warn( '[parseInt(currHeldPieceStringPosition[2],10):', parseInt(currHeldPieceStringPosition[2],10) );
+// console.warn( '[parseInt(currHeldPieceStringPosition[3],10):', parseInt(currHeldPieceStringPosition[3],10) );
+// console.warn( '[parseInt(currHeldPieceStringPosition[2],10)+parseInt(currHeldPieceStrringPosition[3],10):', Number(""+parseInt(currHeldPieceStringPosition[2],10)+parseInt(currHeldPieceStringPosition[3],10)) );
+// console.warn( 'currHeldPieceStartingPosition:', currHeldPieceStartingPosition );
     
                 movePieceInterval = setInterval(function() {
                     piece.style.top = mouseY - piece.offsetHeight / 2 + window.scrollY + 'px';
@@ -670,7 +756,7 @@ function setPieceHoldEvents() {
     document.addEventListener('mouseup', function(event) {
         window.clearInterval(movePieceInterval);
     
-        if (curHeldPiece !== null) {
+        if (currHeldPiece !== null) {
             const boardElement = document.querySelector('.board');
     
             if ((event.clientX > boardElement.offsetLeft - window.scrollX && event.clientX < boardElement.offsetLeft + boardElement.offsetWidth - window.scrollX) &&
@@ -694,15 +780,15 @@ function setPieceHoldEvents() {
                     var zPosition = 0;
                     const pieceReleasePosition = [zPosition, yPosition, xPosition];
     
-                    if (!(pieceReleasePosition[0] === curHeldPieceStartingPosition[0] && pieceReleasePosition[1] === curHeldPieceStartingPosition[1] && pieceReleasePosition[2] === curHeldPieceStartingPosition[2])) {
-                        if (curPlayer === 'white') {
-                            if (validateWhiteMovement(curHeldPieceStartingPosition, pieceReleasePosition)) {
-                                movePiece(curHeldPiece, curHeldPieceStartingPosition, pieceReleasePosition);
+                    if (!(pieceReleasePosition[0] === currHeldPieceStartingPosition[0] && pieceReleasePosition[1] === currHeldPieceStartingPosition[1] && pieceReleasePosition[2] === currHeldPieceStartingPosition[2])) {
+                        if (currPlayer === 'white') {
+                            if (validateWhiteMovement(currHeldPieceStartingPosition, pieceReleasePosition)) {
+                                movePiece(currHeldPiece, currHeldPieceStartingPosition, pieceReleasePosition);
                             }
                         }
-                        if (curPlayer === 'black') {
-                            if (validateBlackMovement(curHeldPieceStartingPosition, pieceReleasePosition)) {
-                                movePiece(curHeldPiece, curHeldPieceStartingPosition, pieceReleasePosition);
+                        if (currPlayer === 'black') {
+                            if (validateBlackMovement(currHeldPieceStartingPosition, pieceReleasePosition)) {
+                                movePiece(currHeldPiece, currHeldPieceStartingPosition, pieceReleasePosition);
                             }
                         }
     
@@ -711,66 +797,72 @@ function setPieceHoldEvents() {
 // console.log( 'Even/odd column:', xPosition%2 );
 // console.log( 'X:', (mousePositionOnBoardX - boardBorderSize) / document.getElementsByClassName('square')[0].offsetWidth*1.0 );
 // console.log( 'Y:', (mousePositionOnBoardY - boardBorderSize) / document.getElementsByClassName('square')[0].offsetHeight*0.77 );
-// console.log( 'curPlayer:', curPlayer, 'yPosition:', yPosition, 'xPosition:', xPosition );
+// console.log( 'currPlayer:', currPlayer, 'yPosition:', yPosition, 'xPosition:', xPosition );
     
                     }
                 }
-            curHeldPiece.style.position = 'static';
-            curHeldPiece = null;
-            curHeldPieceStartingPosition = null;
+            currHeldPiece.style.position = 'static';
+            currHeldPiece = null;
+            currHeldPieceStartingPosition = null;
         }
         hasIntervalStarted = false;
     });
 } // setPieceHoldEvents()
 
 function movePiece( piece, startingPosition, endingPosition ) {
-    const boardPiece = curBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
+    const boardPiece = currBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
     
     // If the boardPiece is not empty 
     if ( boardPiece !== '.' ) {
     // If the boardPiece is not empty AND the top rung is empty
-    // if ( (boardPiece !== '.') && ( curBoard[endingPosition[0]+5][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
+    // if ( (boardPiece !== '.') && ( currBoard[endingPosition[0]+5][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
     
         // move the piece
-        curBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]] = '.'; // clear the startingPosition and 
+        // remove the original piece from the DOM, currBoard and the rack
+        removePiece( boardPiece, startingPosition );
+        currBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]] = '.'; // clear the startingPosition and 
+    
         // remove the sourceSquare's child(piece)
-        const sourceSquare = document.getElementById(`${startingPosition[0] + 1}${startingPosition[1] + 1}${startingPosition[2] + 1}`);
-        sourceSquare.removeChild(piece);
+        // const sourceSquare = document.getElementById(`${startingPosition[0] + 1}${startingPosition[1] + 1}${startingPosition[2] + 1}`);
+        // sourceSquare.removeChild(piece);
     
         // const sourceSquare = document.getElementById(`${startingPosition[0] + 1}${startingPosition[1] + 1}${startingPosition[2] + 1}`);
         // sourceSquare.textContent = '';
         // sourceSquare.removeChild(piece);
-        if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 0 ) { p1rack[0] = '.'; } // clear the tile from the p1rack
+
+        // clear the tile from the p1rack
+        if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 0 ) { p1rack[0] = '.'; }
         if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 1 ) { p1rack[1] = '.'; }
         if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 2 ) { p1rack[2] = '.'; }
         if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 3 ) { p1rack[3] = '.'; }
         if ( startingPosition[0] === 0 && startingPosition[1] === 1 && startingPosition[2] === 0 ) { p1rack[4] = '.'; }
         if ( startingPosition[0] === 0 && startingPosition[1] === 1 && startingPosition[2] === 1 ) { p1rack[5] = '.'; }
     
-        if ( startingPosition[0] === 0 && startingPosition[1] === 3 && startingPosition[2] === 10 ) { p2rack[0] = '.'; } // clear the tile from the p2rack
+        // clear the tile from the p2rack
+        if ( startingPosition[0] === 0 && startingPosition[1] === 3 && startingPosition[2] === 10 ) { p2rack[0] = '.'; }
         if ( startingPosition[0] === 0 && startingPosition[1] === 4 && startingPosition[2] === 9 ) { p2rack[1] = '.'; }
         if ( startingPosition[0] === 0 && startingPosition[1] === 3 && startingPosition[2] === 8 ) { p2rack[2] = '.'; }
         if ( startingPosition[0] === 0 && startingPosition[1] === 4 && startingPosition[2] === 7 ) { p2rack[3] = '.'; }
         if ( startingPosition[0] === 0 && startingPosition[1] === 2 && startingPosition[2] === 10 ) { p2rack[4] = '.'; }
         if ( startingPosition[0] === 0 && startingPosition[1] === 3 && startingPosition[2] === 9 ) { p2rack[5] = '.'; }
     
-        if ( !( curBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]].includes(".") ) && !( curBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]].includes("^") ) ) {
+        if ( !( currBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]].includes(".") ) && !( currBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]].includes("^") ) ) {
             // level 0 is not empty AND level 0 is not R, check next level
-            if (!( curBoard[endingPosition[0]+1][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
+            if (!( currBoard[endingPosition[0]+1][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
                 // level 1 is not empty, check next level
-                if (!( curBoard[endingPosition[0]+2][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
+                if (!( currBoard[endingPosition[0]+2][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
                     // level 2 is not empty, check next level
-                    if (!( curBoard[endingPosition[0]+3][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
+                    if (!( currBoard[endingPosition[0]+3][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
                         // level 3 is not empty, check next level
-                        if (!( curBoard[endingPosition[0]+4][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
+                        if (!( currBoard[endingPosition[0]+4][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
                             // level 4 is not empty, check next level
-                            if (!( curBoard[endingPosition[0]+5][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
+                            if (!( currBoard[endingPosition[0]+5][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
                                 // level 5 is not empty, no more levels, this needs to be prevented
     
 console.warn("No more levels available.");
     
                             } else {
-                                curBoard[endingPosition[0]+5][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 5
+                                currBoard[endingPosition[0]+5][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 5
                                 const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
                                 destinationSquare.textContent = '';
     
@@ -779,12 +871,12 @@ console.warn("No more levels available.");
                                 pieceElement.classList.add('piece');
                                 pieceElement.id = boardPiece;
                                 pieceElement.draggable = false;
-                                pieceElement.src = getPieceImageSource(boardPiece+'5');
-// pieceElement.position = static;
+                                pieceElement.src = getPieceImageSource( boardPiece.replace(/\d/g, '') + '5' );
+    
                                 destinationSquare.appendChild(pieceElement);
                             }
                         } else {
-                            curBoard[endingPosition[0]+4][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 4
+                            currBoard[endingPosition[0]+4][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 4
                             const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
                             destinationSquare.textContent = '';
     
@@ -793,12 +885,12 @@ console.warn("No more levels available.");
                             pieceElement.classList.add('piece');
                             pieceElement.id = boardPiece;
                             pieceElement.draggable = false;
-                            pieceElement.src = getPieceImageSource(boardPiece+'4');
-// pieceElement.position = static;
+                            pieceElement.src = getPieceImageSource( boardPiece.replace(/\d/g, '') + '4' );
+    
                             destinationSquare.appendChild(pieceElement);
                         }
                     } else {
-                        curBoard[endingPosition[0]+3][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 3
+                        currBoard[endingPosition[0]+3][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 3
                         const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
                         destinationSquare.textContent = '';
     
@@ -807,12 +899,12 @@ console.warn("No more levels available.");
                         pieceElement.classList.add('piece');
                         pieceElement.id = boardPiece;
                         pieceElement.draggable = false;
-                        pieceElement.src = getPieceImageSource(boardPiece+'3');
-// pieceElement.position = static;
+                        pieceElement.src = getPieceImageSource( boardPiece.replace(/\d/g, '') + '3' );
+                
                         destinationSquare.appendChild(pieceElement);
                     }
                 } else {
-                    curBoard[endingPosition[0]+2][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 2
+                    currBoard[endingPosition[0]+2][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 2
                     const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
                     destinationSquare.textContent = '';
     
@@ -821,12 +913,12 @@ console.warn("No more levels available.");
                     pieceElement.classList.add('piece');
                     pieceElement.id = boardPiece;
                     pieceElement.draggable = false;
-                    pieceElement.src = getPieceImageSource(boardPiece+'2');
-// pieceElement.position = static;
+                    pieceElement.src = getPieceImageSource( boardPiece.replace(/\d/g, '') + '2' );
+    
                     destinationSquare.appendChild(pieceElement);
                 }
             } else {
-                curBoard[endingPosition[0]+1][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 1
+                currBoard[endingPosition[0]+1][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 1
                 const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
                 destinationSquare.textContent = '';
     
@@ -835,109 +927,112 @@ console.warn("No more levels available.");
                 pieceElement.classList.add('piece');
                 pieceElement.id = boardPiece;
                 pieceElement.draggable = false;
-                pieceElement.src = getPieceImageSource(boardPiece+'1');
-// pieceElement.position = static;
+                pieceElement.src = getPieceImageSource( boardPiece.replace(/\d/g, '') + '1' );
+             
                 destinationSquare.appendChild(pieceElement);
             }
         } else {
-            curBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 0
+            currBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 0
             const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
             destinationSquare.textContent = '';
-// pieceElement.position = static;
+    
             destinationSquare.appendChild(piece);
         }
     }
     
 // console.log( '' );
 // console.log( 'movePiece():' );
-// console.log( 'curPlayer:', curPlayer, 'moves a:"', piece.id, '" from startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+// console.log( 'currPlayer:', currPlayer, 'moves a:"', piece.id, '" from startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
 //                                                                  'to endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 // console.log( 'p1rack:', p1rack, 'p1rack.dot_count:', p1rack.filter(x => x === '.').length );
 // console.log( 'p2rack:', p2rack, 'p2rack.dot_count:', p2rack.filter(x => x === '.').length );
     
 } // movePiece( piece, startingPosition, endingPosition )
 
+
 function validateWhiteMovement( startingPosition, endingPosition ) {
-    const boardPiece = curBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
-    switch (boardPiece) {
+    const boardPiece = currBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
+    
+    switch ( boardPiece.replace(/\d/g, '') ) { // Strip the tile_id from the tile, leaving the letter
         case 'a':
-            return testWhiteLetter( startingPosition, endingPosition, 'a' );
-            break;
         case 'b':
-            return testWhiteLetter( startingPosition, endingPosition, 'b' );
-            break;
         case 'c':
-            return testWhiteLetter( startingPosition, endingPosition, 'c' );
-            break;
         case 'd':
-            return testWhiteLetter( startingPosition, endingPosition, 'd' );
-            break;
         case 'e':
-            return testWhiteLetter( startingPosition, endingPosition, 'e' );
-            break;
         case 'f':
-            return testWhiteLetter( startingPosition, endingPosition, 'f' );
-            break;
         case 'g':
-            return testWhiteLetter( startingPosition, endingPosition, 'g' );
-            break;
         case 'h':
-            return testWhiteLetter( startingPosition, endingPosition, 'h' );
-            break;
         case 'i':
-            return testWhiteLetter( startingPosition, endingPosition, 'i' );
-            break;
         case 'j':
-            return testWhiteLetter( startingPosition, endingPosition, 'j' );
-            break;
         case 'k':
-            return testWhiteLetter( startingPosition, endingPosition, 'k' );
-            break;
         case 'l':
-            return testWhiteLetter( startingPosition, endingPosition, 'l' );
-            break;
         case 'm':
-            return testWhiteLetter( startingPosition, endingPosition, 'm' );
-            break;
         case 'n':
-            return testWhiteLetter( startingPosition, endingPosition, 'n' );
-            break;
         case 'o':
-            return testWhiteLetter( startingPosition, endingPosition, 'o' );
-            break;
         case 'p':
-            return testWhiteLetter( startingPosition, endingPosition, 'p' );
-            break;
         case 'q':
-            return testWhiteLetter( startingPosition, endingPosition, 'q' );
-            break;
         case 'r':
-            return testWhiteLetter( startingPosition, endingPosition, 'r' );
-            break;
         case 's':
-            return testWhiteLetter( startingPosition, endingPosition, 's' );
-            break;
         case 't':
-            return testWhiteLetter( startingPosition, endingPosition, 't' );
-            break;
         case 'u':
-            return testWhiteLetter( startingPosition, endingPosition, 'u' );
-            break;
         case 'v':
-            return testWhiteLetter( startingPosition, endingPosition, 'v' );
-            break;
         case 'w':
-            return testWhiteLetter( startingPosition, endingPosition, 'w' );
-            break;
         case 'x':
-            return testWhiteLetter( startingPosition, endingPosition, 'x' );
-            break;
         case 'y':
-            return testWhiteLetter( startingPosition, endingPosition, 'y' );
-            break;
         case 'z':
-            return testWhiteLetter( startingPosition, endingPosition, 'z' );
+            // return testWhiteLetter( startingPosition, endingPosition, 'a' );
+            return testWhiteLetter( startingPosition, endingPosition, boardPiece );
             break;
+            // return testWhiteLetter( startingPosition, endingPosition, 'b' );
+            // break;
+            // return testWhiteLetter( startingPosition, endingPosition, 'c' );
+            // break;
+            // return testWhiteLetter( startingPosition, endingPosition, 'd' );
+            // break;
+            // return testWhiteLetter( startingPosition, endingPosition, 'e' );
+            // break;
+            // return testWhiteLetter( startingPosition, endingPosition, 'f' );
+            // break;
+            // return testWhiteLetter( startingPosition, endingPosition, 'g' );
+            // break;
+            // return testWhiteLetter( startingPosition, endingPosition, 'h' );
+            // break;
+            // return testWhiteLetter( startingPosition, endingPosition, 'i' );
+            // break;
+            // return testWhiteLetter( startingPosition, endingPosition, 'j' );
+            // break;
+            // return testWhiteLetter( startingPosition, endingPosition, 'k' );
+            // break;
+            // return testWhiteLetter( startingPosition, endingPosition, 'l' );
+            // break;
+            // return testWhiteLetter( startingPosition, endingPosition, 'm' );
+            // break;
+            // return testWhiteLetter( startingPosition, endingPosition, 'n' );
+            // break;
+            // return testWhiteLetter( startingPosition, endingPosition, 'o' );
+            // break;
+            // return testWhiteLetter( startingPosition, endingPosition, 'p' );
+            // break;
+            // return testWhiteLetter( startingPosition, endingPosition, 'q' );
+            // break;
+            // return testWhiteLetter( startingPosition, endingPosition, 'r' );
+            // break;
+            // return testWhiteLetter( startingPosition, endingPosition, 's' );
+            // break;
+            // return testWhiteLetter( startingPosition, endingPosition, 't' );
+            // break;
+            // return testWhiteLetter( startingPosition, endingPosition, 'u' );
+            // break;
+            // return testWhiteLetter( startingPosition, endingPosition, 'v' );
+            // break;
+            // return testWhiteLetter( startingPosition, endingPosition, 'w' );
+            // break;
+            // return testWhiteLetter( startingPosition, endingPosition, 'x' );
+            // break;
+            // return testWhiteLetter( startingPosition, endingPosition, 'y' );
+            // break;
+            // return testWhiteLetter( startingPosition, endingPosition, 'z' );
+            // break;
         case ' ':
             if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
                 pickLetter( startingPosition, endingPosition );
@@ -967,86 +1062,38 @@ console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
     } // switch
 } // validateWhiteMovement( startingPosition, endingPosition )
 
+
 function validateBlackMovement( startingPosition, endingPosition ) {
-    const boardPiece = curBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
-    switch (boardPiece) {
+    const boardPiece = currBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
+    
+    switch ( boardPiece.replace(/\d/g, '') ) { // Strip the tile_id from the tile, leaving the letter
         case 'a':
-            return testBlackLetter( startingPosition, endingPosition, 'a' );
-            break;
         case 'b':
-            return testBlackLetter( startingPosition, endingPosition, 'b' );
-            break;
         case 'c':
-            return testBlackLetter( startingPosition, endingPosition, 'c' );
-            break;
         case 'd':
-            return testBlackLetter( startingPosition, endingPosition, 'd' );
-            break;
         case 'e':
-            return testBlackLetter( startingPosition, endingPosition, 'e' );
-            break;
         case 'f':
-            return testBlackLetter( startingPosition, endingPosition, 'f' );
-            break;
         case 'g':
-            return testBlackLetter( startingPosition, endingPosition, 'g' );
-            break;
         case 'h':
-            return testBlackLetter( startingPosition, endingPosition, 'h' );
-            break;
         case 'i':
-            return testBlackLetter( startingPosition, endingPosition, 'i' );
-            break;
         case 'j':
-            return testBlackLetter( startingPosition, endingPosition, 'j' );
-            break;
         case 'k':
-            return testBlackLetter( startingPosition, endingPosition, 'k' );
-            break;
         case 'l':
-            return testBlackLetter( startingPosition, endingPosition, 'l' );
-            break;
         case 'm':
-            return testBlackLetter( startingPosition, endingPosition, 'm' );
-            break;
         case 'n':
-            return testBlackLetter( startingPosition, endingPosition, 'n' );
-            break;
         case 'o':
-            return testBlackLetter( startingPosition, endingPosition, 'o' );
-            break;
         case 'p':
-            return testBlackLetter( startingPosition, endingPosition, 'p' );
-            break;
         case 'q':
-            return testBlackLetter( startingPosition, endingPosition, 'q' );
-            break;
         case 'r':
-            return testBlackLetter( startingPosition, endingPosition, 'r' );
-            break;
         case 's':
-            return testBlackLetter( startingPosition, endingPosition, 's' );
-            break;
         case 't':
-            return testBlackLetter( startingPosition, endingPosition, 't' );
-            break;
         case 'u':
-            return testBlackLetter( startingPosition, endingPosition, 'u' );
-            break;
         case 'v':
-            return testBlackLetter( startingPosition, endingPosition, 'v' );
-            break;
         case 'w':
-            return testBlackLetter( startingPosition, endingPosition, 'w' );
-            break;
         case 'x':
-            return testBlackLetter( startingPosition, endingPosition, 'x' );
-            break;
         case 'y':
-            return testBlackLetter( startingPosition, endingPosition, 'y' );
-            break;
         case 'z':
-            return testBlackLetter( startingPosition, endingPosition, 'z' );
+            return testBlackLetter( startingPosition, endingPosition, boardPiece );
             break;
         case ' ':
             if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
@@ -1054,28 +1101,29 @@ function validateBlackMovement( startingPosition, endingPosition ) {
             }
             break;
         case '^':
-                  if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+            if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
 // console.log( '' );
 // console.log( 'validateBlackMovement(startingPosition, endingPosition)' );
 // console.log( 'validateBlackMovement() success:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
 //                                                  'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 // console.log( 'inRack2(startingPosition):', inRack2(startingPosition) );
 // console.log( 'onBoard(endingPosition):', onBoard(endingPosition) );
-                      return true;
-                  } else {
+                return true;
+            } else {
     
 console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
                                                          'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
 console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
 console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
     
-                      return false;
-                  }
+                return false;
+            }
     } // switch
 } // validateBlackMovement( startingPosition, endingPosition )
 
+
 function testWhiteLetter( startingPosition, endingPosition, piece ) {
-    if ( ( getTopLetter( endingPosition ) !== piece ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+    if ( ( getTopLetter( endingPosition ) !== piece.replace(/\d/g, '') ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
         if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
             return true;
         } else { // Error condition
@@ -1091,8 +1139,9 @@ console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on 
     }
 } // testWhiteLetter( startingPosition, endingPosition, piece )
 
+
 function testBlackLetter( startingPosition, endingPosition, piece ) {
-    if ( ( getTopLetter( endingPosition ) !== piece ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
+    if ( ( getTopLetter( endingPosition ) !== piece.replace(/\d/g, '') ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
         if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
             return true;
         } else { // Error condition
@@ -1108,6 +1157,7 @@ console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on 
     }
 } // testBlackLetter( startingPosition, endingPosition, piece )
 
+
 function pickLetter( startingPosition, endingPosition ) {
     let c = startingPosition[0];
     let b = startingPosition[1];
@@ -1117,23 +1167,55 @@ function pickLetter( startingPosition, endingPosition ) {
     let y = endingPosition[1];
     let x = endingPosition[2];
     
-    // Choose a letter and convert to uppercase
+    // Choose a letter
     var blank = prompt( 'Choose a letter (A - Z):' );
-    blank = blank.toUpperCase(); // the letter_blanks are UpperCase
+
+    // Get blank_tile
+    var blank_tile = blank.toUpperCase() + blank_no;
+    blank_no = blank_no + 1;
+
+    let yxCoord = y+','+x; // use the yxCoords from the lookup
+    let blankLev = getTopLevel( yxCoord ); // use the yxCoords from the lookup
+
+    // Get blank_tileandtier
+    var blank_tileandtier = blank.toUpperCase() + blankLev; // the letter_blanks are UpperCase
     
-// console.log( 'startingPosition:', startingPosition );
-// console.log( 'endingPosition:', endingPosition );
-// console.log( 'blank:', blank );
+console.log( '' );
+console.log( 'pickLetter( startingPosition, endingPosition ):' );
+console.log( 'startingPosition:', startingPosition );
+console.log( 'endingPosition:', endingPosition );
+console.log( 'blankLev:', blankLev );
+console.log( 'blank_tile:', blank_tile );
+console.log( 'blank_tileandtier:', blank_tileandtier );
     
+    // Remove the Pink Rose img if the endingPosition is on a flower
+    if ( endingPosition[0] === 0 && endingPosition[1] === 1 && endingPosition[2] === 4 ) { 
+        removePiece( '^0', endingPosition );
+    }
+    if ( endingPosition[0] === 0 && endingPosition[1] === 1 && endingPosition[2] === 6 ) { 
+        removePiece( '^1', endingPosition );
+    }
+    if ( endingPosition[0] === 0 && endingPosition[1] === 3 && endingPosition[2] === 5 ) { 
+        removePiece( '^2', endingPosition );
+    }
+
     // replace the blank tile with the zero-point letter_blank at the endingPosition
-    loadPiece( blank, [z+1,y+1,x+1] );
-    // put the piece in curBoard
-    curBoard[z][y][x] = blank;
+    loadPiece( blank_tile, [z+1,y+1,x+1] );
+
+    // put the piece in currBoard
+    currBoard[z][y][x] = blank_tile;
     
-    // remove the original blank tile from the DOM, curBoard and the rack
-    removePiece( ' ', startingPosition );
-    curBoard[c][b][a] = '.';
-    
+    // remove the original blank tile from the DOM, currBoard and the rack
+    if ( currPlayer === 'white' ) {
+        if ( p1rack.indexOf( ' 0' ) > -1 ) { removePiece( ' 0', startingPosition ); }
+        if ( p1rack.indexOf( ' 1' ) > -1 ) { removePiece( ' 1', startingPosition ); }
+    }
+    if ( currPlayer === 'white' ) {
+        if ( p2rack.indexOf( ' 0' ) > -1 ) { removePiece( ' 0', startingPosition ); }
+        if ( p2rack.indexOf( ' 1' ) > -1 ) { removePiece( ' 1', startingPosition ); }
+    }
+
+    currBoard[c][b][a] = '.';
     // clear the blank tile from the p1rack
     if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 0 ) { p1rack[0] = '.'; } 
     if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 1 ) { p1rack[1] = '.'; }
@@ -1141,7 +1223,6 @@ function pickLetter( startingPosition, endingPosition ) {
     if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 3 ) { p1rack[3] = '.'; }
     if ( startingPosition[0] === 0 && startingPosition[1] === 1 && startingPosition[2] === 0 ) { p1rack[4] = '.'; }
     if ( startingPosition[0] === 0 && startingPosition[1] === 1 && startingPosition[2] === 1 ) { p1rack[5] = '.'; }
-    
     // clear the blank tile from the p2rack
     if ( startingPosition[0] === 0 && startingPosition[1] === 3 && startingPosition[2] === 10 ) { p2rack[0] = '.'; }
     if ( startingPosition[0] === 0 && startingPosition[1] === 4 && startingPosition[2] === 9 ) { p2rack[1] = '.'; }
@@ -1161,26 +1242,26 @@ function switchPlayer() {
     words.length = 0; // empty words[]
     score_words.length = 0; // empty score_words[]
     
-    if (curPlayer === 'white') {
+    if (currPlayer === 'white') {
         // calculate the score    
         calcScore();
         // redraw
         rePopRack1();
-        // backup curBoard to prevBoard
-        prevBoard = JSON.parse(JSON.stringify(curBoard));
+        // backup currBoard to prevBoard
+        prevBoard = JSON.parse(JSON.stringify(currBoard));
         // switch player
-        curPlayer = 'black';
+        currPlayer = 'black';
     } else {
         // calculate the score    
         calcScore();
         // redraw
         rePopRack2();
-        // backup curBoard to prevBoard
-        prevBoard = JSON.parse(JSON.stringify(curBoard));
+        // backup currBoard to prevBoard
+        prevBoard = JSON.parse(JSON.stringify(currBoard));
         // increment the turn no
         turn_no++;
         // switch player
-        curPlayer = 'white';
+        currPlayer = 'white';
     }
     
 console.log( '' );
@@ -1203,7 +1284,7 @@ function calcScore() {
 } // calcScore()
 
 function findWords() {
-    // 1st: Find the tiles played last turn by diffing prevBoard[][][] and curBoard[][][] back into prevBoard[][][]:
+    // 1st: Find the tiles played last turn by diffing prevBoard[][][] and currBoard[][][] back into prevBoard[][][]:
     for (let h = 0; h < 6 ; h++) { // 6 levels
         for (let i = 0; i < 5 ; i++) { // 5 rows
             for (let j = 0; j < 11; j++) { // 11 columns
@@ -1211,9 +1292,9 @@ function findWords() {
                     // If not on the board, clear the prevBoard element
                     prevBoard[h][i][j] = '.';
                 }
-                if ( prevBoard[h][i][j] !== curBoard[h][i][j] && onBoard([h,i,j]) ) {
+                if ( prevBoard[h][i][j] !== currBoard[h][i][j] && onBoard([h,i,j]) ) {
                     // if different, save the difference to prevBoard
-                    prevBoard[h][i][j] = curBoard[h][i][j];
+                    prevBoard[h][i][j] = currBoard[h][i][j];
                 } else {
                     // if the same, clear the element in prevBoard
                     prevBoard[h][i][j] = '.';
@@ -1222,7 +1303,7 @@ function findWords() {
         }
     } // prevBoard now contains only the tile(s) played for the last turn
     
-    // 2nd: Use the prevBoard[][][] position(s) to find any new word(s) in curBoard[][][]:
+    // 2nd: Use the prevBoard[][][] position(s) to find any new word(s) in currBoard[][][]:
     for (let h = 0; h < 6 ; h++) { // 6 levels
         for (let i = 0; i < 5 ; i++) { // 5 rows
             for (let j = 0; j < 11; j++) { // 11 columns
@@ -1245,6 +1326,11 @@ function findWords() {
             }
         }
     } // score_words[] now contains the words to score
+
+console.log( '' );
+console.log( 'findWords()' ); 
+console.log( 'score_words[]:', score_words ); 
+    
     
 } // findWords()
 
@@ -1279,8 +1365,8 @@ function checkWords() {
         //     return 0;
         // }
     
-        // check that the first word is on a flower
-        if ( ( turn_no === 0 ) && ( curPlayer === 'white' ) ) {
+        // check that the first word is on a perimeter flower
+        if ( ( turn_no === 0 ) && ( currPlayer === 'white' ) ) {
             // for every letter position in word_str, check if its on a flower
     
             var flower = 0;
@@ -1334,16 +1420,17 @@ function scoreWords() {
     let st_bonus = 0; // Stacking letter bonus
     
     // Check for Flower Power and Pollination bonuses
-    if ( ( prevBoard[0][1][4] !== '.' ) || ( prevBoard[0][1][6] !== '.' ) || ( prevBoard[0][3][5] !== '.' ) ) { // Someone played on a Flower
+    if ( ( prevBoard[0][1][4].replace(/\d/g, '') !== '.' ) || ( prevBoard[0][1][6].replace(/\d/g, '') !== '.' ) || ( prevBoard[0][3][5].replace(/\d/g, '') !== '.' ) ) { // Someone played on a Flower
         fp_bonus = 1;
-        if ( ( prevBoard[0][1][4] === 'b' ) || ( prevBoard[0][1][4] === 'q' ) || 
-             ( prevBoard[0][1][6] === 'b' ) || ( prevBoard[0][1][6] === 'q' ) ||
-             ( prevBoard[0][3][5] === 'b' ) || ( prevBoard[0][3][5] === 'q' ) ) {
+        if ( ( prevBoard[0][1][4].replace(/\d/g, '') === 'b' ) || ( prevBoard[0][1][4].replace(/\d/g, '') === 'q' ) || 
+             ( prevBoard[0][1][6].replace(/\d/g, '') === 'b' ) || ( prevBoard[0][1][6].replace(/\d/g, '') === 'q' ) ||
+             ( prevBoard[0][3][5].replace(/\d/g, '') === 'b' ) || ( prevBoard[0][3][5].replace(/\d/g, '') === 'q' ) ) {
             po_bonus = 1;
         }
     }
     
-// console.log( 'score_words:', score_words ); 
+console.log( '' );
+console.log( 'score_words:', score_words ); 
     
     // score score_words[]
     var word_score = 0;
@@ -1408,6 +1495,7 @@ console.log( 'letter:', letter, 'letterVal:', letterVal, 'letterLev:', letterLev
             
                         word_score = word_score + st_bonus * letterVal;
                     }
+    
                     // check for a Flower Power bonus 
                     if ( fp_bonus === 1 ) {
                         word_score = word_score * 2;
@@ -1417,11 +1505,10 @@ console.log( 'letter:', letter, 'letterVal:', letterVal, 'letterLev:', letterLev
                         word_score = word_score + 10;
                     }
                     // build the turn ledger and score
-                    turn_ledger = turn_ledger + word_str + ' ' + word_score + ', ';
+                    turn_ledger = turn_ledger + word_str.toLowerCase() + ' ' + word_score + ', ';
                     turn_score = turn_score + word_score;
-    
                     // record log
-                    game_record.push( curPlayer, turn_no, element_str, word_score );
+                    game_record.push( currPlayer, turn_no, element_str, word_score );
                     break;
     
                 case 'DW': // Downwards Word
@@ -1444,6 +1531,7 @@ console.log( 'A Downwards Word Lookup:' );
             
                         word_score = word_score + st_bonus * letterVal;
                     }
+    
                     // check for a Flower Power bonus 
                     if ( fp_bonus === 1 ) {
                         word_score = word_score * 2;
@@ -1453,11 +1541,10 @@ console.log( 'A Downwards Word Lookup:' );
                         word_score = word_score + 10;
                     }
                     // build the turn ledger and score
-                    turn_ledger = turn_ledger + word_str + ' ' + word_score + ', ';
+                    turn_ledger = turn_ledger + word_str.toLowerCase() + ' ' + word_score + ', ';
                     turn_score = turn_score + word_score;
-                    
                     // record log
-                    game_record.push( curPlayer, turn_no, element_str, word_score );
+                    game_record.push( currPlayer, turn_no, element_str, word_score );
                     break;
     
                 case 'DO': // Straight-Down Word
@@ -1480,6 +1567,7 @@ console.log( 'A Down Word Lookup:' );
             
                         word_score = word_score + st_bonus * letterVal;
                     }
+    
                     // check for a Flower Power bonus 
                     if ( fp_bonus === 1 ) {
                         word_score = word_score * 2;
@@ -1489,11 +1577,10 @@ console.log( 'A Down Word Lookup:' );
                         word_score = word_score + 10;
                     }
                     // build the turn ledger and score
-                    turn_ledger = turn_ledger + word_str + ' ' + word_score + ', ';
+                    turn_ledger = turn_ledger + word_str.toLowerCase() + ' ' + word_score + ', ';
                     turn_score = turn_score + word_score;
-    
                     // record log
-                    game_record.push( curPlayer, turn_no, element_str, word_score );
+                    game_record.push( currPlayer, turn_no, element_str, word_score );
                     break;
     
             }
@@ -1513,13 +1600,13 @@ console.log( 'game_record:', game_record );
     // remove trailing ', ' from turn_ledger
     turn_ledger = turn_ledger.replace(/, $/, '');
     
-    if (curPlayer === 'white') {
+    if (currPlayer === 'white') {
         p1score = p1score + turn_score;
         const p1scoreDiv = document.getElementById('p1score');
         p1scoreText = p1scoreText + 'Player 1: ' + turn_ledger + ' = ' + p1score + '\n';
         p1scoreDiv.innerHTML = p1scoreText;
     
-console.log( p1scoreDiv.innerHTML );
+        console.log( p1scoreDiv.innerHTML );
     
     } else {
         p2score = p2score + turn_score;
@@ -1527,7 +1614,7 @@ console.log( p1scoreDiv.innerHTML );
         p2scoreText = p2scoreText + 'Player 2: ' + turn_ledger + ' = ' + p2score + '\n';
         p2scoreDiv.innerHTML = p2scoreText;
     
-console.log( p2scoreDiv.innerHTML );
+        console.log( p2scoreDiv.innerHTML );
     
     }
 } // scoreWords()
@@ -1538,11 +1625,11 @@ function wordFinder( position ) { // position = an array of numbers
     let z = position[0];
     let y = position[1];
     let x = position[2]; 
-    // the [z] coordinate is unused, the source curBoard[][][] is flattened into flatBoard[][]
+    // the [z] coordinate is unused, the source currBoard[][][] is flattened into flatBoard[][]
     
     var str = '';
     
-    flattenBoard(); // flattens global curBoard[z][y][x] into the global flatBoard[y][x]
+    flattenBoard(); // flattens global currBoard[z][y][x] into the global flatBoard[y][x]
     
     if ( onBoard( position ) ) { // only process valid board positions
     
@@ -1555,23 +1642,23 @@ function wordFinder( position ) { // position = an array of numbers
         ///////////////////////////////////////////////////////////////////////
         // build and number all possible Upward strings on flatBoard[][]      /
         ///////////////////////////////////////////////////////////////////////
-        upwd_str0=flatBoard[1][4]+flatBoard[1][5];
-        upwd_str1=flatBoard[2][4]+flatBoard[2][5]+flatBoard[1][6];
-        upwd_str2=flatBoard[3][5]+flatBoard[2][6];
+        upwd_str0=flatBoard[1][4].replace(/\d/g, '') + flatBoard[1][5].replace(/\d/g, '');
+        upwd_str1=flatBoard[2][4].replace(/\d/g, '') + flatBoard[2][5].replace(/\d/g, '') + flatBoard[1][6].replace(/\d/g, '');
+        upwd_str2=flatBoard[3][5].replace(/\d/g, '') + flatBoard[2][6].replace(/\d/g, '');
     
         ///////////////////////////////////////////////////////////////////////
         // build and number all possible Downward strings on flatBoard[][]    /
         ///////////////////////////////////////////////////////////////////////
-        dnwd_str0=flatBoard[1][5]+flatBoard[1][6];
-        dnwd_str1=flatBoard[1][4]+flatBoard[2][5]+flatBoard[2][6];
-        dnwd_str2=flatBoard[2][4]+flatBoard[3][5];
+        dnwd_str0=flatBoard[1][5].replace(/\d/g, '') + flatBoard[1][6].replace(/\d/g, '');
+        dnwd_str1=flatBoard[1][4].replace(/\d/g, '') + flatBoard[2][5].replace(/\d/g, '') + flatBoard[2][6].replace(/\d/g, '');
+        dnwd_str2=flatBoard[2][4].replace(/\d/g, '') + flatBoard[3][5].replace(/\d/g, '');
     
         ///////////////////////////////////////////////////////////////////////
         // build and number all possible Down strings on flatBoard[][]        /
         ///////////////////////////////////////////////////////////////////////
-        down_str0=flatBoard[1][4]+flatBoard[2][4];
-        down_str1=flatBoard[1][5]+flatBoard[2][5]+flatBoard[3][5];
-        down_str2=flatBoard[1][6]+flatBoard[2][6];
+        down_str0=flatBoard[1][4].replace(/\d/g, '') + flatBoard[2][4].replace(/\d/g, '');
+        down_str1=flatBoard[1][5].replace(/\d/g, '') + flatBoard[2][5].replace(/\d/g, '') + flatBoard[3][5].replace(/\d/g, '');
+        down_str2=flatBoard[1][6].replace(/\d/g, '') + flatBoard[2][6].replace(/\d/g, '');
     
         yandx_str = '' + y + x;
 // console.log( 'yandx_str:', yandx_str );
@@ -1646,45 +1733,48 @@ function wordFinder( position ) { // position = an array of numbers
 }; // wordFinder( position )
 
 function flattenBoard() {
-    // This function flattens the curBoard[][][] into flatBoard[][]
-    // by using the highest level letter tile in curBoard
+    // This function flattens the currBoard[][][] into flatBoard[][]
+    // by using the highest level letter tile in currBoard
     
     // level h, row i and column j
     for (let h = 0; h < 6 ; h++) { // 6 levels
         for (let i = 0; i < 5 ; i++) { // 5 rows
             for (let j = 0; j < 11; j++) { // 11 columns
-                // Iterate over every curBoard element
-                if ( ( curBoard[h][i][j] !== '.' ) && ( curBoard[h][i][j] !== '^' ) ) {
-                    // flatBoard will contain the highest letter tile in curBoard
-                    flatBoard[i][j] = curBoard[h][i][j];
+                // Iterate over every currBoard element
+                if ( ( currBoard[h][i][j] !== '.' ) && ( currBoard[h][i][j] !== '^1' ) && ( currBoard[h][i][j] !== '^2' ) && ( currBoard[h][i][j] !== '^3' ) ) {
+                    // flatBoard will contain the highest letter tile in currBoard
+                    flatBoard[i][j] = currBoard[h][i][j];
                 }
             }
         }
     }
 }; // flattenBoard()
 
-function getTopLevel( position ) { // position = string of yxCoords, returns the highest level
+function getTopLevel( position ) {
+    // Return the highest occupied level for this position, a yxCoord string 
+    
     // convert string position to an array
     const myArray = position.split(',');
     let y = Number(myArray[0]);
-    let x = Number(myArray[1]); // position [y,x] is the source for finding the top z level in curBoard[][][]
+    let x = Number(myArray[1]); // position [y,x] is the source for finding the top z level in currBoard[][][]
     
-// console.log( '' );
-// console.log( 'getTopLevel(', position, '):' );
-// console.log( 'position:', position );
-// console.log( 'y:', y );
-// console.log( 'x:', x );
+console.log( '' );
+console.log( 'getTopLevel(', position, '):' );
+console.log( 'position:', position );
+console.log( 'y:', y );
+console.log( 'x:', x );
     
-    // use the yxCoords to get the top level from curBoard
+    // use the yxCoords to get the top level from currBoard
     for (let level = 5; level >= 0 ; level--) { // 6 levels
-        if ( curBoard[level][y][x] !== '.' ) {
-            return level;
-            break;
-        }
+        // if ( ( currBoard[level][y][x] !== '.' ) || ( level === 'undefined' ) ) {
+        if ( currBoard[level][y][x] !== '.' ) {
+                return level;
+                break;
+        } 
     }
 } // getTopLevel( position )
 
-function getTopLetter( position ) { // return the piece that is on top of the current position
+function getTopLetter( position ) { // return the letter that is on top of the current position
     let z = position[0]; // this z-coordinate is not accurate
     let y = position[1]; // use the yxCoords
     let x = position[2];
@@ -1693,15 +1783,34 @@ function getTopLetter( position ) { // return the piece that is on top of the cu
 // console.log( 'In getTopLetter:' );
 // console.log( 'position:', position, 'z:', z, 'y:', y, 'x:', x );
     
-    // get the top letter from curBoard for yxCoord
+    // get the top letter from currBoard for yxCoord
     for (let level = 5; level >= 0 ; level--) { // 6 levels
-        if ( curBoard[level][y][x] !== '.' ) {
-            top_letter = curBoard[level][y][x];
+        if ( currBoard[level][y][x] !== '.' ) {
+            top_letter = currBoard[level][y][x].replace(/\d/g, '');
             break;
         }
     }
     return top_letter.toLowerCase();
 } // getTopLetter( position )
+
+function getTopTile( position ) { // return the tile that is on top of the current position
+    let z = position[0]; // this z-coordinate is not accurate
+    let y = position[1]; // use the yxCoords
+    let x = position[2];
+    let top_letter = '';
+    
+// console.log( 'In getTopTile:' );
+// console.log( 'position:', position, 'z:', z, 'y:', y, 'x:', x );
+    
+    // get the top tile from currBoard for yxCoord
+    for (let level = 5; level >= 0 ; level--) { // 6 levels
+        if ( currBoard[level][y][x] !== '.' ) {
+            top_tile = currBoard[level][y][x];
+            break;
+        }
+    }
+    return top_tile;
+} // getTopTile( position )
 
 function getLetterValue( piece ) {
     // Return the value of the given piece.

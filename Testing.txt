@@ -8,7 +8,55 @@ Blank tile replacement is almost working correctly...
     Uncaught TypeError: Failed to execute 'removeChild' on 'Node': parameter 1 is not of type 'Node'.
   
     I'd like to fix this before saving to GitHub...
+    Got this working on 20221001 and checked it in.
 
+================================================================================
+
+20221014 New Testing of Blank Tile replacements...
+
+	 -> The score ledger should display words in lower-case
+		Done and tested.  20201015
+
+	 -> Blank replacements on flowers need to remove the flower...
+		Done and tested.  20201018
+
+20221025 Open issues:
+
+	 -> Cannot play the new tiles in the racks...
+
+ good tile example:
+<img class="piece" id="c0" draggable="true" src="assets/C0.png" style="position: static; top: 245px; left: 672px;">
+
+ bad tile example:
+<img class="piece" id="t5" draggable="true" src="assets/T0.png">
+
+missing:
+ style="position: static; top: 245px; left: 672px;">
+
+
+	 -> removePiece() removes the wrong piece from the racks...
+		Solution, tiles went from being a single character
+                to being numbered characters for uniqueness.
+                The 9 "a" tiles are now 'a0' through 'a8'.
+
+	looks good, still testing...
+
+
+	 -> All tiles must be placed on a line
+
+	 -> Do not allow an existing word to be completely over-written.
+
+	 -> Do not allow a word of length === 1.
+
+	 -> Playing on top of tier 6 makes the tile "disappear".
+
+	 -> Now able to play a letter on top of the same letter...
+	    Corrected, still testing...
+
+
+Blank Tile Testing:
+	-> The A blank seems off color... fixed all letter_blanks, re-test...
+	
 
 
 
