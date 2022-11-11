@@ -1,0 +1,80 @@
+
+20221111 undo_turn testing with the 2x2x2 board and code...
+
+  The initial test put a 2-letter word back in the rack and removed the
+  moves from game_record.  However, the second letter played is now
+  un-playable and stuck on the rack.
+
+  --> inspect(p1rack): ['t0', '.', 'd0', 'a2', 'a1', '.']
+
+  The p1rack was not updated as part of the undo_turn.
+  Review code...
+
+
+
+20221110 Computer crashed during demo
+
+20221109 undo_turn() testing:
+20221110 undo_turn() testing:
+
+o i b n
+i1 p0
+
+
+inspect(game_record)
+(10) ['white', 0, img#i1.piece, Array(3), Array(3), 'white', 0, img#p0.piece, Array(3), Array(3)]
+0: "white"
+1: 0
+2: img#i1.piece  // 
+3: (3) [0, 1, 0] // move i1 from [0,1,0] to [0,2,4]
+4: (3) [0, 2, 4] // 
+5: "white"
+6: 0
+7: img#p0.piece  //
+8: (3) [0, 1, 1] // move p0 from [0,1,1] to [0,2,5]
+9: Array(3)      //
+      0: 0
+      1: 2
+      2: 5
+      length: 3
+      [[Prototype]]: Array(0)
+   length: 10
+   [[Prototype]]: Array(0)
+
+
+z g _ n
+t _
+
+
+inspect(game_record)
+(10) ['white', 0, img#w0.piece, Array(3), Array(3), 'white', 0, img#e1.piece, Array(3), Array(3)]
+0 : "white"
+1 : 0
+2 : img#w0.piece  // 
+3 : (3) [0, 1, 1] // move w0 from [0,1,1] to [0,2,4]
+4 : (3) [0, 2, 4] // 
+5 : "white"
+6 : 0
+7 : img#e1.piece  //
+8 : (3) [0, 0, 2] // move e1 from [0,0,2] to [0,2,5]
+9 : (3) [0, 2, 5] //
+length : 10
+[[Prototype]]
+: 
+Array(0)
+
+--> move e1 from [0,2,5] to [0,0,2] --> movePiece( e1, [0,2,5], [0,0,2] )
+--> move w0 from [0,2,4] to [0,1,1] --> movePiece( w0, [0,2,4], [0,1,1] )
+
+
+
+
+in undo_turn, line 1420:
+    movePiece( piece1, from1, to1 );
+in movePiece:
+            destinationSquare.appendChild(piece);
+
+
+
+
+

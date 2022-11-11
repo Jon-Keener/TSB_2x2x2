@@ -1077,7 +1077,7 @@ console.log( 'undoPiece(', piece, ',', startingPosition, ',', endingPosition, ')
         // move the piece
         // remove the original piece from the DOM, currBoard and the rack
 
-        // undoPiece() doesn't remove from the rack
+        // undoPiece() doesn't remove from the rack - instead it adds back to it
         // removeRack( boardPiece, startingPosition );
     
         currBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]] = '.'; // clear the startingPosition and 
@@ -1090,22 +1090,22 @@ console.log( 'undoPiece(', piece, ',', startingPosition, ',', endingPosition, ')
         // sourceSquare.textContent = '';
         // sourceSquare.removeChild(piece);
     
-        // undoPiece() doesn't remove from the rack
-        // clear the tile from the p1rack
-        // if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 0 ) { p1rack[0] = '.'; }
-        // if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 1 ) { p1rack[1] = '.'; }
-        // if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 2 ) { p1rack[2] = '.'; }
-        // if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 3 ) { p1rack[3] = '.'; }
-        // if ( startingPosition[0] === 0 && startingPosition[1] === 1 && startingPosition[2] === 0 ) { p1rack[4] = '.'; }
-        // if ( startingPosition[0] === 0 && startingPosition[1] === 1 && startingPosition[2] === 1 ) { p1rack[5] = '.'; }
+        // undoPiece() doesn't remove from the rack - instead it adds back to it
+        // add the tile to the p1rack
+        if ( endingPosition[0] === 0 && endingPosition[1] === 0 && endingPosition[2] === 0 ) { p1rack[0] = boardPiece; }
+        if ( endingPosition[0] === 0 && endingPosition[1] === 0 && endingPosition[2] === 1 ) { p1rack[1] = boardPiece; }
+        if ( endingPosition[0] === 0 && endingPosition[1] === 0 && endingPosition[2] === 2 ) { p1rack[2] = boardPiece; }
+        if ( endingPosition[0] === 0 && endingPosition[1] === 0 && endingPosition[2] === 3 ) { p1rack[3] = boardPiece; }
+        if ( endingPosition[0] === 0 && endingPosition[1] === 1 && endingPosition[2] === 0 ) { p1rack[4] = boardPiece; }
+        if ( endingPosition[0] === 0 && endingPosition[1] === 1 && endingPosition[2] === 1 ) { p1rack[5] = boardPiece; }
     
-        // clear the tile from the p2rack
-        // if ( startingPosition[0] === 0 && startingPosition[1] === 3 && startingPosition[2] === 10 ) { p2rack[0] = '.'; }
-        // if ( startingPosition[0] === 0 && startingPosition[1] === 4 && startingPosition[2] === 9 ) { p2rack[1] = '.'; }
-        // if ( startingPosition[0] === 0 && startingPosition[1] === 3 && startingPosition[2] === 8 ) { p2rack[2] = '.'; }
-        // if ( startingPosition[0] === 0 && startingPosition[1] === 4 && startingPosition[2] === 7 ) { p2rack[3] = '.'; }
-        // if ( startingPosition[0] === 0 && startingPosition[1] === 2 && startingPosition[2] === 10 ) { p2rack[4] = '.'; }
-        // if ( startingPosition[0] === 0 && startingPosition[1] === 3 && startingPosition[2] === 9 ) { p2rack[5] = '.'; }
+        // add the tile to the p2rack
+        if ( endingPosition[0] === 0 && endingPosition[1] === 3 && endingPosition[2] === 10 ) { p2rack[0] = boardPiece; }
+        if ( endingPosition[0] === 0 && endingPosition[1] === 4 && endingPosition[2] === 9 ) { p2rack[1] = boardPiece; }
+        if ( endingPosition[0] === 0 && endingPosition[1] === 3 && endingPosition[2] === 8 ) { p2rack[2] = boardPiece; }
+        if ( endingPosition[0] === 0 && endingPosition[1] === 4 && endingPosition[2] === 7 ) { p2rack[3] = boardPiece; }
+        if ( endingPosition[0] === 0 && endingPosition[1] === 2 && endingPosition[2] === 10 ) { p2rack[4] = boardPiece; }
+        if ( endingPosition[0] === 0 && endingPosition[1] === 3 && endingPosition[2] === 9 ) { p2rack[5] = boardPiece; }
     
         if ( !( currBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]].includes(".") ) && !( currBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]].includes("^") ) ) {
             // level 0 is not empty AND level 0 is not R, check next level
@@ -1192,7 +1192,8 @@ console.warn("No more levels available.");
              
                 destinationSquare.appendChild(pieceElement);
             }
-        } else {
+        } // level 0 not empty
+	else {
             currBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 0
             const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
             destinationSquare.textContent = '';
@@ -1511,8 +1512,8 @@ function calcScore() {
     
     findWords(); // populate the score_words[] array
         
+    // if score_words is empty the player passed - switch player and update the score
     if ( score_words.length === 0 ) {
-        // player passed - update the scores and switch player
         
         if ( currPlayer === 'white' ) {
             currPlayer = 'black';
@@ -1536,17 +1537,13 @@ function calcScore() {
         
         }
 
-    } else {
-        // find and score words
+    } else { // score_words is not empty - find and score the words in score_words
     
+        // if there was a problem with any word created, rollback the entire move
         if ( checkWords() ) {
-            // there was a problem with a word, rollback the entire move
             undo_turn();
-// console.warn( 'checkWords():', checkWords() );
-// console.warn( 'Rollback the move' );
         } else {
-            // there was no problem
-            // score the words in the score_words[] array
+            // there was no problem so score the words in the score_words[] array
             scoreWords(); 
                 
             // backup currBoard to prevBoard
@@ -1554,12 +1551,12 @@ function calcScore() {
                 
             // redraw tiles and switch player
             if ( currPlayer === 'white' ) {
-                // redraw for the p1 rack
+                // redraw for the p1rack
                 rePopRack1();
                 // switch player
                 currPlayer = 'black';
             } else {
-                // redraw for the p2 rack
+                // redraw for the p2rack
                 rePopRack2();
                 // increment the turn_no
                 turn_no++;
@@ -1661,6 +1658,10 @@ console.log( 'score_words[]:', score_words );
 
 
 function checkWords() {
+
+console.log( '' );
+console.log( 'checkWords():' );
+
     //////////////////////////////////////////////////////////////////////////////
     // Validate every word in the score_words[] array                            /
     // Return 0 for success, anything else for failure.                          /
@@ -1687,52 +1688,106 @@ function checkWords() {
     
 // console.log( 'word_str:', word_str, 'yx_str:', yx_str, 'yx_dir:', yx_dir );
     
+        //////////////////////////////////////////////////
         // check that every word is two or more characters
+        //////////////////////////////////////////////////
         if ( word_str.length < 2 ) {
-            console.warn( 'Every word must be two or more characters in length.' );
-            console.warn( 'Undo the last turn.' );
+            console.error( 'Every word must be two or more characters in length.  Undo the last turn.' );
             return 100;
         }
     
+        /////////////////////////////////////////////////////
         // check that the first word is on a perimeter flower
+        /////////////////////////////////////////////////////
         if ( ( turn_no === 0 ) && ( currPlayer === 'white' ) ) {
 
-            // for every letter position in word_str, check if its on a perimeter flower
-            var periflower = 0;
-            for ( var i = 0; i < word_str.length; i++ ) {
-
-                new_str = upwd_lookup( yx_str, i ); // lookup new yxCoords, the first one remains the same
-                new_ary = new_str.split(',').map(Number); // new_ary is an array of numbers
-
-console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
-console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) ); 
-
-                if ( onFlower( new_ary ) && onPerimeter( new_ary ) ) {
-                    periflower = 1;
-                }
-
-                // coords = upwd_lookup( yx_str, i ); // get yxCoords and convert to an array
-                // coord_array = coords.split(',').map(element => { return Number(element); } );
-
-console.log( '' );
-console.log( 'checkWords():' );
-// console.log( 'coords:', coords, 'coord_array:', coord_array, 'new_str:', new_str ); 
-console.log( 'new_str:', new_str ); 
-
-            }
-            if ( periflower === 0 ) {
-                console.warn( 'The first word must be on a perimeter flower.' );
-                console.warn( 'Undo the last turn.' );
-                return 200;
-            }
-
-        }
+            switch ( yx_dir ) {
     
+                case 'UP': // Upwards Word
+    
+                    // for every letter position in word_str, check if its on a perimeter flower
+                    var periflower = 0;
+                    for ( var i = 0; i < word_str.length; i++ ) {
+
+                        new_str = upwd_lookup( yx_str, i ); // lookup new yxCoords, the first one remains the same
+                        new_ary = new_str.split(',').map(Number); // new_ary is an array of numbers
+
+// console.log( 'yx_str:', yx_str ); 
+// console.log( 'new_str:', new_str ); 
+// console.log( 'new_ary:', new_ary ); 
+// console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
+// console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) ); 
+
+                        if ( onFlower( new_ary ) && onPerimeter( new_ary ) ) {
+                            periflower = 1;
+                        }
+                    }
+                    if ( periflower === 0 ) {
+                        console.error( 'The first word must be on a perimeter flower.  Undo the last turn.' );
+                        return 200;
+                    }
+                    break;
+
+                case 'DW': // Downwards Word
+    
+                    // for every letter position in word_str, check if its on a perimeter flower
+                    var periflower = 0;
+                    for ( var i = 0; i < word_str.length; i++ ) {
+
+                        new_str = dnwd_lookup( yx_str, i ); // lookup new yxCoords, the first one remains the same
+                        new_ary = new_str.split(',').map(Number); // new_ary is an array of numbers
+
+// console.log( 'yx_str:', yx_str ); 
+// console.log( 'new_str:', new_str ); 
+// console.log( 'new_ary:', new_ary ); 
+// console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
+// console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) ); 
+
+                        if ( onFlower( new_ary ) && onPerimeter( new_ary ) ) {
+                            periflower = 1;
+                        }
+                    }
+                    if ( periflower === 0 ) {
+                        console.error( 'The first word must be on a perimeter flower.  Undo the last turn.' );
+                        return 200;
+                    }
+                    break;
+
+                case 'DO': // Straight-Down Word
+
+                    // for every letter position in word_str, check if its on a perimeter flower
+                    var periflower = 0;
+                    for ( var i = 0; i < word_str.length; i++ ) {
+
+                        new_str = (y + i)+','+x; // calculate the new coords ( add one to y )
+                        new_ary = new_str.split(',').map(Number); // new_ary is an array of numbers
+
+// console.log( 'yx_str:', yx_str ); 
+// console.log( 'new_str:', new_str ); 
+// console.log( 'new_ary:', new_ary ); 
+// console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
+// console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) ); 
+
+                        if ( onFlower( new_ary ) && onPerimeter( new_ary ) ) {
+                            periflower = 1;
+                        }
+                    }
+                    if ( periflower === 0 ) {
+                        console.error( 'The first word must be on a perimeter flower.  Undo the last turn.' );
+                        return 200;
+                    }
+                    break;
+
+            } // switch ( yx_dir )
+    
+        } // first word check
+
         // check that every tile is played in a line
 
         // check that an existing word is not completely over-written
 
     }
+    // return success
     return 0;
 } // checkWords()
 
@@ -1880,7 +1935,7 @@ console.log( 'A Down Word Lookup:' );
                         // get the letter value
                         letterVal = getLetterValue( letter );
                         // get the letter level
-                        new_str = (y + i)+','+x;
+                        new_str = (y + i)+','+x; // calculate the new coords ( add one to y )
                         letterLev = getTopLevel( new_str ); // use the new_str yxCoords
     
 // console.log( 'yx_str:', yx_str, 'new_str:', new_str );
@@ -2411,8 +2466,8 @@ function dnwd_lookup( position, idx ) { // string and a number, returns yx_str
     if ( idx === 1 ) {
         if ( position === '1,4' ) return '2,5'; 
         if ( position === '1,5' ) return '1,6'; 
-        if ( position === '2,4' ) return '3,5'; 
         if ( position === '2,5' ) return '2,6'; 
+        if ( position === '2,4' ) return '3,5'; 
     }
     if ( idx === 2 ) return '2,6';
 } // dnwd_lookup( position, idx )
