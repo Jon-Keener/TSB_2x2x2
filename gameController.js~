@@ -6,10 +6,19 @@ var words = [];
 var score_words = [];
 var game_record = [];
 var turn_no = 0;
+var passed = 0;
 var blank_no = 0;
+
+// vars for storing the style of the rack pieces
+var rack1style = [];
+var rack2style = [];
 
 let currBoard;
 let currPlayer;
+
+let unPiece;
+let unFrom;
+let unTo;
 
 let currHeldPiece;
 let currHeldPieceStartingPosition;
@@ -87,7 +96,7 @@ function startGame() {
         let j = Math.floor(Math.random() * tiles.length); // Random draw from the remaining tiles.
         p1rack[i] = tiles[j]; // Assign the tile, level to the p1rack.
         let tileandtier = p1rack[i].replace(/\d/g, '') + '0'; // Tile and tier
-
+    
 // console.log( 'tileandtier', tileandtier );
         // p1rack[i].piece = getPieceImageSource(p1rack[i]);
         // p1rack[i].piece = getPieceImageSource( p1rack[i].replace(/\d,/g, '') ); // Replace tile number with level number.
@@ -97,7 +106,7 @@ function startGame() {
         j = Math.floor(Math.random() * tiles.length); // Random draw from the remaining tiles.
         p2rack[i] = tiles[j]; // Assign the tile, level to the p2rack.
         tileandtier = p2rack[i].replace(/\d/g, '') + '0'; // Tile and tier
-
+    
 // console.log( 'tileandtier', tileandtier );
         // p2rack[i].piece = getPieceImageSource(p2rack[i]);
         // p2rack[i].piece = getPieceImageSource( p2rack[i].replace(/\d,/g, '') ); // Replace tile number with level number.
@@ -112,10 +121,11 @@ function startGame() {
     const starterPlayer = 'white';
     
     updateGameBoard();
-
+    
     loadPosition(gameBoard, starterPlayer);
     
 } // startGame()
+
 
 function loadPosition( position, playerToMove ) {
     currBoard = position;
@@ -138,6 +148,7 @@ function loadPosition( position, playerToMove ) {
     }
 } // loadPosition( position, playerToMove )
 
+
 function loadRack( piece, position ) {
     // piece and position, an array of ZYX ids, which concat into the Id
     
@@ -159,11 +170,12 @@ function loadRack( piece, position ) {
     
     updateGameBoard();
     
-console.log( '' );
-console.log( 'loadRack( piece, position ):' );
-console.log( 'piece:', piece, 'position:', position, 'squareElement:', squareElement, 'pieceElement:', pieceElement );
+// console.log( '' );
+// console.log( 'loadRack( piece, position ):' );
+// console.log( 'piece:', piece, 'position:', position, 'squareElement:', squareElement, 'pieceElement:', pieceElement );
     
 } // loadRack( piece, position )
+
 
 function loadPiece( piece, position ) {
     // piece and position, an array of ZYX ids, which concat to the Id
@@ -175,7 +187,7 @@ function loadPiece( piece, position ) {
     const pieceElement = document.createElement('img');
     pieceElement.classList.add('piece');
     pieceElement.id = piece;
-    pieceElement.draggable = false;
+    pieceElement.draggable = true; // was false
     
     let tileandtier = piece.replace(/\d/g, '') + '0'; // Tile and tier
     pieceElement.src = getPieceImageSource( tileandtier );
@@ -183,27 +195,99 @@ function loadPiece( piece, position ) {
     // Append the pieceElement to the squareElement
     squareElement.appendChild(pieceElement);
     
+    updateGameBoard();
+    
 console.log( '' );
 console.log( 'loadPiece( piece, position ):' );
 console.log( 'piece:', piece, 'position:', position, 'squareElement:', squareElement, 'pieceElement:', pieceElement );
     
 } // loadPiece( piece, position )
 
+
 function removeRack( piece, position ) {
-    // piece and position, an array of ZYX ids, which concat into the Id
+    let z = position[0]; // piece and position, an array of ZYX ids, which concat into the Id
+    let y = position[1];
+    let x = position[2];
     
     // Get the squareElement
     const squareElement = document.getElementById(`${position[0]}${position[1]}${position[2]}`);
     
     // Get the pieceElement
-    const pieceElement = document.squareElement.getElementsByClassName('piece');
+    // const pieceElement = document.squareElement.getElementsByClassName('piece');
+    const pieceElement = document.getElementById( piece ); // This now works for every tile on the board due to unique tiles.
+
+    // Before removing the rack tile, capture its style so it can be reapplied with the next tile drawn
+    if ( inRack1( position ) ) {
+        if ( ( y === 0 ) && ( x === 0 ) ) {
+            // rack1style[0] = pieceElement.getPropertyValue('style');
+            rack1style[0] = pieceElement.style;
+console.log( 'rack1style[0]:', rack1style[0] );
+        }
+        if ( ( y === 0 ) && ( x === 1 ) ) {
+            // rack1style[1] = pieceElement.getPropertyValue('style');
+            rack1style[1] = pieceElement.style;
+console.log( 'rack1style[1]:', rack1style[1] );
+        }
+        if ( ( y === 0 ) && ( x === 2 ) ) {
+            // rack1style[2] = pieceElement.getPropertyValue('style');
+            rack1style[2] = pieceElement.style;
+console.log( 'rack1style[2]:', rack1style[2] );
+        }
+        if ( ( y === 0 ) && ( x === 3 ) ) {
+            // rack1style[3] = pieceElement.getPropertyValue('style');
+            rack1style[3] = pieceElement.style;
+console.log( 'rack1style[3]:', rack1style[3] );
+        }
+        if ( ( y === 1 ) && ( x === 0 ) ) {
+            // rack1style[4] = pieceElement.getPropertyValue('style');
+            rack1style[4] = pieceElement.style;
+console.log( 'rack1style[4]:', rack1style[4] );
+        }
+        if ( ( y === 1 ) && ( x === 1 ) ) {
+            // rack1style[5] = pieceElement.getPropertyValue('style');
+            rack1style[5] = pieceElement.style;
+console.log( 'rack1style[5]:', rack1style[5] );
+        }
+    }
+    if ( inRack2( position ) ) {
+        if ( ( y === 3 ) && ( x === 10 ) ) {
+            // rack2style[0] = pieceElement.getPropertyValue('style');
+            rack2style[0] = pieceElement.style;
+console.log( 'rack2style[0]:', rack2style[0] );
+        }
+        if ( ( y === 4 ) && ( x === 9 ) ) {
+            // rack2style[1] = pieceElement.getPropertyValue('style');
+            rack2style[1] = pieceElement.style;
+console.log( 'rack2style[1]:', rack2style[1] );
+        }
+        if ( ( y === 3 ) && ( x === 8 ) ) {
+            // rack2style[2] = pieceElement.getPropertyValue('style');
+            rack2style[2] = pieceElement.style;
+console.log( 'rack2style[2]:', rack2style[2] );
+        }
+        if ( ( y === 4 ) && ( x === 7 ) ) {
+            // rack2style[3] = pieceElement.getPropertyValue('style');
+            rack2style[3] = pieceElement.style;
+console.log( 'rack2style[3]:', rack2style[3] );
+        }
+        if ( ( y === 2 ) && ( x === 10 ) ) {
+            // rack2style[4] = pieceElement.getPropertyValue('style');
+            rack2style[4] = pieceElement.style;
+console.log( 'rack2style[4]:', rack2style[4] );
+        }
+        if ( ( y === 3 ) && ( x === 9 ) ) {
+            // rack2style[5] = pieceElement.getPropertyValue('style');
+            rack2style[5] = pieceElement.style;
+console.log( 'rack2style[5]:', rack2style[5] );
+        }
+    }
     pieceElement.remove();
     
     updateGameBoard();
     
-// console.log( '' );
-// console.log( 'removeRack( piece, position ):' );
-// console.log( 'piece:', piece, 'position:', position, 'squareElement:', squareElement, 'pieceElement:', pieceElement );
+console.log( '' );
+console.log( 'removeRack( piece, position ):' );
+console.log( 'piece:', piece, 'position:', position, 'squareElement:', squareElement, 'pieceElement:', pieceElement );
     
 } // removeRack( piece, position ) 
 
@@ -223,6 +307,8 @@ console.log( 'piece:', piece, 'position:', position, 'squareElement:', squareEle
     
     // Remove the pieceElement
     pieceElement.remove();
+    
+    updateGameBoard();
     
 } // removePiece( piece, position )
 
@@ -244,9 +330,10 @@ function updateGameBoard() {
     if (typeof p2rack[5] !== 'undefined') { gameBoard[0][3][9]  = p2rack[5] } else { gameBoard[0][3][9] = '.' };
 }
 
+
 function getPieceImageSource( piece ) {
     // piece is tileandtier
-
+    
     switch ( piece ) {
         case '.': return '';
         case 'null': return '';
@@ -471,6 +558,7 @@ function getPieceImageSource( piece ) {
     }
 } // getPieceImageSource( piece )
 
+
 function rePopRack1() {
     // repopulate the p1rack
     let dotcnt = p1rack.filter(x => x === '.').length;
@@ -503,13 +591,14 @@ function rePopRack1() {
         }
         tiles.splice(j, 1); // Delete from tiles.
         p1rack[i].piece = getPieceImageSource( p1rack[i].replace(/\d/g, '')+'0' ); // Replace tile id with the tier
-
+    
 // console.log( '' );
 // console.log( 'rePopRack1():' );
 // console.log( 'currPlayer:', currPlayer, 'p1rack:', p1rack, 'ctr:', i, 'dot:', dotcnt, 'rnd:', j, 'index:', k, 'tiles:', tiles );
     
     }
 } // rePopRack1()
+
 
 function rePopRack2() {
     // repopulate the p2rack
@@ -551,7 +640,9 @@ function rePopRack2() {
     }
 } // rePopRack2()
 
+
 /* test functions */
+
 
 function inRack1( position ) { // true if the position [z,y,x] is within the p1rack
     let z = position[0];
@@ -565,12 +656,14 @@ function inRack1( position ) { // true if the position [z,y,x] is within the p1r
     }
 } // inRack1( position )
 
+
 // console.log( 'inRack1([0,0,0]):', inRack1([0,0,0]) );
 // console.log( 'inRack1([0,0,1]):', inRack1([0,0,1]) );
 // console.log( 'inRack1([0,0,2]):', inRack1([0,0,2]) );
 // console.log( 'inRack1([0,0,3]):', inRack1([0,0,3]) );
 // console.log( 'inRack1([0,1,0]):', inRack1([0,1,0]) );
 // console.log( 'inRack1([0,1,1]):', inRack1([0,1,1]) );
+
 
 function inRack2( position ) { // true if the position [z,y,x] is within the p2rack
     let z = position[0];
@@ -584,12 +677,14 @@ function inRack2( position ) { // true if the position [z,y,x] is within the p2r
     }
 } // inRack2( position )
 
+
 // console.log( 'inRack2([0,3,10]):', inRack2([0,3,10]) );
 // console.log( 'inRack2([0,4,9]):', inRack2([0,4,9]) );
 // console.log( 'inRack2([0,3,8]):', inRack2([0,3,8]) );
 // console.log( 'inRack2([0,4,7]):', inRack2([0,4,7]) );
 // console.log( 'inRack2([0,2,10]):', inRack2([0,2,10]) );
 // console.log( 'inRack2([0,3,9]):', inRack2([0,3,9]) );
+
 
 function onBoard( position ) { // true if the position is on the board
     let z = position[0];
@@ -602,6 +697,7 @@ function onBoard( position ) { // true if the position is on the board
         return false;
     }
 } // onBoard( position )
+
 
 // console.log( 'onBoard([0,0,0]):', onBoard([0,0,0] ) );
 // console.log( 'onBoard([0,0,1]):', onBoard([0,0,1] ) );
@@ -659,18 +755,27 @@ function onBoard( position ) { // true if the position is on the board
 // console.log( 'onBoard([0,4,9]):', onBoard([0,4,9] ) );
 // console.log( 'onBoard([0,4,10]):', onBoard([0,4,10]) );
 
+
 function onFlower( position ) { // true if the position [y,x] is on a flower
-    // let z = position[0];
     let y = position[0];
     let x = position[1];
     
-    // if ( (z===0 && y===1 && x===4) || (z===0 && y===1 && x===6) || (z===0 && y===3 && x===5) ) { // flowers
     if ( (y===1 && x===4) || (y===1 && x===6) || (y===3 && x===5) ) { // flowers
         return true;
     } else {
         return false;
     }
 } // onFlower( position )
+
+
+// console.log( 'onFlower( [1,4] ):', onFlower( [1,4] ) );
+// console.log( 'onFlower( [1,5] ):', onFlower( [1,5] ) );
+// console.log( 'onFlower( [1,6] ):', onFlower( [1,6] ) );
+// console.log( 'onFlower( [2,4] ):', onFlower( [2,4] ) );
+// console.log( 'onFlower( [2,5] ):', onFlower( [2,5] ) );
+// console.log( 'onFlower( [2,6] ):', onFlower( [2,6] ) );
+// console.log( 'onFlower( [3,5] ):', onFlower( [3,5] ) );
+
 
 function onPerimeter( position ) { // true if the position [y,x] is on the perimeter
     // let z = position[0];
@@ -683,6 +788,7 @@ function onPerimeter( position ) { // true if the position [y,x] is on the perim
         return false;
     }
 } // onPerimeter( position )
+
 
 // console.log( 'onPerimeter( [1,4] ):', onPerimeter( [1,4] ) );
 // console.log( 'onPerimeter( [1,5] ):', onPerimeter( [1,5] ) );
@@ -698,7 +804,9 @@ function onPerimeter( position ) { // true if the position [y,x] is on the perim
 // console.log( 'onPerimeter([0,3,5]):', onPerimeter([0,3,5] ) );
 // console.log( 'onPerimeter([0,2,6]):', onPerimeter([0,2,6] ) );
 
+
 /* movement functions */
+
 
 function setPieceHoldEvents() {
     let mouseX, mouseY = 0;
@@ -807,7 +915,12 @@ function setPieceHoldEvents() {
     });
 } // setPieceHoldEvents()
 
+
 function movePiece( piece, startingPosition, endingPosition ) {
+    
+console.log( '' );
+console.log( 'movePiece(', piece, ',', startingPosition, ',', endingPosition, '):' );
+    
     const boardPiece = currBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
     
     // If the boardPiece is not empty 
@@ -817,7 +930,7 @@ function movePiece( piece, startingPosition, endingPosition ) {
     
         // move the piece
         // remove the original piece from the DOM, currBoard and the rack
-        removePiece( boardPiece, startingPosition );
+        removeRack( boardPiece, startingPosition );
         currBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]] = '.'; // clear the startingPosition and 
     
         // remove the sourceSquare's child(piece)
@@ -827,7 +940,7 @@ function movePiece( piece, startingPosition, endingPosition ) {
         // const sourceSquare = document.getElementById(`${startingPosition[0] + 1}${startingPosition[1] + 1}${startingPosition[2] + 1}`);
         // sourceSquare.textContent = '';
         // sourceSquare.removeChild(piece);
-
+    
         // clear the tile from the p1rack
         if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 0 ) { p1rack[0] = '.'; }
         if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 1 ) { p1rack[1] = '.'; }
@@ -937,6 +1050,8 @@ console.warn("No more levels available.");
             destinationSquare.appendChild(piece);
         }
     }
+    // push a 5 element move record to the game_record
+    game_record.push( currPlayer, turn_no, piece, startingPosition, endingPosition );
     
 // console.log( '' );
 // console.log( 'movePiece():' );
@@ -946,6 +1061,158 @@ console.warn("No more levels available.");
 // console.log( 'p2rack:', p2rack, 'p2rack.dot_count:', p2rack.filter(x => x === '.').length );
     
 } // movePiece( piece, startingPosition, endingPosition )
+
+
+function undoPiece( piece, startingPosition, endingPosition ) {
+    
+console.log( '' );
+console.log( 'undoPiece(', piece, ',', startingPosition, ',', endingPosition, '):' );
+    
+    const boardPiece = currBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
+    
+    // If the boardPiece is not empty 
+    if ( boardPiece !== '.' ) {
+    // If the boardPiece is not empty AND the top rung is empty
+    // if ( (boardPiece !== '.') && ( currBoard[endingPosition[0]+5][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
+    
+        // move the piece
+        // remove the original piece from the DOM, currBoard and the rack
+
+        // undoPiece() doesn't remove from the rack
+        // removeRack( boardPiece, startingPosition );
+    
+        currBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]] = '.'; // clear the startingPosition and 
+    
+        // remove the sourceSquare's child(piece)
+        // const sourceSquare = document.getElementById(`${startingPosition[0] + 1}${startingPosition[1] + 1}${startingPosition[2] + 1}`);
+        // sourceSquare.removeChild(piece);
+    
+        // const sourceSquare = document.getElementById(`${startingPosition[0] + 1}${startingPosition[1] + 1}${startingPosition[2] + 1}`);
+        // sourceSquare.textContent = '';
+        // sourceSquare.removeChild(piece);
+    
+        // undoPiece() doesn't remove from the rack
+        // clear the tile from the p1rack
+        // if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 0 ) { p1rack[0] = '.'; }
+        // if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 1 ) { p1rack[1] = '.'; }
+        // if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 2 ) { p1rack[2] = '.'; }
+        // if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 3 ) { p1rack[3] = '.'; }
+        // if ( startingPosition[0] === 0 && startingPosition[1] === 1 && startingPosition[2] === 0 ) { p1rack[4] = '.'; }
+        // if ( startingPosition[0] === 0 && startingPosition[1] === 1 && startingPosition[2] === 1 ) { p1rack[5] = '.'; }
+    
+        // clear the tile from the p2rack
+        // if ( startingPosition[0] === 0 && startingPosition[1] === 3 && startingPosition[2] === 10 ) { p2rack[0] = '.'; }
+        // if ( startingPosition[0] === 0 && startingPosition[1] === 4 && startingPosition[2] === 9 ) { p2rack[1] = '.'; }
+        // if ( startingPosition[0] === 0 && startingPosition[1] === 3 && startingPosition[2] === 8 ) { p2rack[2] = '.'; }
+        // if ( startingPosition[0] === 0 && startingPosition[1] === 4 && startingPosition[2] === 7 ) { p2rack[3] = '.'; }
+        // if ( startingPosition[0] === 0 && startingPosition[1] === 2 && startingPosition[2] === 10 ) { p2rack[4] = '.'; }
+        // if ( startingPosition[0] === 0 && startingPosition[1] === 3 && startingPosition[2] === 9 ) { p2rack[5] = '.'; }
+    
+        if ( !( currBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]].includes(".") ) && !( currBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]].includes("^") ) ) {
+            // level 0 is not empty AND level 0 is not R, check next level
+            if (!( currBoard[endingPosition[0]+1][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
+                // level 1 is not empty, check next level
+                if (!( currBoard[endingPosition[0]+2][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
+                    // level 2 is not empty, check next level
+                    if (!( currBoard[endingPosition[0]+3][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
+                        // level 3 is not empty, check next level
+                        if (!( currBoard[endingPosition[0]+4][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
+                            // level 4 is not empty, check next level
+                            if (!( currBoard[endingPosition[0]+5][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
+                                // level 5 is not empty, no more levels, this needs to be prevented
+    
+console.warn("No more levels available.");
+    
+                            } else {
+                                currBoard[endingPosition[0]+5][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 5
+                                const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
+                                destinationSquare.textContent = '';
+    
+                                // build a new pieceElement and append it to the destinationSquare
+                                const pieceElement = document.createElement('img');
+                                pieceElement.classList.add('piece');
+                                pieceElement.id = boardPiece;
+                                pieceElement.draggable = false;
+                                pieceElement.src = getPieceImageSource( boardPiece.replace(/\d/g, '') + '5' );
+    
+                                destinationSquare.appendChild(pieceElement);
+                            }
+                        } else {
+                            currBoard[endingPosition[0]+4][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 4
+                            const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
+                            destinationSquare.textContent = '';
+    
+                            // build a new pieceElement and append it to the destinationSquare
+                            const pieceElement = document.createElement('img');
+                            pieceElement.classList.add('piece');
+                            pieceElement.id = boardPiece;
+                            pieceElement.draggable = false;
+                            pieceElement.src = getPieceImageSource( boardPiece.replace(/\d/g, '') + '4' );
+    
+                            destinationSquare.appendChild(pieceElement);
+                        }
+                    } else {
+                        currBoard[endingPosition[0]+3][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 3
+                        const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
+                        destinationSquare.textContent = '';
+    
+                        // build a new pieceElement and append it to the destinationSquare
+                        const pieceElement = document.createElement('img');
+                        pieceElement.classList.add('piece');
+                        pieceElement.id = boardPiece;
+                        pieceElement.draggable = false;
+                        pieceElement.src = getPieceImageSource( boardPiece.replace(/\d/g, '') + '3' );
+                
+                        destinationSquare.appendChild(pieceElement);
+                    }
+                } else {
+                    currBoard[endingPosition[0]+2][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 2
+                    const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
+                    destinationSquare.textContent = '';
+    
+                    // build a new pieceElement and append it to the destinationSquare
+                    const pieceElement = document.createElement('img');
+                    pieceElement.classList.add('piece');
+                    pieceElement.id = boardPiece;
+                    pieceElement.draggable = false;
+                    pieceElement.src = getPieceImageSource( boardPiece.replace(/\d/g, '') + '2' );
+    
+                    destinationSquare.appendChild(pieceElement);
+                }
+            } else {
+                currBoard[endingPosition[0]+1][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 1
+                const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
+                destinationSquare.textContent = '';
+    
+                // build a new pieceElement and append it to the destinationSquare
+                const pieceElement = document.createElement('img');
+                pieceElement.classList.add('piece');
+                pieceElement.id = boardPiece;
+                pieceElement.draggable = false;
+                pieceElement.src = getPieceImageSource( boardPiece.replace(/\d/g, '') + '1' );
+             
+                destinationSquare.appendChild(pieceElement);
+            }
+        } else {
+            currBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 0
+            const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
+            destinationSquare.textContent = '';
+    
+            destinationSquare.appendChild(piece);
+        }
+    }
+
+    // undoPiece() doesn't record to the game_record
+    // game_record.push( currPlayer, turn_no, piece, startingPosition, endingPosition );
+    
+// console.log( '' );
+// console.log( 'undoPiece():' );
+// console.log( 'currPlayer:', currPlayer, 'moves a:"', piece.id, '" from startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
+//                                                                  'to endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
+// console.log( 'p1rack:', p1rack, 'p1rack.dot_count:', p1rack.filter(x => x === '.').length );
+// console.log( 'p2rack:', p2rack, 'p2rack.dot_count:', p2rack.filter(x => x === '.').length );
+    
+} // undoPiece( piece, startingPosition, endingPosition )
 
 
 function validateWhiteMovement( startingPosition, endingPosition ) {
@@ -978,7 +1245,6 @@ function validateWhiteMovement( startingPosition, endingPosition ) {
         case 'x':
         case 'y':
         case 'z':
-            // return testWhiteLetter( startingPosition, endingPosition, 'a' );
             return testWhiteLetter( startingPosition, endingPosition, boardPiece );
             break;
             // return testWhiteLetter( startingPosition, endingPosition, 'b' );
@@ -1121,37 +1387,29 @@ console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
 
 
 function testWhiteLetter( startingPosition, endingPosition, piece ) {
-    if ( ( getTopLetter( endingPosition ) !== piece.replace(/\d/g, '') ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-        if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+    // if moving the piece from the p1rack to the board
+    if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
+        // if not landing on the same letter or on a bee
+        if ( ( getTopLetter( endingPosition ) !== piece.replace(/\d/g, '') ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
             return true;
         } else { // Error condition
-console.warn( 'validateWhiteMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack1(startingPosition):', inRack1(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+console.warn( 'testWhiteLetter() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
             return false;
         }
-    } else { // Error condition
-console.warn( 'validateWhiteMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-        return false;
     }
 } // testWhiteLetter( startingPosition, endingPosition, piece )
 
 
 function testBlackLetter( startingPosition, endingPosition, piece ) {
-    if ( ( getTopLetter( endingPosition ) !== piece.replace(/\d/g, '') ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
-        if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+    // if moving the piece from the p2rack to the board
+    if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
+        // if not landing on the same letter or on a bee
+        if ( ( getTopLetter( endingPosition ) !== piece.replace(/\d/g, '') ) && ( getTopLetter( endingPosition ) !== 'b' ) && ( getTopLetter( endingPosition ) !== 'q' ) ) {
             return true;
         } else { // Error condition
-console.warn( 'validateBlackMovement() failure denied:', 'startingPosition[', startingPosition[0], ',', startingPosition[1], ',', startingPosition[2], '], ',
-                                                         'endingPosition[', endingPosition[0], ',', endingPosition[1], ',', endingPosition[2], ']' );
-console.warn( 'inRack2(startingPosition):', inRack2(startingPosition) );
-console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
+console.warn( 'testBlackLetter() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
             return false;
         }
-    } else { // Error condition
-console.warn( 'validateBlackMovement() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
-        return false;
     }
 } // testBlackLetter( startingPosition, endingPosition, piece )
 
@@ -1167,14 +1425,14 @@ function pickLetter( startingPosition, endingPosition ) {
     
     // Choose a letter
     var blank = prompt( 'Choose a letter (A - Z):' );
-
+    
     // Get blank_tile
     var blank_tile = blank.toUpperCase() + blank_no;
     blank_no = blank_no + 1;
-
+    
     let yxCoord = y+','+x; // use the yxCoords from the lookup
     let blankLev = getTopLevel( yxCoord ); // use the yxCoords from the lookup
-
+    
     // Get blank_tileandtier
     var blank_tileandtier = blank.toUpperCase() + blankLev; // the letter_blanks are UpperCase
     
@@ -1196,23 +1454,23 @@ console.log( 'blank_tileandtier:', blank_tileandtier );
     if ( endingPosition[0] === 0 && endingPosition[1] === 3 && endingPosition[2] === 5 ) { 
         removePiece( '^2', endingPosition );
     }
-
+    
     // replace the blank tile with the zero-point letter_blank at the endingPosition
     loadPiece( blank_tile, [z+1,y+1,x+1] );
-
+    
     // put the piece in currBoard
     currBoard[z][y][x] = blank_tile;
     
     // remove the original blank tile from the DOM, currBoard and the rack
     if ( currPlayer === 'white' ) {
-        if ( p1rack.indexOf( ' 0' ) > -1 ) { removePiece( ' 0', startingPosition ); }
-        if ( p1rack.indexOf( ' 1' ) > -1 ) { removePiece( ' 1', startingPosition ); }
+        if ( p1rack.indexOf( ' 0' ) > -1 ) { removeRack( ' 0', startingPosition ); }
+        if ( p1rack.indexOf( ' 1' ) > -1 ) { removeRack( ' 1', startingPosition ); }
     }
     if ( currPlayer === 'white' ) {
-        if ( p2rack.indexOf( ' 0' ) > -1 ) { removePiece( ' 0', startingPosition ); }
-        if ( p2rack.indexOf( ' 1' ) > -1 ) { removePiece( ' 1', startingPosition ); }
+        if ( p2rack.indexOf( ' 0' ) > -1 ) { removeRack( ' 0', startingPosition ); }
+        if ( p2rack.indexOf( ' 1' ) > -1 ) { removeRack( ' 1', startingPosition ); }
     }
-
+    
     currBoard[c][b][a] = '.';
     // clear the blank tile from the p1rack
     if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 0 ) { p1rack[0] = '.'; } 
@@ -1231,12 +1489,18 @@ console.log( 'blank_tileandtier:', blank_tileandtier );
     
 } // pickLetter( startingPosition, endingPosition )
 
+
 function switchPlayer() {
     // called by the $ onclick button:
     //   calculate the score, 
     //   redraw tile(s), 
     //   update prevBoard and then switch players
     
+    if ( words.length === 0 ) {
+        passed = 1;
+console.log( currPlayer, 'Passed.' );
+    }
+
     words.length = 0; // empty words[]
     score_words.length = 0; // empty score_words[]
     
@@ -1244,22 +1508,22 @@ function switchPlayer() {
         // calculate the score    
         calcScore();
         // redraw
-        rePopRack1();
+        // rePopRack1();
         // backup currBoard to prevBoard
-        prevBoard = JSON.parse(JSON.stringify(currBoard));
+        // prevBoard = JSON.parse(JSON.stringify(currBoard));
         // switch player
-        currPlayer = 'black';
+        // currPlayer = 'black';
     } else {
         // calculate the score    
         calcScore();
         // redraw
-        rePopRack2();
+        // rePopRack2();
         // backup currBoard to prevBoard
-        prevBoard = JSON.parse(JSON.stringify(currBoard));
+        // prevBoard = JSON.parse(JSON.stringify(currBoard));
         // increment the turn no
-        turn_no++;
+        // turn_no++;
         // switch player
-        currPlayer = 'white';
+        // currPlayer = 'white';
     }
     
 console.log( '' );
@@ -1267,19 +1531,108 @@ console.log( 'switchPlayer():' );
     
 } // switchPlayer()
 
+
 function calcScore() {
     
-    findWords(); // populate the score_words[] array
+    if ( passed === 1 ) {
+        // simply switch player and update the scores
+        if ( currPlayer === 'white' ) {
+            currPlayer = 'black';
+
+            p1score = p1score + 0;
+            const p1scoreDiv = document.getElementById('p1score');
+            p1scoreText = p1scoreText + 'Player 1: ' + 'PASSED' + ' = ' + p1score + '\n';
+            p1scoreDiv.innerHTML = p1scoreText;
     
-    // if ( !checkWords() ) {
+            console.log( p1scoreDiv.innerHTML );
+    
+        } else {
+            currPlayer = 'white';
+
+            p2score = p2score + 0;
+            const p2scoreDiv = document.getElementById('p2score');
+            p2scoreText = p2scoreText + 'Player 2: ' + 'PASSED' + ' = ' + p2score + '\n';
+            p2scoreDiv.innerHTML = p2scoreText;
+        
+            console.log( p2scoreDiv.innerHTML );
+        
+        }
+        passed = 0;
+
+    } else {
+        // find and score words
+    
+        findWords(); // populate the score_words[] array
+        
+        if ( checkWords() ) {
+            // there was a problem with a word, rollback the entire move
+            undo_turn();
 // console.warn( 'checkWords():', checkWords() );
 // console.warn( 'Rollback the move' );
-        // there was a problem with a word, rollback the entire move
-    // }
-    
-    scoreWords(); // score the words in the score_words[] array
-    
+        } else {
+            // there was no problem
+            // score the words in the score_words[] array
+            scoreWords(); 
+                
+            // backup currBoard to prevBoard
+            prevBoard = JSON.parse(JSON.stringify(currBoard));
+                
+            // redraw tiles and switch player
+            if ( currPlayer === 'white' ) {
+                // redraw for the p1 rack
+                rePopRack1();
+                // switch player
+                currPlayer = 'black';
+            } else {
+                // redraw for the p2 rack
+                rePopRack2();
+                // increment the turn_no
+                turn_no++;
+                // switch player
+                currPlayer = 'white';
+            }
+        }
+    }
 } // calcScore()
+
+
+function undo_turn() {
+    
+    // use game_record to undo the current turn
+    
+console.warn( '' );
+console.warn( 'undo_turn():' );
+console.warn( 'game_record:', game_record );
+
+
+    for ( let i=game_record.length; i>=0; i-- ) {
+        
+        if ( i%5 === 4 ) { // to position
+            // get the from from the to
+            unFrom = game_record[i];
+        }
+        if ( i%5 === 3 ) { // from position
+            // get the to from the from
+            unTo = game_record[i];
+        }
+        if ( i%5 === 2 ) { // img element
+            // get the img element by the unique piece id
+            unPiece = document.getElementById( game_record[i].id );
+    
+console.log( 'unPiece:', unPiece.id, 'unFrom:', unFrom, 'unTo:', unTo ); 
+        
+            undoPiece( unPiece, unFrom, unTo );
+        
+        }
+    }
+
+    for ( let i=game_record.length; i>=0; i-- ) {
+        // remove the turn from the game_record
+        game_record.pop();
+    }
+    
+} // undo_turn()
+
 
 function findWords() {
     // 1st: Find the tiles played last turn by diffing prevBoard[][][] and currBoard[][][] back into prevBoard[][][]:
@@ -1324,17 +1677,18 @@ function findWords() {
             }
         }
     } // score_words[] now contains the words to score
-
+    
 console.log( '' );
 console.log( 'findWords()' ); 
 console.log( 'score_words[]:', score_words ); 
     
-    
 } // findWords()
+
 
 function checkWords() {
     //////////////////////////////////////////////////////////////////////////////
     // Validate every word in the score_words[] array                            /
+    // Return 0 for success, anything else for failure.                          /
     //////////////////////////////////////////////////////////////////////////////
     for ( let index = 0; index < score_words.length; ++index ) {
         const element = score_words[index];
@@ -1358,68 +1712,66 @@ function checkWords() {
     
 // console.log( 'word_str:', word_str, 'yx_str:', yx_str, 'yx_dir:', yx_dir );
     
-        // check that the word is a word
-        // if ( word_str.length < 2 ) {
-        //     return 0;
-        // }
+        // check that every word is two or more characters
+        if ( word_str.length < 2 ) {
+            console.warn( 'Every word must be two or more characters in length.' );
+            console.warn( 'Undo the last turn.' );
+            return 100;
+        }
     
         // check that the first word is on a perimeter flower
         if ( ( turn_no === 0 ) && ( currPlayer === 'white' ) ) {
-            // for every letter position in word_str, check if its on a flower
-    
-            var flower = 0;
-            switch ( yx_dir ) {
-                case 'UP': // Upwards Word
-console.log( 'An Upwards Word Checkup:' );
-                    // for every letter in word_str, check for a flower
-                    for ( var i = 0; i < word_str.length; i++ ) {
-                        coords = upwd_lookup( yx_str, i ); // get yxCoords and convert to an array
-                        coord_array = coords.split(',').map(element => { return Number(element); } );
-                        if ( onFlower( coord_array ) ) {
-                            flower = 1;
-                        }
-                    }
-                    return flower;
-                break;
-    
-                case 'DW': // Downwards Word
-console.log( 'A Downwards Word Checkup:' );
-                    // for every letter in word_str, check for a flower
-                    for ( var i = 0; i < word_str.length; i++ ) {
-                        coords = dnwd_lookup( yx_str, i ); // get yxCoords and convert to an array
-                        coord_array = coords.split(',').map(element => { return Number(element); } );
-                        if ( onFlower( coord_array ) ) {
-                            flower = 1;
-                        }
-                    }
-                    return flower;
-                break;
-    
-                case 'DO': // Down Word
-console.log( 'A Down Word Checkup:' );
-                    // for every letter in word_str, check for a flower
-                    for ( var i = 0; i < word_str.length; i++ ) {
-                        coords = (y + i)+','+x; // get yxCoords and convert to an array
-                        coord_array = coords.split(',').map(element => { return Number(element); } );
-                        if ( onFlower( coord_array ) ) {
-                            flower = 1;
-                        }
-                    }
-                    return flower;
-                break;
+
+            // for every letter position in word_str, check if its on a perimeter flower
+            var periflower = 0;
+            for ( var i = 0; i < word_str.length; i++ ) {
+
+                new_str = upwd_lookup( yx_str, i ); // lookup new yxCoords, the first one remains the same
+                new_ary = new_str.split(',').map(Number); // new_ary is an array of numbers
+
+console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
+console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) ); 
+
+                if ( onFlower( new_ary ) && onPerimeter( new_ary ) ) {
+                    periflower = 1;
+                }
+
+                // coords = upwd_lookup( yx_str, i ); // get yxCoords and convert to an array
+                // coord_array = coords.split(',').map(element => { return Number(element); } );
+
+console.log( '' );
+console.log( 'checkWords():' );
+// console.log( 'coords:', coords, 'coord_array:', coord_array, 'new_str:', new_str ); 
+console.log( 'new_str:', new_str ); 
+
             }
+            if ( periflower === 0 ) {
+                console.warn( 'The first word must be on a perimeter flower.' );
+                console.warn( 'Undo the last turn.' );
+                return 200;
+            }
+
         }
+    
+        // check that every tile is played in a line
+
+        // check that an existing word is not completely over-written
+
     }
+    return 0;
 } // checkWords()
+
 
 function scoreWords() {
     let fp_bonus = 0; // Flower Power word bonus
     let po_bonus = 0; // Pollination word bonus
     let st_bonus = 0; // Stacking letter bonus
     
-    // Check for Flower Power and Pollination bonuses
+    // Check for a Flower Power bonus
     if ( ( prevBoard[0][1][4].replace(/\d/g, '') !== '.' ) || ( prevBoard[0][1][6].replace(/\d/g, '') !== '.' ) || ( prevBoard[0][3][5].replace(/\d/g, '') !== '.' ) ) { // Someone played on a Flower
         fp_bonus = 1;
+    
+        // Check for a Pollination bonus
         if ( ( prevBoard[0][1][4].replace(/\d/g, '') === 'b' ) || ( prevBoard[0][1][4].replace(/\d/g, '') === 'q' ) || 
              ( prevBoard[0][1][6].replace(/\d/g, '') === 'b' ) || ( prevBoard[0][1][6].replace(/\d/g, '') === 'q' ) ||
              ( prevBoard[0][3][5].replace(/\d/g, '') === 'b' ) || ( prevBoard[0][3][5].replace(/\d/g, '') === 'q' ) ) {
@@ -1428,6 +1780,7 @@ function scoreWords() {
     }
     
 console.log( '' );
+console.log( 'scoreWords():' );
 console.log( 'score_words:', score_words ); 
     
     // score score_words[]
@@ -1437,8 +1790,6 @@ console.log( 'score_words:', score_words );
     var word_str = '';
     var curWord_str = '';
     var turn_ledger = '';
-    
-console.log( 'score_words[]:', score_words );
     
     //////////////////////////////////////////////////////////////////////////////
     // For every element (word, position, direction) in the score_words[] array, /
@@ -1505,7 +1856,7 @@ console.log( 'letter:', letter, 'letterVal:', letterVal, 'letterLev:', letterLev
                     // build the turn ledger and score
                     turn_ledger = turn_ledger + word_str.toLowerCase() + ' ' + word_score + ', ';
                     turn_score = turn_score + word_score;
-                    // record log
+                    // push a 4 element score record to the game_record
                     game_record.push( currPlayer, turn_no, element_str, word_score );
                     break;
     
@@ -1541,7 +1892,7 @@ console.log( 'A Downwards Word Lookup:' );
                     // build the turn ledger and score
                     turn_ledger = turn_ledger + word_str.toLowerCase() + ' ' + word_score + ', ';
                     turn_score = turn_score + word_score;
-                    // record log
+                    // push a 4 element score record to the game_record
                     game_record.push( currPlayer, turn_no, element_str, word_score );
                     break;
     
@@ -1577,7 +1928,7 @@ console.log( 'A Down Word Lookup:' );
                     // build the turn ledger and score
                     turn_ledger = turn_ledger + word_str.toLowerCase() + ' ' + word_score + ', ';
                     turn_score = turn_score + word_score;
-                    // record log
+                    // push a 4 element score record to the game_record
                     game_record.push( currPlayer, turn_no, element_str, word_score );
                     break;
     
@@ -1616,6 +1967,7 @@ console.log( 'game_record:', game_record );
     
     }
 } // scoreWords()
+
 
 function wordFinder( position ) { // position = an array of numbers
                                   // If a word is found, return a record: ['it, [2, 4], UP']
@@ -1663,53 +2015,49 @@ function wordFinder( position ) { // position = an array of numbers
         switch ( yandx_str ) {
     
             case '14':
-// console.log( 'in case 14' );
             check_upwd_str0();
             check_dnwd_str1();
             check_down_str0();
             break;
     
             case '15':
-// console.log( 'in case 15' );
             check_upwd_str0();
             check_dnwd_str0();
             check_down_str1();
             break;
     
-// console.log( 'in case 24' );
+            case '16':
+            check_upwd_str1();
+            check_dnwd_str0();
+            check_down_str2();
+            break;
+    
+            case '24':
             check_upwd_str1();
             check_dnwd_str2();
             check_down_str0();
             break;
     
             case '25':
-// console.log( 'in case 25' );
             check_upwd_str1();
             check_dnwd_str1();
             check_down_str1();
             break;
     
-            case '16':
-// console.log( 'in case 16' );
-            check_upwd_str1();
-            check_dnwd_str0();
+            case '26':
+            check_upwd_str2();
+            check_dnwd_str1();
             check_down_str2();
             break;
     
             case '35':
-// console.log( 'in case 35' );
             check_upwd_str2();
             check_dnwd_str2();
             check_down_str1();
             break;
     
-            case '26':
-// console.log( 'in case 26' );
-            check_upwd_str2();
-            check_dnwd_str1();
-            check_down_str2();
-            break;
         } // end of switch
+        
     } // only process valid board positions
     
     // a well-formed element in words[]: ['an, [1,4], UP']
@@ -1730,6 +2078,7 @@ function wordFinder( position ) { // position = an array of numbers
     
 }; // wordFinder( position )
 
+
 function flattenBoard() {
     // This function flattens the currBoard[][][] into flatBoard[][]
     // by using the highest level letter tile in currBoard
@@ -1739,7 +2088,7 @@ function flattenBoard() {
         for (let i = 0; i < 5 ; i++) { // 5 rows
             for (let j = 0; j < 11; j++) { // 11 columns
                 // Iterate over every currBoard element
-                if ( ( currBoard[h][i][j] !== '.' ) && ( currBoard[h][i][j] !== '^1' ) && ( currBoard[h][i][j] !== '^2' ) && ( currBoard[h][i][j] !== '^3' ) ) {
+                if ( ( currBoard[h][i][j] !== '.' ) && ( currBoard[h][i][j] !== '^0' ) && ( currBoard[h][i][j] !== '^1' ) && ( currBoard[h][i][j] !== '^2' ) ) {
                     // flatBoard will contain the highest letter tile in currBoard
                     flatBoard[i][j] = currBoard[h][i][j];
                 }
@@ -1747,6 +2096,7 @@ function flattenBoard() {
         }
     }
 }; // flattenBoard()
+
 
 function getTopLevel( position ) {
     // Return the highest occupied level for this position, a yxCoord string 
@@ -1758,9 +2108,7 @@ function getTopLevel( position ) {
     
 console.log( '' );
 console.log( 'getTopLevel(', position, '):' );
-console.log( 'position:', position );
-console.log( 'y:', y );
-console.log( 'x:', x );
+console.log( 'x:', x, 'y:', y );
     
     // use the yxCoords to get the top level from currBoard
     for (let level = 5; level >= 0 ; level--) { // 6 levels
@@ -1771,6 +2119,7 @@ console.log( 'x:', x );
         } 
     }
 } // getTopLevel( position )
+
 
 function getTopLetter( position ) { // return the letter that is on top of the current position
     let z = position[0]; // this z-coordinate is not accurate
@@ -1791,6 +2140,7 @@ function getTopLetter( position ) { // return the letter that is on top of the c
     return top_letter.toLowerCase();
 } // getTopLetter( position )
 
+
 function getTopTile( position ) { // return the tile that is on top of the current position
     let z = position[0]; // this z-coordinate is not accurate
     let y = position[1]; // use the yxCoords
@@ -1809,6 +2159,7 @@ function getTopTile( position ) { // return the tile that is on top of the curre
     }
     return top_tile;
 } // getTopTile( position )
+
 
 function getLetterValue( piece ) {
     // Return the value of the given piece.
@@ -1882,9 +2233,11 @@ function getLetterValue( piece ) {
     }
 } // getLetterValue( piece )
 
+
 /*********************************/
 /* check upward string functions */
 /*********************************/
+
 
 function check_upwd_str0() {
     result = upwd_str0.match( wordre );
@@ -1902,6 +2255,7 @@ function check_upwd_str0() {
         words.push( word + ', ' + yxCoords + ', UP' );
     }
 } // check_upwd_str0()
+
 
 function check_upwd_str1() {
     result = upwd_str1.match( wordre );
@@ -1921,6 +2275,7 @@ function check_upwd_str1() {
     }
 } // check_upwd_str1()
 
+
 function check_upwd_str2() {
     result = upwd_str2.match( wordre );
     if ( result ) {
@@ -1938,9 +2293,11 @@ function check_upwd_str2() {
     }
 } // check_upwd_str2()
 
+
 /***********************************/
 /* check downward string functions */
 /***********************************/
+
 
 function check_dnwd_str0() {
     result = dnwd_str0.match( wordre );
@@ -1958,6 +2315,7 @@ function check_dnwd_str0() {
         words.push( word + ', ' + yxCoords + ', DW' );
     }
 } // check_dnwd_str0()
+
 
 function check_dnwd_str1() {
     result = dnwd_str1.match( wordre );
@@ -1977,6 +2335,7 @@ function check_dnwd_str1() {
     }
 } // check_dnwd_str1()
 
+
 function check_dnwd_str2() {
     result = dnwd_str2.match( wordre );
     if ( result ) {
@@ -1994,9 +2353,11 @@ function check_dnwd_str2() {
     }
 } // check_dnwd_str2()
 
+
 /*******************************/
 /* check down string functions */
 /*******************************/
+
 
 function check_down_str0() {
     result = down_str0.match( wordre );
@@ -2014,6 +2375,7 @@ function check_down_str0() {
         words.push( word + ', ' + yxCoords + ', DO' );
     }
 } // check_down_str0()
+
 
 function check_down_str1() {
     result = down_str1.match( wordre );
@@ -2033,6 +2395,7 @@ function check_down_str1() {
     }
 } // check_down_str1()
 
+
 function check_down_str2() {
     result = down_str2.match( wordre );
     if ( result ) {
@@ -2050,9 +2413,11 @@ function check_down_str2() {
     }
 } // check_down_str2()
 
+
 /********************/
 /* lookup functions */
 /********************/
+
 
 function upwd_lookup( position, idx ) { // string and a number, returns yx_str
     if ( idx === 0 ) return position;
@@ -2065,6 +2430,7 @@ function upwd_lookup( position, idx ) { // string and a number, returns yx_str
     if ( idx === 2 ) return '1,6';
 } // upwd_lookup( position, idx )
 
+
 function dnwd_lookup( position, idx ) { // string and a number, returns yx_str
     if ( idx === 0 ) return position;
     if ( idx === 1 ) {
@@ -2075,6 +2441,7 @@ function dnwd_lookup( position, idx ) { // string and a number, returns yx_str
     }
     if ( idx === 2 ) return '2,6';
 } // dnwd_lookup( position, idx )
+
 
 startGame();
 setPieceHoldEvents();
