@@ -1,3 +1,19 @@
+20221114 undo_turn development and testing with the 2x2x2 board and code...
+
+  all undo tests have worked so far: 100, 200, 201, 202
+    there were problems for 100 and other things though...
+
+  what about regular scoring?
+
+
+
+
+
+
+
+
+
+
 
 20221111 undo_turn testing with the 2x2x2 board and code...
 
@@ -31,6 +47,7 @@
       --> DW 2-letter word undo_turn works
       --> DO 2-letter word undo_turn works
 
+      --> Checked-In and promoting to TSB, 20221111.
 
 
 

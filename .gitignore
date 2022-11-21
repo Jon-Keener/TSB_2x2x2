@@ -43,3 +43,16 @@ TSB_2x2x2_Testing.txt
 TSB_2x2x2_Testing.txt~
 Undo_testing.txt
 Testing.txt
+*.txt~
+Undo_testing.txt~
+*.js~
+*.un~
+*.swp
+.gameController.js.un~
+.Undo_testing.txt.swp
+gameController.js~
+Undo_testing.txt~
+*.js~
+*.txt~
+*.swp
+*.un~
