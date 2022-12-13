@@ -14,6 +14,7 @@ let rack2style = [];
 
 let currPlayer;
 
+// undo globals
 let unPiece;
 let unFrom;
 let unTo;
@@ -68,7 +69,7 @@ let currBoard = JSON.parse(JSON.stringify(gameBoard));
 // copy gameBoard to prevBoard
 let prevBoard = JSON.parse(JSON.stringify(gameBoard));
 
-let diffBoard = [];
+// let diffBoard = [];
 
 let flatBoard = [ // 1 level of 5 rows of 11 columns, [Z,Y,X]: [0,0,0] - [0,4,10]
 ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
@@ -98,6 +99,9 @@ let down_str0=flatBoard[1][4].replace(/\d/g, '') + flatBoard[2][4].replace(/\d/g
 let down_str1=flatBoard[1][5].replace(/\d/g, '') + flatBoard[2][5].replace(/\d/g, '') + flatBoard[3][5].replace(/\d/g, '');
 let down_str2=flatBoard[1][6].replace(/\d/g, '') + flatBoard[2][6].replace(/\d/g, '');
 
+let diffBoard; // global diffBoard
+let adjaBoard; // global adjaBoard
+
 // Initialize the letter tiles, the player racks and scores.
 let tiles = ['a0', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8', 'b0', 'b1', 'b2', 'c0', 'c1', 'd0', 'd1', 'd2', 'd3', 'e0', 'e1',
              'e2', 'e3', 'e4', 'e5', 'e6', 'e7', 'e8', 'e9', 'e10', 'f0', 'f1', 'g0', 'g1', 'g2', 'h0', 'h1', 'i0', 'i1', 'i2', 'i3', 
@@ -125,24 +129,23 @@ function startGame() {
         let j = Math.floor(Math.random() * tiles.length);
         p1rack[i] = tiles[j]; // Assign the tile to the p1rack.
         // calculate tileandtier
-        let tileandtier = p1rack[i].replace(/\d/g, '') + '0';
-        p1rack[i].piece = getPieceImageSource( tileandtier ); // tileandtier yields the piece img element.
+        let tileandtier = p1rack[i].replace(/\d/g, '') + '0'; // level 0
+        p1rack[i].piece = getPieceImageSource( tileandtier ); // tileandtier yields the proper image for the piece
         tiles.splice(j, 1); // Delete from tiles.
     
         // Player 2 random draw from the remaining tiles.
         j = Math.floor(Math.random() * tiles.length);
         p2rack[i] = tiles[j]; // Assign the tile to the p2rack.
         // calculate tileandtier
-        tileandtier = p2rack[i].replace(/\d/g, '') + '0'; // tileandtier yields the piece img element. // Tile and tier
-        p2rack[i].piece = getPieceImageSource( tileandtier ); // Replace tile id with the tile and tier.
+        tileandtier = p2rack[i].replace(/\d/g, '') + '0'; // level 0
+        p2rack[i].piece = getPieceImageSource( tileandtier ); // tileandtier yields the proper image for the piece
         tiles.splice(j, 1); // Delete from tiles.
     
     }
     
     const starterPlayer = 'white';
     
-    updateBoardsFromRack1();
-    updateBoardsFromRack2();
+    updateBoardsFromRacks();
     
     loadPosition(gameBoard, starterPlayer);
     
@@ -172,7 +175,9 @@ function loadPosition( position, playerToMove ) {
 
 
 function loadRack( piece, position ) {
-    // piece and position, an array of ZYX ids, which concat into the Id
+    let z = position[0]; // piece and position, an array of ZYX ids, which concat into the Id
+    let y = position[1];
+    let x = position[2];
     
     // Get the squareElement
     const squareElement = document.getElementById(`${position[0]}${position[1]}${position[2]}`);
@@ -182,16 +187,15 @@ function loadRack( piece, position ) {
     pieceElement.classList.add('piece');
     pieceElement.id = piece;
     pieceElement.draggable = true;
-    pieceElement.style = "position: static;"; // top: 245px; left: 672px;"; // new code, this seemed to be required but it didn't help
     
-    let tileandtier = piece.replace(/\d/g, '') + '0'; // Tile and tier
+    // set the piece's ImageSource based on tileandtier
+    let tileandtier = piece.replace(/\d/g, '') + '0'; // level 0
     pieceElement.src = getPieceImageSource( tileandtier );
     
     // Append the pieceElement to the squareElement
     squareElement.appendChild(pieceElement);
     
-    // updateBoardsFromRack1();
-    // updateBoardsFromRack2();
+    // updateBoardsFromRacks();
     
 console.log( '' );
 console.log( 'loadRack(', piece, ',', position, '):' );
@@ -218,8 +222,7 @@ function loadPiece( piece, position ) {
     // Append the pieceElement to the squareElement
     squareElement.appendChild(pieceElement);
     
-    // updateBoardsFromRack1();
-    // updateBoardsFromRack2();
+    // updateBoardsFromRacks();
     
 console.log( '' );
 console.log( 'loadPiece(', piece, ',', position, '):' );
@@ -272,7 +275,6 @@ console.log( 'rack1style[4]:', rack1style[4] );
             rack1style[5] = pieceElement.style;
 console.log( 'rack1style[5]:', rack1style[5] );
         }
-        // updateBoardsFromRack1();
     }
     
     if ( inRack2( position ) ) {
@@ -306,7 +308,7 @@ console.log( 'rack2style[4]:', rack2style[4] );
             rack2style[5] = pieceElement.style;
 console.log( 'rack2style[5]:', rack2style[5] );
         }
-        // updateBoardsFromRack2();
+        // updateBoardsFromRacks();
     }
     
     // Remove the piece and update the gameBoard
@@ -334,36 +336,34 @@ console.log( 'squareElement:', squareElement, 'pieceElement:', pieceElement );
     
     // Remove the piece and update the gameBoard
     pieceElement.remove();
-    // updateBoardsFromRack1();
-    // updateBoardsFromRack2();
+    // updateBoardsFromRacks();
     
 } // removePiece( piece, position )
 
 
-function updateBoardsFromRack1() {
-    // Add p1rack to the boards, unless undefined.
+function updateBoardsFromRacks() {
+    
 console.log( 'currBoard[0] before updateBoardsFromRacks', currBoard[0] );
+    
+    // Add p1rack to the boards, unless undefined.
     if (typeof p1rack[0] !== 'undefined') { gameBoard[0][0][0] = p1rack[0]; currBoard[0][0][0] = p1rack[0]; };
     if (typeof p1rack[1] !== 'undefined') { gameBoard[0][0][1] = p1rack[1]; currBoard[0][0][1] = p1rack[1]; };
     if (typeof p1rack[2] !== 'undefined') { gameBoard[0][0][2] = p1rack[2]; currBoard[0][0][2] = p1rack[2]; };
     if (typeof p1rack[3] !== 'undefined') { gameBoard[0][0][3] = p1rack[3]; currBoard[0][0][3] = p1rack[3]; };
     if (typeof p1rack[4] !== 'undefined') { gameBoard[0][1][0] = p1rack[4]; currBoard[0][1][0] = p1rack[4]; };
     if (typeof p1rack[5] !== 'undefined') { gameBoard[0][1][1] = p1rack[5]; currBoard[0][1][1] = p1rack[5]; };
-console.log( 'currBoard[0] after updateBoardsFromRacks', currBoard[0] );
-} // updateBoardsFromRack1()
 
-
-function updateBoardsFromRack2() {
     // Add p2rack to the boards, unless undefined.
-console.log( 'currBoard[0] before updateBoardsFromRacks', currBoard[0] );
     if (typeof p2rack[0] !== 'undefined') { gameBoard[0][3][10] = p2rack[0]; currBoard[0][3][10] = p2rack[0]; };
     if (typeof p2rack[1] !== 'undefined') { gameBoard[0][4][9]  = p2rack[1]; currBoard[0][4][9]  = p2rack[1]; };
     if (typeof p2rack[2] !== 'undefined') { gameBoard[0][3][8]  = p2rack[2]; currBoard[0][3][8]  = p2rack[2]; };
     if (typeof p2rack[3] !== 'undefined') { gameBoard[0][4][7]  = p2rack[3]; currBoard[0][4][7]  = p2rack[3]; };
     if (typeof p2rack[4] !== 'undefined') { gameBoard[0][2][10] = p2rack[4]; currBoard[0][2][10] = p2rack[4]; };
     if (typeof p2rack[5] !== 'undefined') { gameBoard[0][3][9]  = p2rack[5]; currBoard[0][3][9]  = p2rack[5]; };
+    
 console.log( 'currBoard[0] after updateBoardsFromRacks', currBoard[0] );
-} // updateBoardsFromRack2()
+    
+} // updateBoardsFromRacks()
 
 
 function getPieceImageSource( piece ) {
@@ -600,37 +600,48 @@ function rePopRack1() {
     for ( let i = 0; i < dotcnt; i++ ) {
         let j = Math.floor(Math.random() * tiles.length); // Random draw from the remaining tiles.
         let k = p1rack.indexOf('.');
-        p1rack[k] = tiles[j]; // Assign to the p1rack.
+        p1rack[k] = tiles[j]; // Assign the random tile to an empty apace in the p1rack.
+        tiles.splice(j, 1); // Delete from tiles.
     
         // Update p1rack, gameBoard and currBoard based on the index of the dot.
         switch(k) { // p1rack order
             case 0: loadRack(p1rack[k], [1,1,1]); // [Z,Y,X] ids
                     gameBoard[0][0][0] = p1rack[k];
                     currBoard[0][0][0] = p1rack[k];			
+                    // Add a new Event Listener to the new piece
+                    addEventListener( document.getElementById( p1rack[k] ) );			
                     break;
             case 1: loadRack(p1rack[k], [1,1,2]);
                     gameBoard[0][0][1] = p1rack[k];
                     currBoard[0][0][1] = p1rack[k];			
+                    // Add a new Event Listener to the new piece
+                    addEventListener( document.getElementById( p1rack[k] ) );			
                     break;
             case 2: loadRack(p1rack[k], [1,1,3]);
                     gameBoard[0][0][2] = p1rack[k];
                     currBoard[0][0][2] = p1rack[k];			
+                    // Add a new Event Listener to the new piece
+                    addEventListener( document.getElementById( p1rack[k] ) );			
                     break;
             case 3: loadRack(p1rack[k], [1,1,4]);
                     gameBoard[0][0][3] = p1rack[k];
                     currBoard[0][0][3] = p1rack[k];			
+                    // Add a new Event Listener to the new piece
+                    addEventListener( document.getElementById( p1rack[k] ) );			
                     break;
             case 4: loadRack(p1rack[k], [1,2,1]);
                     gameBoard[0][1][0] = p1rack[k];
                     currBoard[0][1][0] = p1rack[k];			
+                    // Add a new Event Listener to the new piece
+                    addEventListener( document.getElementById( p1rack[k] ) );			
                     break;
             case 5: loadRack(p1rack[k], [1,2,2]);
                     gameBoard[0][1][1] = p1rack[k];
                     currBoard[0][1][1] = p1rack[k];			
+                    // Add a new Event Listener to the new piece
+                    addEventListener( document.getElementById( p1rack[k] ) );			
                     break;
         }
-        tiles.splice(j, 1); // Delete from tiles.
-        p1rack[i].piece = getPieceImageSource( p1rack[i].replace(/\d/g, '')+'0' ); // Replace tile id with the tier
     }
     
 // console.log( '' );
@@ -646,37 +657,48 @@ function rePopRack2() {
     for ( let i = 0; i < dotcnt; i++ ) {
         let j = Math.floor(Math.random() * tiles.length); // Random draw from the remaining tiles.
         let k = p2rack.indexOf('.');
-        p2rack[k] = tiles[j]; // Assign to the p2rack.
+        p2rack[k] = tiles[j]; // Assign the random tile to an empty apace in the p2rack.
+        tiles.splice(j, 1); // Delete from tiles.
     
         // Update p2rack, gameBoard and currBoard based on the index of the dot.
         switch(k) { // p2rack order
             case 0: loadRack(p2rack[k], [1,4,11]); // [Z,Y,X] ids
                     gameBoard[0][3][10] = p1rack[k];
                     currBoard[0][3][10] = p1rack[k];			
+                    // Add a new Event Listener to the new piece
+                    addEventListener( document.getElementById( p2rack[k] ) );			
                     break;
             case 1: loadRack(p2rack[k], [1,5,10]);
                     gameBoard[0][4][10] = p1rack[k];
                     currBoard[0][4][10] = p1rack[k];			
+                    // Add a new Event Listener to the new piece
+                    addEventListener( document.getElementById( p2rack[k] ) );			
                     break;
             case 2: loadRack(p2rack[k], [1,4,9]);
                     gameBoard[0][3][8] = p1rack[k];
                     currBoard[0][3][8] = p1rack[k];			
+                    // Add a new Event Listener to the new piece
+                    addEventListener( document.getElementById( p2rack[k] ) );			
                     break;
             case 3: loadRack(p2rack[k], [1,5,8]);
                     gameBoard[0][4][7] = p1rack[k];
                     currBoard[0][4][7] = p1rack[k];			
+                    // Add a new Event Listener to the new piece
+                    addEventListener( document.getElementById( p2rack[k] ) );			
                     break;
             case 4: loadRack(p2rack[k], [1,3,11]);
                     gameBoard[0][2][10] = p1rack[k];
                     currBoard[0][2][10] = p1rack[k];			
+                    // Add a new Event Listener to the new piece
+                    addEventListener( document.getElementById( p2rack[k] ) );			
                     break;
             case 5: loadRack(p2rack[k], [1,4,10]);
                     gameBoard[0][3][9] = p1rack[k];
                     currBoard[0][3][9] = p1rack[k];			
+                    // Add a new Event Listener to the new piece
+                    addEventListener( document.getElementById( p2rack[k] ) );			
                     break;
         }
-        tiles.splice(j, 1); // Delete from tiles.
-        p2rack[i].piece = getPieceImageSource( p2rack[i].replace(/\d/g, '')+'0' ); // Replace tile id with the tier
     }
     
 // console.log( '' );
@@ -839,6 +861,49 @@ function onPerimeter( position ) {
 /* movement functions */
 
 
+function addEventListener( piece ) {
+    
+console.log( '' );
+console.log( 'addEventListener(', piece, ')', );
+    
+    let listenerName = 'mouseDownListener' + piece;
+    listenerName = function(event) { // define listenerName as a function that captures the startingPosition
+        mouseX = event.clientX;
+        mouseY = event.clientY;
+    
+        let hasIntervalStarted = false;
+        if (hasIntervalStarted === false) {
+            piece.style.position = 'absolute';
+    
+            currHeldPiece = piece;
+            const currHeldPieceStringPosition = piece.parentElement.id.split(''); // Split up the parentElement.id into currHeldPieceStringPosition[]
+    
+            // The logic for the 2x2x2 board was fairly easy - If the 4th digit of currHeldPieceStartingPosition is NaN then don't use it.
+            if (isNaN(parseInt(currHeldPieceStringPosition[3],10))) { // If the 4th digit is NaN then don't use it.
+                currHeldPieceStartingPosition = [ parseInt(currHeldPieceStringPosition[0],10)-1,
+                                                 parseInt(currHeldPieceStringPosition[1],10)-1,
+                                                 parseInt(currHeldPieceStringPosition[2],10)-1 ];
+            } else {
+                currHeldPieceStartingPosition = [ parseInt(currHeldPieceStringPosition[0],10)-1,
+                                                 parseInt(currHeldPieceStringPosition[1],10)-1, 
+                                                 Number("" + parseInt(currHeldPieceStringPosition[2],10) + parseInt(currHeldPieceStringPosition[3],10))-1 ]; // Concat the 3rd and 4th digits.
+            }
+    
+            movePieceInterval = setInterval(function() {
+                piece.style.top = mouseY - piece.offsetHeight / 2 + window.scrollY + 'px';
+                piece.style.left = mouseX - piece.offsetWidth / 2 + window.scrollX + 'px';
+            }, 1);
+    
+            hasIntervalStarted = true;
+        }
+    }; // a mousedown event listener for this piece
+    
+    // add the mousedown Event Listener
+    piece.addEventListener('mousedown', listenerName);
+    
+} // addEventListener( piece )
+
+
 function setPieceHoldEvents() {
     let mouseX, mouseY = 0;
     
@@ -853,6 +918,7 @@ function setPieceHoldEvents() {
     
     for (const piece of pieces) {
         piece.addEventListener('mousedown', function(event) {
+            // event.preventDefault(); // new, didn't work
             mouseX = event.clientX;
             mouseY = event.clientY;
         
@@ -960,7 +1026,9 @@ console.log( 'movePiece(', piece, ',', startingPosition, ',', endingPosition, ')
             return -1;
         } else {
 
-            // move the piece
+            ////////////////////
+            // move the piece //
+            ////////////////////
             currBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]] = '.'; // clear the startingPosition
             // remove the piece's img from the startingPosition
             const sourceSquare = document.getElementById(`${startingPosition[0] + 1}${startingPosition[1] + 1}${startingPosition[2] + 1}`);
@@ -968,14 +1036,6 @@ console.log( 'movePiece(', piece, ',', startingPosition, ',', endingPosition, ')
  		
             // remove the original piece from the DOM, currBoard and the rack
             // removeRack( boardPiece, startingPosition );
-        
-            // remove the sourceSquare's child(piece)
-            // const sourceSquare = document.getElementById(`${startingPosition[0] + 1}${startingPosition[1] + 1}${startingPosition[2] + 1}`);
-            // sourceSquare.removeChild(piece);
-        
-            // const sourceSquare = document.getElementById(`${startingPosition[0] + 1}${startingPosition[1] + 1}${startingPosition[2] + 1}`);
-            // sourceSquare.textContent = '';
-            // sourceSquare.removeChild(piece);
         
             // clear the tile from the p1rack
             if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 0 ) { p1rack[0] = '.'; }
@@ -1454,8 +1514,9 @@ function switchPlayer() {
     // called by the $ onclick button:
     // end turn and calculate the score 
     
-    words.length = 0; // empty words[]
-    score_words.length = 0; // empty score_words[]
+    // empty words and score_words
+    words.length = 0;
+    score_words.length = 0;
     
     // calculate the score    
     calcScore();
@@ -1497,12 +1558,10 @@ function calcScore() {
     
     } else { // score_words is not empty - find and score the words in score_words
     
-        // if there was a problem with any word created, rollback the entire move
-        // if ( checkWords() ) {
-        if ( checkWords() !== 0 ) {
-            undo_turn();
-        } else {
-            // there was no problem so score the words in the score_words[] array
+        // check the words in score_words
+        if ( checkWords() === 0 ) {
+    
+            // no errors, so score the words in score_words
             scoreWords(); 
                 
             // copy currBoard to prevBoard
@@ -1522,6 +1581,9 @@ function calcScore() {
                 // switch player
                 currPlayer = 'white';
             }
+        } else {
+            // there was an error, so rollback the entire turn
+            undo_turn();
         }
     }
 } // calcScore()
@@ -1590,6 +1652,9 @@ function checkWords() {
     
 console.log( '' );
 console.log( 'checkWords():' );
+
+    let periflower = 0;
+    let adjacency = 0;
     
     for ( let index = 0; index < score_words.length; ++index ) {
         const element = score_words[index];
@@ -1621,7 +1686,7 @@ console.log( 'checkWords():' );
             console.error( 'Every word must be two or more characters in length.  Undo the last turn.' );
             return 100;
         }
-    
+
         ///////////////////////////////////////////////////////////////////////////////
         // check that the first word is on a perimeter flower or return an error 200 //
         ///////////////////////////////////////////////////////////////////////////////
@@ -1631,7 +1696,6 @@ console.log( 'checkWords():' );
                 case 'UP': // Upwards Word
     
                     // for every letter position in word_str, check if its on a perimeter flower
-                    let periflowerUp = 0;
                     for ( let i = 0; i < word_str.length; i++ ) {
     
                         new_str = upwd_lookup( yx_str, i ); // lookup new yxCoords, the first one remains the same
@@ -1639,16 +1703,16 @@ console.log( 'checkWords():' );
     
 // console.log( 'yx_str:', yx_str ); 
 // console.log( 'new_str:', new_str ); 
-// console.log( 'new_ary:', new_ary ); 
-// console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
-// console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) ); 
+console.log( 'new_ary:', new_ary ); 
+console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
+console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) ); 
     
                         if ( onFlower( new_ary ) && onPerimeter( new_ary ) ) {
-                            periflowerUp = 1;
+                            periflower = 1;
                         }
                     }
-                    if ( periflowerUp === 0 ) {
-                        console.error( 'checkWords() returns 200 for an UP word.' );
+                    if ( periflower === 0 ) {
+console.log( 'checkWords() returns 200 for an UP word.' );
                         console.error( 'The first word must be on a perimeter flower.  Undo the last turn.' );
                         return 200;
                     }
@@ -1656,7 +1720,6 @@ console.log( 'checkWords():' );
                 case 'DW': // Downwards Word
     
                     // for every letter position in word_str, check if its on a perimeter flower
-                    let periflowerDn = 0;
                     for ( let i = 0; i < word_str.length; i++ ) {
     
                         new_str = dnwd_lookup( yx_str, i ); // lookup new yxCoords, the first one remains the same
@@ -1664,16 +1727,16 @@ console.log( 'checkWords():' );
     
 // console.log( 'yx_str:', yx_str ); 
 // console.log( 'new_str:', new_str ); 
-// console.log( 'new_ary:', new_ary ); 
-// console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
-// console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) ); 
+console.log( 'new_ary:', new_ary ); 
+console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
+console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) ); 
     
                         if ( onFlower( new_ary ) && onPerimeter( new_ary ) ) {
-                            periflowerDn = 1;
+                            periflower = 1;
                         }
                     }
-                    if ( periflowerDn === 0 ) {
-                        console.error( 'checkWords() returns 201 for a DW word.' );
+                    if ( periflower === 0 ) {
+console.log( 'checkWords() returns 201 for a DW word.' );
                         console.error( 'The first word must be on a perimeter flower.  Undo the last turn.' );
                         return 201;
                     }
@@ -1681,7 +1744,6 @@ console.log( 'checkWords():' );
                 case 'DO': // Straight-Down Word
     
                     // for every letter position in word_str, check if its on a perimeter flower
-                    let periflowerDo = 0;
                     for ( let i = 0; i < word_str.length; i++ ) {
     
                         new_str = (y + i)+','+x; // calculate the new coords ( add one to y )
@@ -1689,26 +1751,134 @@ console.log( 'checkWords():' );
     
 // console.log( 'yx_str:', yx_str ); 
 // console.log( 'new_str:', new_str ); 
-// console.log( 'new_ary:', new_ary ); 
-// console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
-// console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) ); 
+console.log( 'new_ary:', new_ary ); 
+console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
+console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) ); 
     
                         if ( onFlower( new_ary ) && onPerimeter( new_ary ) ) {
-                            periflowerDo = 1;
+                            periflower = 1;
                         }
                     }
-                    if ( periflowerDo === 0 ) {
-                        console.error( 'checkWords() returns 202 for a DO word.' );
+                    if ( periflower === 0 ) {
+console.log( 'checkWords() returns 202 for a DO word.' );
                         console.error( 'The first word must be on a perimeter flower.  Undo the last turn.' );
                         return 202;
                     }
                     break;
             } // switch ( yx_dir )
     
-        } 
-        // else { // end of first word check, every other word needs to be on a flower OR on or next to a previous word played
-        // }
+        } // first word check, returns 200s on error
+        else
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // check that every other word is on a perimeter flower or adjacent to a played word or return an error 300 //
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        {
     
+            // refresh adjaBoard
+            refresh_adjaBoard();
+    
+            switch ( yx_dir ) {
+                case 'UP': // Upwards Word
+    
+                    // for every letter position in word_str, check if its on a perimeter flower
+                    for ( let i = 0; i < word_str.length; i++ ) {
+    
+                        new_str = upwd_lookup( yx_str, i ); // lookup new yxCoords, the first one remains the same
+                        new_ary = new_str.split(',').map(Number); // new_ary is an array of numbers
+    
+// console.log( 'yx_str:', yx_str ); 
+// console.log( 'new_str:', new_str ); 
+console.log( 'new_ary:', new_ary ); 
+console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
+console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) ); 
+    
+                        // if any letter of the word is on a perimeter flower
+                        if ( onFlower( new_ary ) && onPerimeter( new_ary ) ) {
+                            periflower = 1;
+                        }
+                        // if any letter of the word is adjacent to a played word
+                        if ( onAdjacent( new_ary ) ) {
+                            adjacency = 1;
+                        }
+			    
+                    }
+                    // after checking every position in word_str
+                    // if not on a perimeter flower AND not on an adjacent square then error 300
+                    if ( ( periflower === 0 ) && ( adjacency === 0 ) ) {
+console.log( 'checkWords() returns 300 for an UP word.' );
+                        console.error( 'Words must be on a perimeter flower.  Undo the last turn.' );
+                        return 300;
+                    }
+                    break;
+    
+                case 'DW': // Downwards Word
+    
+                    // for every letter position in word_str, check if its on a perimeter flower
+                    for ( let i = 0; i < word_str.length; i++ ) {
+    
+                        new_str = dnwd_lookup( yx_str, i ); // lookup new yxCoords, the first one remains the same
+                        new_ary = new_str.split(',').map(Number); // new_ary is an array of numbers
+    
+// console.log( 'yx_str:', yx_str ); 
+// console.log( 'new_str:', new_str ); 
+console.log( 'new_ary:', new_ary ); 
+console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
+console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) ); 
+    
+                        // if any letter of the word is on a perimeter flower
+                        if ( onFlower( new_ary ) && onPerimeter( new_ary ) ) {
+                            periflower = 1;
+                        }
+                        // if any letter of the word is adjacent to a played word
+                        if ( onAdjacent( new_ary ) ) {
+                            adjacency = 1;
+                        }
+                    }
+                    // after checking every position in word_str
+                    // if not on a perimeter flower AND not on an adjacent square then error 300
+                    if ( ( periflower === 0 ) && ( adjacency === 0 ) ) {
+console.log( 'checkWords() returns 301 for a DW word.' );
+                        console.error( 'Words must be on a perimeter flower.  Undo the last turn.' );
+                        return 301;
+                    }
+                    break;
+    
+                case 'DO': // Straight-Down Word
+    
+                    // for every letter position in word_str, check if its on a perimeter flower
+                    for ( let i = 0; i < word_str.length; i++ ) {
+    
+                        new_str = (y + i)+','+x; // calculate the new coords ( add one to y )
+                        new_ary = new_str.split(',').map(Number); // new_ary is an array of numbers
+    
+// console.log( 'yx_str:', yx_str ); 
+// console.log( 'new_str:', new_str ); 
+console.log( 'new_ary:', new_ary ); 
+console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
+console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) ); 
+    
+                        // if any letter of the word is on a perimeter flower
+                        if ( onFlower( new_ary ) && onPerimeter( new_ary ) ) {
+                            periflower = 1;
+                        }
+                        // if any letter of the word is adjacent to a played word
+                        if ( onAdjacent( new_ary ) ) {
+                            adjacency = 1;
+                        }
+                    }
+                    // after checking every position in word_str
+                    // if not on a perimeter flower AND not on an adjacent square then error 300
+                    if ( ( periflower === 0 ) && ( adjacency === 0 ) ) {
+console.log( 'checkWords() returns 302 for a DO word.' );
+                        console.error( 'The first word must be on a perimeter flower.  Undo the last turn.' );
+                        return 302;
+                    }
+                    break;
+            } // switch ( yx_dir )
+    
+        }
+
         // check that every tile is played in a line
     
         // check that an existing word is not completely over-written
@@ -2132,6 +2302,108 @@ function flattenBoard() {
 }; // flattenBoard()
 
 
+function refresh_adjaBoard() {
+    // This function expands currBoard[][][] into adjaBoard[][] for scoring purposes
+    
+    // clear adjaBoard
+    adjaBoard = [ // 5 rows of 11 columns, [Z,Y,X]: [0,0,0] - [0,4,10]
+    ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+    ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+    ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+    ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+    ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.']];
+
+// console.log( '' );
+// console.log( 'refresh_adjaBoard() before:' );
+// console.log( 'currBoard[0]', currBoard[0], 'adjaBoard', adjaBoard );
+    
+    // Iterate over every currBoard element
+    for (let z = 0; z < 6 ; z++) { // 6 levels
+        for (let y = 0; y < 5 ; y++) { // 5 rows
+            for (let x = 0; x < 11; x++) { // 11 columns
+    
+                // if onBoard and not blank and not a flower then copy to adjaBoard and adjacent adjaBoard spaces 
+                if ( ( onBoard( [z,y,x] ) ) && 
+                     ( currBoard[z][y][x] !== '.' ) && 
+                     ( currBoard[z][y][x] !== '^0' ) && ( currBoard[z][y][x] !== '^1' ) && ( currBoard[z][y][x] !== '^2' ) && 
+                     ( currBoard[z][y][x] !== '^3' ) && ( currBoard[z][y][x] !== '^4' ) && ( currBoard[z][y][x] !== '^5' ) && ( currBoard[z][y][x] !== '^6' ) ) {
+    
+                    adjaBoard[y][x] = currBoard[z][y][x];
+    
+                    // always test with onBoard for the adjacent spaces
+                    if ( x%2 === 0 ) {
+                        // this is the adjacent math for an even column
+                        if ( onBoard( [0,y,x-1] ) && ( x-1 >= 0 ) ) { 
+                            adjaBoard[y][x-1] = currBoard[z][y][x];
+                        }
+                        if ( onBoard( [0,y-1,x] ) && ( y-1 >= 0 ) ) {
+                            adjaBoard[y-1][x] = currBoard[z][y][x];
+                        }
+                        if ( onBoard( [0,y,x+1] ) && ( x+1 <= 11 ) ) {
+                            adjaBoard[y][x+1] = currBoard[z][y][x];
+                        }
+                        if ( onBoard( [0,y+1,x+1] ) && ( y+1 <= 5 ) && ( x+1 <= 11 ) ) {
+                            adjaBoard[y+1][x+1] = currBoard[z][y][x];
+                        }
+                        if ( onBoard( [0,y+1,x] ) && ( y+1 <= 5 ) ) { 
+                            adjaBoard[y+1][x] = currBoard[z][y][x]; 
+                        }
+                        if ( onBoard( [0,y+1,x-1] ) && ( y+1 <= 5 ) && ( x-1 >= 0 ) ) {
+                            adjaBoard[y+1][x-1] = currBoard[z][y][x]; 
+                        }
+                    } else {
+                        // this is the adjacent math for an odd column
+                        if ( onBoard( [0,y-1,x-1] ) && ( y-1 >= 0 ) && ( x-1 >= 0 ) ) {
+                            adjaBoard[y-1][x-1] = currBoard[z][y][x]; 
+                        }
+                        if ( onBoard( [0,y-1,x] ) && ( y-1 >= 0 ) ) {
+                            adjaBoard[y-1][x] = currBoard[z][y][x]; 
+                        }
+                        if ( onBoard( [0,y-1,x+1] ) && ( y-1 >= 0 ) && ( x+1 <= 11 ) ) {
+                            adjaBoard[y-1][x+1] = currBoard[z][y][x]; 
+                        }
+                        if ( onBoard( [0,y,x+1] ) && ( x+1 <= 11 ) ) {
+                            adjaBoard[y][x+1] = currBoard[z][y][x]; 
+                        }
+                        if ( onBoard( [0,y+1,x] ) && ( y+1 <= 5 ) ) {
+                            adjaBoard[y+1][x] = currBoard[z][y][x]; 
+                        }
+                        if ( onBoard( [0,y,x-1] ) && ( x-1 >= 0 ) ) {
+                            adjaBoard[y][x-1] = currBoard[z][y][x]; 
+                        }
+                    }
+                } // columns
+            } // rows
+        } // levels
+    } // adjaBoard now contains the tiles in currBoard and tiles in all adjacent spaces
+    
+console.log( '' );
+console.log( 'refresh_adjaBoard() after:' );
+console.log( 'currBoard[0]', currBoard[0], 'adjaBoard', adjaBoard );
+    
+}; // refresh_adjaBoard()
+
+
+function onAdjacent( position ) {
+    // true if the position is on the adjaBoard
+    // let z = position[0];
+    let y = position[0];
+    let x = position[1];
+    
+    refresh_adjaBoard();
+
+console.log( '' );
+console.log( 'onAdjacent(', position, ')' );
+console.log( 'currBoard[0]', currBoard[0], 'adjaBoard', adjaBoard );
+    
+    if ( adjaBoard[y][x] !== '.' ) {
+        return false; // blanks return false
+    } else {
+        return true; // tiles return true
+    }
+} // onAdjacent( position )
+
+
 function getTopLevel( position ) {
     // Return the highest occupied level for this position, a yxCoord string 
     
@@ -2185,7 +2457,7 @@ function getTopTile( position ) {
     let z = position[0]; // this z-coordinate is not accurate
     let y = position[1]; // use the yxCoords
     let x = position[2];
-    let top_letter = '';
+    let top_tile = '';
     
     // get the top tile from currBoard for yxCoord
     for (let level = 5; level >= 0 ; level--) { // 6 levels
