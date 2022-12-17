@@ -5,6 +5,7 @@
 let words = [];
 let score_words = [];
 let game_record = [];
+let endingPositions = [];
 let turn_no = 0;
 let blank_no = 0;
 
@@ -69,9 +70,19 @@ let currBoard = JSON.parse(JSON.stringify(gameBoard));
 // copy gameBoard to prevBoard
 let prevBoard = JSON.parse(JSON.stringify(gameBoard));
 
-// let diffBoard = [];
+// copy gameBoard to diffBoard
+let diffBoard = JSON.parse(JSON.stringify(gameBoard));
+
+// 2-D gameBoards
 
 let flatBoard = [ // 1 level of 5 rows of 11 columns, [Z,Y,X]: [0,0,0] - [0,4,10]
+['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'] ];
+
+let adjaBoard = [ // 1 level of 5 rows of 11 columns, [Z,Y,X]: [0,0,0] - [0,4,10]
 ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
 ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
 ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
@@ -99,9 +110,6 @@ let down_str0=flatBoard[1][4].replace(/\d/g, '') + flatBoard[2][4].replace(/\d/g
 let down_str1=flatBoard[1][5].replace(/\d/g, '') + flatBoard[2][5].replace(/\d/g, '') + flatBoard[3][5].replace(/\d/g, '');
 let down_str2=flatBoard[1][6].replace(/\d/g, '') + flatBoard[2][6].replace(/\d/g, '');
 
-let diffBoard; // global diffBoard
-let adjaBoard; // global adjaBoard
-
 // Initialize the letter tiles, the player racks and scores.
 let tiles = ['a0', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8', 'b0', 'b1', 'b2', 'c0', 'c1', 'd0', 'd1', 'd2', 'd3', 'e0', 'e1',
              'e2', 'e3', 'e4', 'e5', 'e6', 'e7', 'e8', 'e9', 'e10', 'f0', 'f1', 'g0', 'g1', 'g2', 'h0', 'h1', 'i0', 'i1', 'i2', 'i3', 
@@ -128,17 +136,17 @@ function startGame() {
         // Player 1 random draw from the remaining tiles.
         let j = Math.floor(Math.random() * tiles.length);
         p1rack[i] = tiles[j]; // Assign the tile to the p1rack.
-        // calculate tileandtier
-        let tileandtier = p1rack[i].replace(/\d/g, '') + '0'; // level 0
-        p1rack[i].piece = getPieceImageSource( tileandtier ); // tileandtier yields the proper image for the piece
+            // calculate tileandtier
+            // let tileandtier = p1rack[i].replace(/\d/g, '') + '0'; // level 0
+            // p1rack[i].piece = getPieceImageSource( tileandtier ); // tileandtier yields the proper image for the piece
         tiles.splice(j, 1); // Delete from tiles.
     
         // Player 2 random draw from the remaining tiles.
         j = Math.floor(Math.random() * tiles.length);
         p2rack[i] = tiles[j]; // Assign the tile to the p2rack.
-        // calculate tileandtier
-        tileandtier = p2rack[i].replace(/\d/g, '') + '0'; // level 0
-        p2rack[i].piece = getPieceImageSource( tileandtier ); // tileandtier yields the proper image for the piece
+            // calculate tileandtier
+            // tileandtier = p2rack[i].replace(/\d/g, '') + '0'; // level 0
+            // p2rack[i].piece = getPieceImageSource( tileandtier ); // tileandtier yields the proper image for the piece
         tiles.splice(j, 1); // Delete from tiles.
     
     }
@@ -156,16 +164,16 @@ function loadPosition( position, playerToMove ) {
     currBoard = position;
     currPlayer = playerToMove;
     
-    // level h, row i and column j
-    for (let h = 0; h < 6 ; h++) { // 6 levels
-        for (let i = 0; i < 5 ; i++) { // 5 rows
-            for (let j = 0; j < 11; j++) { // 11 columns
-                if ( position[h][i][j] !== '.' ) {
+    // level z, row y and column x
+    for (let z = 0; z < 6 ; z++) { // 6 levels
+        for (let y = 0; y < 5 ; y++) { // 5 rows
+            for (let x = 0; x < 11; x++) { // 11 columns
+                if ( position[z][y][x] !== '.' ) {
     
-                    if ( inRack1([h,i,j]) || inRack2([h,i,j]) ) {
-                        loadRack( position[h][i][j], [h+1,i+1,j+1] );
+                    if ( inRack1([z,y,x]) || inRack2([z,y,x]) ) {
+                        loadRack( position[z][y][x], [z+1,y+1,x+1] );
                     } else {
-                        loadPiece( position[h][i][j], [h+1,i+1,j+1] );
+                        loadPiece( position[z][y][x], [z+1,y+1,x+1] );
                     }
                 }
             }
@@ -236,82 +244,14 @@ function removeRack( piece, position ) {
     const squareElement = document.getElementById(`${position[0]}${position[1]}${position[2]}`);
     
     // Get the pieceElement
-    // const pieceElement = document.squareElement.getElementsByClassName('piece');
     const pieceElement = document.getElementById( piece ); // This now works for every tile on the board due to unique tiles.
     
-    // Before removing the rack tile, capture its style so it can be reapplied with the next tile drawn
-    if ( inRack1( position ) ) {
-        if ( ( y === 0 ) && ( x === 0 ) ) {
-            // rack1style[0] = pieceElement.getPropertyValue('style');
-            rack1style[0] = pieceElement.style;
-console.log( 'rack1style[0]:', rack1style[0] );
-        }
-        if ( ( y === 0 ) && ( x === 1 ) ) {
-            // rack1style[1] = pieceElement.getPropertyValue('style');
-            rack1style[1] = pieceElement.style;
-console.log( 'rack1style[1]:', rack1style[1] );
-        }
-        if ( ( y === 0 ) && ( x === 2 ) ) {
-            // rack1style[2] = pieceElement.getPropertyValue('style');
-            rack1style[2] = pieceElement.style;
-console.log( 'rack1style[2]:', rack1style[2] );
-        }
-        if ( ( y === 0 ) && ( x === 3 ) ) {
-            // rack1style[3] = pieceElement.getPropertyValue('style');
-            rack1style[3] = pieceElement.style;
-console.log( 'rack1style[3]:', rack1style[3] );
-        }
-        if ( ( y === 1 ) && ( x === 0 ) ) {
-            // rack1style[4] = pieceElement.getPropertyValue('style');
-            rack1style[4] = pieceElement.style;
-console.log( 'rack1style[4]:', rack1style[4] );
-        }
-        if ( ( y === 1 ) && ( x === 1 ) ) {
-            // rack1style[5] = pieceElement.getPropertyValue('style');
-            rack1style[5] = pieceElement.style;
-console.log( 'rack1style[5]:', rack1style[5] );
-        }
-    }
-    
-    if ( inRack2( position ) ) {
-        if ( ( y === 3 ) && ( x === 10 ) ) {
-            // rack2style[0] = pieceElement.getPropertyValue('style');
-            rack2style[0] = pieceElement.style;
-console.log( 'rack2style[0]:', rack2style[0] );
-        }
-        if ( ( y === 4 ) && ( x === 9 ) ) {
-            // rack2style[1] = pieceElement.getPropertyValue('style');
-            rack2style[1] = pieceElement.style;
-console.log( 'rack2style[1]:', rack2style[1] );
-        }
-        if ( ( y === 3 ) && ( x === 8 ) ) {
-            // rack2style[2] = pieceElement.getPropertyValue('style');
-            rack2style[2] = pieceElement.style;
-console.log( 'rack2style[2]:', rack2style[2] );
-        }
-        if ( ( y === 4 ) && ( x === 7 ) ) {
-            // rack2style[3] = pieceElement.getPropertyValue('style');
-            rack2style[3] = pieceElement.style;
-console.log( 'rack2style[3]:', rack2style[3] );
-        }
-        if ( ( y === 2 ) && ( x === 10 ) ) {
-            // rack2style[4] = pieceElement.getPropertyValue('style');
-            rack2style[4] = pieceElement.style;
-console.log( 'rack2style[4]:', rack2style[4] );
-        }
-        if ( ( y === 3 ) && ( x === 9 ) ) {
-            // rack2style[5] = pieceElement.getPropertyValue('style');
-            rack2style[5] = pieceElement.style;
-console.log( 'rack2style[5]:', rack2style[5] );
-        }
-    }
-    
-    // Remove the piece and update the gameBoard
+    // Remove the piece
     pieceElement.remove();
     
-console.log( '' );
-console.log( 'removeRack(', piece, ',', position, '):' );
-console.log( 'squareElement:', squareElement, 'pieceElement:', pieceElement );
+// console.log( '' );
+// console.log( 'removeRack(', piece, ',', position, '):' );
+// console.log( 'squareElement:', squareElement, 'pieceElement:', pieceElement );
     
 } // removeRack( piece, position ) 
 
@@ -1010,6 +950,7 @@ function movePiece( piece, startingPosition, endingPosition ) {
 console.log( '' );
 console.log( 'movePiece(', piece, ',', startingPosition, ',', endingPosition, '):' );
     
+    // move validations to validateMovement()
     const boardPiece = currBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
     
     // If the boardPiece is not empty 
@@ -1017,6 +958,12 @@ console.log( 'movePiece(', piece, ',', startingPosition, ',', endingPosition, ')
     
         // if the top tier is not empty
         if ( !( currBoard[5][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
+            console.warn( 'You cannot stack letters over 6 tiles high.' );
+            return -1;
+        }
+        // if they play more than one tile on a position during a turn
+        if ( indexOfArray( endingPosition, endingPositions ) !== -1 ) {
+            console.warn( 'You cannot play more than one letter on a space in a turn.' );
             return -1;
         } else {
 
@@ -1140,6 +1087,7 @@ console.warn("No more levels available.");
                 destinationSquare.appendChild(piece);
             }
         }
+        endingPositions.push( endingPosition );
     }
     
     // push a 5 element move record to the game_record
@@ -1405,12 +1353,12 @@ function testWhiteLetter( startingPosition, endingPosition, piece ) {
     // if moving the piece from the p1rack to the board
     if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
         // if not landing on the same letter or on a bee
-        if ( ( getTopTile( endingPosition ).replace(/\d/g, '') !== piece.replace(/\d/g, '') ) && 
-	     ( getTopTile( endingPosition ).replace(/\d/g, '') !== 'b' ) &&
-	     ( getTopTile( endingPosition ).replace(/\d/g, '') !== 'q' ) ) {
+        if ( ( getTopTile( endingPosition ).toLowerCase().replace(/\d/g, '') !== piece.toLowerCase().replace(/\d/g, '') ) && 
+	     ( getTopTile( endingPosition ).toLowerCase().replace(/\d/g, '') !== 'b' ) &&
+	     ( getTopTile( endingPosition ).toLowerCase().replace(/\d/g, '') !== 'q' ) ) {
             return true;
         } else { // Error condition
-console.error( 'testWhiteLetter() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
+console.warn( 'testWhiteLetter() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
             return false;
         }
     }
@@ -1421,9 +1369,9 @@ function testBlackLetter( startingPosition, endingPosition, piece ) {
     // if moving the piece from the p2rack to the board
     if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
         // if not landing on the same letter or on a bee
-        if ( ( getTopTile( endingPosition ).replace(/\d/g, '') !== piece.replace(/\d/g, '') ) && 
-	     ( getTopTile( endingPosition ).replace(/\d/g, '') !== 'b' ) &&
-	     ( getTopTile( endingPosition ).replace(/\d/g, '') !== 'q' ) ) {
+        if ( ( getTopTile( endingPosition ).toLowerCase().replace(/\d/g, '') !== piece.toLowerCase().replace(/\d/g, '') ) && 
+	     ( getTopTile( endingPosition ).toLowerCase().replace(/\d/g, '') !== 'b' ) &&
+	     ( getTopTile( endingPosition ).toLowerCase().replace(/\d/g, '') !== 'q' ) ) {
             return true;
         } else { // Error condition
 console.warn( 'testBlackLetter() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
@@ -1450,7 +1398,8 @@ function pickLetter( startingPosition, endingPosition ) {
     blank_no = blank_no + 1;
     
     let yxCoord = y+','+x; // use the yxCoords from the lookup
-    let blankLev = getTopLevel( yxCoord ); // use the yxCoords from the lookup
+    let blankLev = getTopLevel( yxCoord ) + 1; // use the yxCoords from the lookup + 1
+console.log( 'blankLev', blankLev );
     
     // Get blank_tileandtier
     let blank_tileandtier = blank.toUpperCase() + blankLev; // the letter_blanks are UpperCase
@@ -1468,7 +1417,17 @@ function pickLetter( startingPosition, endingPosition ) {
     if ( z === 0 && y === 3 && x === 5 ) { 
         removePiece( '^2', endingPosition );
     }
+
+    // see if there is an img already attached to the endingPosition 
+    if ( currBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]] !== '.' ) { 
+        removePiece( currBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]], endingPosition );
+        // remove any img from the endingPosition
+        // const sourceSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
+        // sourceSquare.removeChild(piece); // remove the sourceSquare's child(piece)
+    }
     
+console.log( 'loadPiece(', blank_tile, [z+1,y+1,x+1], ')', );
+
     // replace the blank tile with the zero-point letter_blank at the endingPosition
     loadPiece( blank_tile, [z+1,y+1,x+1] );
     
@@ -1514,6 +1473,13 @@ function switchPlayer() {
     
     // calculate the score    
     calcScore();
+    
+    // refresh adjaBoard
+    refresh_adjaBoard();
+    
+    // clear endingPositions
+    endingPositions = [];
+    endingPositions.length = 0; // empty endingPositions[]
     
 console.log( '' );
 console.log( 'switchPlayer():' );
@@ -1676,8 +1642,8 @@ console.log( 'checkWords():' );
         // check that every word is two or more characters or return an error 100 //
         ////////////////////////////////////////////////////////////////////////////
         if ( word_str.length < 2 ) {
-            console.error( 'checkWords() returns 100.' );
-            console.error( 'Every word must be two or more characters in length.  Undo the last turn.' );
+            console.warn( 'checkWords() returns 100.' );
+            console.warn( 'Every word must be two or more characters in length.  Undo the last turn.' );
             return 100;
         }
 
@@ -1700,6 +1666,7 @@ console.log( 'checkWords():' );
 console.log( 'new_ary:', new_ary ); 
 console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
 console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) ); 
+console.log( 'onAdjacent( ', new_ary, '):', onAdjacent( new_ary ) ); 
     
                         if ( onFlower( new_ary ) && onPerimeter( new_ary ) ) {
                             periflower = 1;
@@ -1707,7 +1674,7 @@ console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) );
                     }
                     if ( periflower === 0 ) {
 console.log( 'checkWords() returns 200 for an UP word.' );
-                        console.error( 'The first word must be on a perimeter flower.  Undo the last turn.' );
+                        console.warn( 'The first word must be on a perimeter flower.  Undo the last turn.' );
                         return 200;
                     }
                     break;
@@ -1724,6 +1691,7 @@ console.log( 'checkWords() returns 200 for an UP word.' );
 console.log( 'new_ary:', new_ary ); 
 console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
 console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) ); 
+console.log( 'onAdjacent( ', new_ary, '):', onAdjacent( new_ary ) ); 
     
                         if ( onFlower( new_ary ) && onPerimeter( new_ary ) ) {
                             periflower = 1;
@@ -1731,7 +1699,7 @@ console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) );
                     }
                     if ( periflower === 0 ) {
 console.log( 'checkWords() returns 201 for a DW word.' );
-                        console.error( 'The first word must be on a perimeter flower.  Undo the last turn.' );
+                        console.warn( 'The first word must be on a perimeter flower.  Undo the last turn.' );
                         return 201;
                     }
                     break;
@@ -1748,6 +1716,7 @@ console.log( 'checkWords() returns 201 for a DW word.' );
 console.log( 'new_ary:', new_ary ); 
 console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
 console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) ); 
+console.log( 'onAdjacent( ', new_ary, '):', onAdjacent( new_ary ) ); 
     
                         if ( onFlower( new_ary ) && onPerimeter( new_ary ) ) {
                             periflower = 1;
@@ -1755,7 +1724,7 @@ console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) );
                     }
                     if ( periflower === 0 ) {
 console.log( 'checkWords() returns 202 for a DO word.' );
-                        console.error( 'The first word must be on a perimeter flower.  Undo the last turn.' );
+                        console.warn( 'The first word must be on a perimeter flower.  Undo the last turn.' );
                         return 202;
                     }
                     break;
@@ -1768,9 +1737,6 @@ console.log( 'checkWords() returns 202 for a DO word.' );
         // check that every other word is on a perimeter flower or adjacent to a played word or return an error 300 //
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
         {
-    
-            // refresh adjaBoard
-            refresh_adjaBoard();
     
             switch ( yx_dir ) {
                 case 'UP': // Upwards Word
@@ -1786,6 +1752,7 @@ console.log( 'checkWords() returns 202 for a DO word.' );
 console.log( 'new_ary:', new_ary ); 
 console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
 console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) ); 
+console.log( 'onAdjacent( ', new_ary, '):', onAdjacent( new_ary ) ); 
     
                         // if any letter of the word is on a perimeter flower
                         if ( onFlower( new_ary ) && onPerimeter( new_ary ) ) {
@@ -1801,7 +1768,7 @@ console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) );
                     // if not on a perimeter flower AND not on an adjacent square then error 300
                     if ( ( periflower === 0 ) && ( adjacency === 0 ) ) {
 console.log( 'checkWords() returns 300 for an UP word.' );
-                        console.error( 'Words must be on a perimeter flower.  Undo the last turn.' );
+                        console.warn( 'Words must be on a perimeter flower.  Undo the last turn.' );
                         return 300;
                     }
                     break;
@@ -1819,6 +1786,7 @@ console.log( 'checkWords() returns 300 for an UP word.' );
 console.log( 'new_ary:', new_ary ); 
 console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
 console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) ); 
+console.log( 'onAdjacent( ', new_ary, '):', onAdjacent( new_ary ) ); 
     
                         // if any letter of the word is on a perimeter flower
                         if ( onFlower( new_ary ) && onPerimeter( new_ary ) ) {
@@ -1833,7 +1801,7 @@ console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) );
                     // if not on a perimeter flower AND not on an adjacent square then error 300
                     if ( ( periflower === 0 ) && ( adjacency === 0 ) ) {
 console.log( 'checkWords() returns 301 for a DW word.' );
-                        console.error( 'Words must be on a perimeter flower.  Undo the last turn.' );
+                        console.warn( 'Words must be on a perimeter flower.  Undo the last turn.' );
                         return 301;
                     }
                     break;
@@ -1851,6 +1819,7 @@ console.log( 'checkWords() returns 301 for a DW word.' );
 console.log( 'new_ary:', new_ary ); 
 console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
 console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) ); 
+console.log( 'onAdjacent( ', new_ary, '):', onAdjacent( new_ary ) ); 
     
                         // if any letter of the word is on a perimeter flower
                         if ( onFlower( new_ary ) && onPerimeter( new_ary ) ) {
@@ -1865,7 +1834,7 @@ console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) );
                     // if not on a perimeter flower AND not on an adjacent square then error 300
                     if ( ( periflower === 0 ) && ( adjacency === 0 ) ) {
 console.log( 'checkWords() returns 302 for a DO word.' );
-                        console.error( 'The first word must be on a perimeter flower.  Undo the last turn.' );
+                        console.warn( 'The first word must be on a perimeter flower.  Undo the last turn.' );
                         return 302;
                     }
                     break;
@@ -2380,20 +2349,18 @@ console.log( 'currBoard[0]', currBoard[0], 'adjaBoard', adjaBoard );
 
 function onAdjacent( position ) {
     // true if the position is on the adjaBoard
+    
     // let z = position[0];
     let y = position[0];
     let x = position[1];
     
-    refresh_adjaBoard();
-
 console.log( '' );
 console.log( 'onAdjacent(', position, ')' );
-console.log( 'currBoard[0]', currBoard[0], 'adjaBoard', adjaBoard );
     
-    if ( adjaBoard[y][x] !== '.' ) {
-        return false; // blanks return false
+    if ( adjaBoard[y][x] === '.' ) {
+        return false; // a blank tile returns false
     } else {
-        return true; // tiles return true
+        return true;
     }
 } // onAdjacent( position )
 
@@ -2411,12 +2378,14 @@ function getTopLevel( position ) {
     
     // use the yxCoords to get the top level from currBoard
     for (let level = 5; level >= 0 ; level--) { // 6 levels
-        // if ( ( currBoard[level][y][x] !== '.' ) || ( level === 'undefined' ) ) {
+        // return the highest tiled level for this position
         if ( currBoard[level][y][x] !== '.' ) {
-                return level;
-                break;
+            return level;
+            break;
         } 
     }
+    return 0;
+    
 } // getTopLevel( position )
 
 
@@ -2748,6 +2717,15 @@ function dnwd_lookup( position, idx ) { // string and a number, returns yx_str
     }
     if ( idx === 2 ) return '2,6';
 } // dnwd_lookup( position, idx )
+
+
+function indexOfArray( val, array ) {
+    var hash = {};
+    for (var i = 0; i < array.length; i++) {
+        hash[array[i]] = i;
+    }
+    return (hash.hasOwnProperty(val)) ? hash[val] : -1;
+}; // indexOfArray( val, array )
 
 
 startGame();
