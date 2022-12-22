@@ -9,10 +9,6 @@ let endingPositions = [];
 let turn_no = 0;
 let blank_no = 0;
 
-// vars for storing the style of the rack pieces
-let rack1style = [];
-let rack2style = [];
-
 let currPlayer;
 
 // undo globals
@@ -110,6 +106,21 @@ let down_str0=flatBoard[1][4].replace(/\d/g, '') + flatBoard[2][4].replace(/\d/g
 let down_str1=flatBoard[1][5].replace(/\d/g, '') + flatBoard[2][5].replace(/\d/g, '') + flatBoard[3][5].replace(/\d/g, '');
 let down_str2=flatBoard[1][6].replace(/\d/g, '') + flatBoard[2][6].replace(/\d/g, '');
 
+// UP arrays of consecutive yxCoords
+const UP0 = [[1,4],[1,5]];
+const UP1 = [[2,4],[2,5],[1,6]];
+const UP2 = [[3,5],[2,6]];
+
+// DW arrays of consecutive yxCoords
+const DW0 = [[1,5],[1,6]];
+const DW1 = [[1,4],[2,5],[2,6]];
+const DW2 = [[2,4],[3,5]];
+
+// DO arrays of consecutive yxCoords
+const DO0 = [[1,4],[2,4]];
+const DO1 = [[1,5],[2,5],[3,5]];
+const DO2 = [[1,6],[2,6]];
+
 // Initialize the letter tiles, the player racks and scores.
 let tiles = ['a0', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8', 'b0', 'b1', 'b2', 'c0', 'c1', 'd0', 'd1', 'd2', 'd3', 'e0', 'e1',
              'e2', 'e3', 'e4', 'e5', 'e6', 'e7', 'e8', 'e9', 'e10', 'f0', 'f1', 'g0', 'g1', 'g2', 'h0', 'h1', 'i0', 'i1', 'i2', 'i3', 
@@ -160,35 +171,35 @@ function startGame() {
 } // startGame()
 
 
-function loadPosition( position, playerToMove ) {
-    currBoard = position;
+function loadPosition( zyxCoords, playerToMove ) {
+    currBoard = zyxCoords;
     currPlayer = playerToMove;
     
     // level z, row y and column x
     for (let z = 0; z < 6 ; z++) { // 6 levels
         for (let y = 0; y < 5 ; y++) { // 5 rows
             for (let x = 0; x < 11; x++) { // 11 columns
-                if ( position[z][y][x] !== '.' ) {
+                if ( zyxCoords[z][y][x] !== '.' ) {
     
                     if ( inRack1([z,y,x]) || inRack2([z,y,x]) ) {
-                        loadRack( position[z][y][x], [z+1,y+1,x+1] );
+                        loadRack( zyxCoords[z][y][x], [z+1,y+1,x+1] );
                     } else {
-                        loadPiece( position[z][y][x], [z+1,y+1,x+1] );
+                        loadPiece( zyxCoords[z][y][x], [z+1,y+1,x+1] );
                     }
                 }
             }
         }
     }
-} // loadPosition( position, playerToMove )
+} // loadPosition( zyxCoords, playerToMove )
 
 
-function loadRack( piece, position ) {
-    let z = position[0]; // piece and position, an array of ZYX ids, which concat into the Id
-    let y = position[1];
-    let x = position[2];
+function loadRack( piece, zyxCoords ) {
+    let z = zyxCoords[0]; // piece and zyxCoords, an array of ZYX ids, which concat into the Id
+    let y = zyxCoords[1];
+    let x = zyxCoords[2];
     
     // Get the squareElement
-    const squareElement = document.getElementById(`${position[0]}${position[1]}${position[2]}`);
+    const squareElement = document.getElementById(`${zyxCoords[0]}${zyxCoords[1]}${zyxCoords[2]}`);
     
     // Create the pieceElement
     const pieceElement = document.createElement('img');
@@ -203,18 +214,18 @@ function loadRack( piece, position ) {
     // Append the pieceElement to the squareElement
     squareElement.appendChild(pieceElement);
     
-console.log( '' );
-console.log( 'loadRack(', piece, ',', position, '):' );
-console.log( 'squareElement:', squareElement, 'pieceElement:', pieceElement );
+// console.log( '' );
+// console.log( 'loadRack(', piece, ',', zyxCoords, '):' );
+// console.log( 'squareElement:', squareElement, 'pieceElement:', pieceElement );
     
-} // loadRack( piece, position )
+} // loadRack( piece, zyxCoords )
 
 
-function loadPiece( piece, position ) {
-    // piece and position, an array of ZYX ids, which concat to the Id
+function loadPiece( piece, zyxCoords ) {
+    // piece and zyxCoords, an array of ZYX ids, which concat to the Id
     
     // Get the squareElement
-    const squareElement = document.getElementById(`${position[0]}${position[1]}${position[2]}`);
+    const squareElement = document.getElementById(`${zyxCoords[0]}${zyxCoords[1]}${zyxCoords[2]}`);
     
     // Create the pieceElement
     const pieceElement = document.createElement('img');
@@ -228,20 +239,20 @@ function loadPiece( piece, position ) {
     // Append the pieceElement to the squareElement
     squareElement.appendChild(pieceElement);
     
-console.log( '' );
-console.log( 'loadPiece(', piece, ',', position, '):' );
-console.log( 'squareElement:', squareElement, 'pieceElement:', pieceElement );
+// console.log( '' );
+// console.log( 'loadPiece(', piece, ',', zyxCoords, '):' );
+// console.log( 'squareElement:', squareElement, 'pieceElement:', pieceElement );
     
-} // loadPiece( piece, position )
+} // loadPiece( piece, zyxCoords )
 
 
-function removeRack( piece, position ) {
-    let z = position[0]; // piece and position, an array of ZYX ids, which concat into the Id
-    let y = position[1];
-    let x = position[2];
+function removeRack( piece, zyxCoords ) {
+    let z = zyxCoords[0]; // piece and zyxCoords, an array of ZYX ids, which concat into the Id
+    let y = zyxCoords[1];
+    let x = zyxCoords[2];
     
     // Get the squareElement
-    const squareElement = document.getElementById(`${position[0]}${position[1]}${position[2]}`);
+    const squareElement = document.getElementById(`${zyxCoords[0]}${zyxCoords[1]}${zyxCoords[2]}`);
     
     // Get the pieceElement
     const pieceElement = document.getElementById( piece ); // This now works for every tile on the board due to unique tiles.
@@ -250,34 +261,34 @@ function removeRack( piece, position ) {
     pieceElement.remove();
     
 // console.log( '' );
-// console.log( 'removeRack(', piece, ',', position, '):' );
+// console.log( 'removeRack(', piece, ',', zyxCoords, '):' );
 // console.log( 'squareElement:', squareElement, 'pieceElement:', pieceElement );
     
-} // removeRack( piece, position ) 
+} // removeRack( piece, zyxCoords ) 
 
 
-function removePiece( piece, position ) {
-    // piece and position, an array of ZYX ids, which concat into the Id
+function removePiece( piece, zyxCoords ) {
+    // piece and zyxCoords, an array of ZYX ids, which concat into the Id
     
     // Get the squareElement
-    const squareElement = document.getElementById(`${position[0]}${position[1]}${position[2]}`);
+    const squareElement = document.getElementById(`${zyxCoords[0]}${zyxCoords[1]}${zyxCoords[2]}`);
     
     // Get the pieceElement
     const pieceElement = document.getElementById( piece ); // This now works for every tile on the board due to unique tiles.
     
-console.log( '' );
-console.log( 'removePiece(', piece, ',', position, '):' );
-console.log( 'squareElement:', squareElement, 'pieceElement:', pieceElement );
+// console.log( '' );
+// console.log( 'removePiece(', piece, ',', zyxCoords, '):' );
+// console.log( 'squareElement:', squareElement, 'pieceElement:', pieceElement );
     
     // Remove the piece
     pieceElement.remove();
     
-} // removePiece( piece, position )
+} // removePiece( piece, zyxCoords )
 
 
 function updateBoardsFromRacks() {
     
-console.log( 'currBoard[0] before updateBoardsFromRacks', currBoard[0] );
+// console.log( 'currBoard[0] before updateBoardsFromRacks', currBoard[0] );
     
     // Add p1rack to the boards, unless undefined.
     if (typeof p1rack[0] !== 'undefined') { gameBoard[0][0][0] = p1rack[0]; currBoard[0][0][0] = p1rack[0]; };
@@ -295,7 +306,7 @@ console.log( 'currBoard[0] before updateBoardsFromRacks', currBoard[0] );
     if (typeof p2rack[4] !== 'undefined') { gameBoard[0][2][10] = p2rack[4]; currBoard[0][2][10] = p2rack[4]; };
     if (typeof p2rack[5] !== 'undefined') { gameBoard[0][3][9]  = p2rack[5]; currBoard[0][3][9]  = p2rack[5]; };
     
-console.log( 'currBoard[0] after updateBoardsFromRacks', currBoard[0] );
+// console.log( 'currBoard[0] after updateBoardsFromRacks', currBoard[0] );
     
 } // updateBoardsFromRacks()
 
@@ -541,39 +552,39 @@ function rePopRack1() {
         switch(k) { // p1rack order
             case 0: loadRack(p1rack[k], [1,1,1]); // [Z,Y,X] ids
                     gameBoard[0][0][0] = p1rack[k];
-                    currBoard[0][0][0] = p1rack[k];			
+                    currBoard[0][0][0] = p1rack[k];
                     // Add a new Event Listener to the new piece
-                    addEventListener( document.getElementById( p1rack[k] ) );			
+                    addEventListener( document.getElementById( p1rack[k] ) );
                     break;
             case 1: loadRack(p1rack[k], [1,1,2]);
                     gameBoard[0][0][1] = p1rack[k];
-                    currBoard[0][0][1] = p1rack[k];			
+                    currBoard[0][0][1] = p1rack[k];
                     // Add a new Event Listener to the new piece
-                    addEventListener( document.getElementById( p1rack[k] ) );			
+                    addEventListener( document.getElementById( p1rack[k] ) );
                     break;
             case 2: loadRack(p1rack[k], [1,1,3]);
                     gameBoard[0][0][2] = p1rack[k];
-                    currBoard[0][0][2] = p1rack[k];			
+                    currBoard[0][0][2] = p1rack[k];
                     // Add a new Event Listener to the new piece
-                    addEventListener( document.getElementById( p1rack[k] ) );			
+                    addEventListener( document.getElementById( p1rack[k] ) );
                     break;
             case 3: loadRack(p1rack[k], [1,1,4]);
                     gameBoard[0][0][3] = p1rack[k];
-                    currBoard[0][0][3] = p1rack[k];			
+                    currBoard[0][0][3] = p1rack[k];
                     // Add a new Event Listener to the new piece
-                    addEventListener( document.getElementById( p1rack[k] ) );			
+                    addEventListener( document.getElementById( p1rack[k] ) );
                     break;
             case 4: loadRack(p1rack[k], [1,2,1]);
                     gameBoard[0][1][0] = p1rack[k];
-                    currBoard[0][1][0] = p1rack[k];			
+                    currBoard[0][1][0] = p1rack[k];
                     // Add a new Event Listener to the new piece
-                    addEventListener( document.getElementById( p1rack[k] ) );			
+                    addEventListener( document.getElementById( p1rack[k] ) );
                     break;
             case 5: loadRack(p1rack[k], [1,2,2]);
                     gameBoard[0][1][1] = p1rack[k];
-                    currBoard[0][1][1] = p1rack[k];			
+                    currBoard[0][1][1] = p1rack[k];
                     // Add a new Event Listener to the new piece
-                    addEventListener( document.getElementById( p1rack[k] ) );			
+                    addEventListener( document.getElementById( p1rack[k] ) );
                     break;
         }
     }
@@ -598,39 +609,39 @@ function rePopRack2() {
         switch(k) { // p2rack order
             case 0: loadRack(p2rack[k], [1,4,11]); // [Z,Y,X] ids
                     gameBoard[0][3][10] = p1rack[k];
-                    currBoard[0][3][10] = p1rack[k];			
+                    currBoard[0][3][10] = p1rack[k];
                     // Add a new Event Listener to the new piece
-                    addEventListener( document.getElementById( p2rack[k] ) );			
+                    addEventListener( document.getElementById( p2rack[k] ) );
                     break;
             case 1: loadRack(p2rack[k], [1,5,10]);
                     gameBoard[0][4][10] = p1rack[k];
-                    currBoard[0][4][10] = p1rack[k];			
+                    currBoard[0][4][10] = p1rack[k];
                     // Add a new Event Listener to the new piece
-                    addEventListener( document.getElementById( p2rack[k] ) );			
+                    addEventListener( document.getElementById( p2rack[k] ) );
                     break;
             case 2: loadRack(p2rack[k], [1,4,9]);
                     gameBoard[0][3][8] = p1rack[k];
-                    currBoard[0][3][8] = p1rack[k];			
+                    currBoard[0][3][8] = p1rack[k];
                     // Add a new Event Listener to the new piece
-                    addEventListener( document.getElementById( p2rack[k] ) );			
+                    addEventListener( document.getElementById( p2rack[k] ) );
                     break;
             case 3: loadRack(p2rack[k], [1,5,8]);
                     gameBoard[0][4][7] = p1rack[k];
-                    currBoard[0][4][7] = p1rack[k];			
+                    currBoard[0][4][7] = p1rack[k];
                     // Add a new Event Listener to the new piece
-                    addEventListener( document.getElementById( p2rack[k] ) );			
+                    addEventListener( document.getElementById( p2rack[k] ) );
                     break;
             case 4: loadRack(p2rack[k], [1,3,11]);
                     gameBoard[0][2][10] = p1rack[k];
-                    currBoard[0][2][10] = p1rack[k];			
+                    currBoard[0][2][10] = p1rack[k];
                     // Add a new Event Listener to the new piece
-                    addEventListener( document.getElementById( p2rack[k] ) );			
+                    addEventListener( document.getElementById( p2rack[k] ) );
                     break;
             case 5: loadRack(p2rack[k], [1,4,10]);
                     gameBoard[0][3][9] = p1rack[k];
-                    currBoard[0][3][9] = p1rack[k];			
+                    currBoard[0][3][9] = p1rack[k];
                     // Add a new Event Listener to the new piece
-                    addEventListener( document.getElementById( p2rack[k] ) );			
+                    addEventListener( document.getElementById( p2rack[k] ) );
                     break;
         }
     }
@@ -644,18 +655,18 @@ function rePopRack2() {
 /* test functions */
 
 
-function inRack1( position ) {
-    // true if the position is within the p1rack
-    let z = position[0];
-    let y = position[1];
-    let x = position[2];
+function inRack1( zyxCoords ) {
+    // true if the zyxCoords is within the p1rack
+    let z = zyxCoords[0];
+    let y = zyxCoords[1];
+    let x = zyxCoords[2];
     
     if ( (z===0 && y===0 && x===0) || (z===0 && y===0 && x===1) || (z===0 && y===0 && x===2) || (z===0 && y===0 && x===3) || (z===0 && y===1 && x===0) || (z===0 && y===1 && x===1) ) { // p1rack
         return true;
     } else {
         return false;
     }
-} // inRack1( position )
+} // inRack1( zyxCoords )
 // console.log( 'inRack1([0,0,0]):', inRack1([0,0,0]) );
 // console.log( 'inRack1([0,0,1]):', inRack1([0,0,1]) );
 // console.log( 'inRack1([0,0,2]):', inRack1([0,0,2]) );
@@ -664,18 +675,18 @@ function inRack1( position ) {
 // console.log( 'inRack1([0,1,1]):', inRack1([0,1,1]) );
 
 
-function inRack2( position ) {
-    // true if the position [z,y,x] is within the p2rack
-    let z = position[0];
-    let y = position[1];
-    let x = position[2];
+function inRack2( zyxCoords ) {
+    // true if the zyxCoords [z,y,x] is within the p2rack
+    let z = zyxCoords[0];
+    let y = zyxCoords[1];
+    let x = zyxCoords[2];
     
     if ( (z===0 && y===3 && x===10) || (z===0 && y===4 && x===9) || (z===0 && y===3 && x===8) || (z===0 && y===4 && x===7) || (z===0 && y===2 && x===10) || (z===0 && y===3 && x===9) ) { // p2rack
         return true;
     } else {
         return false;
     }
-} // inRack2( position )
+} // inRack2( zyxCoords )
 // console.log( 'inRack2([0,3,10]):', inRack2([0,3,10]) );
 // console.log( 'inRack2([0,4,9]):', inRack2([0,4,9]) );
 // console.log( 'inRack2([0,3,8]):', inRack2([0,3,8]) );
@@ -684,18 +695,18 @@ function inRack2( position ) {
 // console.log( 'inRack2([0,3,9]):', inRack2([0,3,9]) );
 
 
-function onBoard( position ) {
-    // true if the position is on the board
-    let z = position[0];
-    let y = position[1];
-    let x = position[2];
+function onBoard( zyxCoords ) {
+    // true if the zyxCoords is on the board
+    let z = zyxCoords[0];
+    let y = zyxCoords[1];
+    let x = zyxCoords[2];
     
     if ( (y===1 && x===4) || (y===1 && x===5) || (y===1 && x===6) || (y===2 && x===4) || (y===2 && x===5) || (y===2 && x===6) || (y===3 && x===5) ) { // board
         return true;
     } else {
         return false;
     }
-} // onBoard( position )
+} // onBoard( zyxCoords )
 // console.log( 'onBoard([0,0,0]):', onBoard([0,0,0] ) );
 // console.log( 'onBoard([0,0,1]):', onBoard([0,0,1] ) );
 // console.log( 'onBoard([0,0,2]):', onBoard([0,0,2] ) );
@@ -753,17 +764,17 @@ function onBoard( position ) {
 // console.log( 'onBoard([0,4,10]):', onBoard([0,4,10]) );
 
 
-function onFlower( position ) {
-    // true if the position [y,x] is on a flower
-    let y = position[0];
-    let x = position[1];
+function onFlower( yxCoords ) {
+    // true if the yxCoords[y,x] is on a flower
+    let y = yxCoords[0];
+    let x = yxCoords[1];
     
     if ( (y===1 && x===4) || (y===1 && x===6) || (y===3 && x===5) ) { // flowers
         return true;
     } else {
         return false;
     }
-} // onFlower( position )
+} // onFlower( yxCoords )
 // console.log( 'onFlower( [1,4] ):', onFlower( [1,4] ) );
 // console.log( 'onFlower( [1,5] ):', onFlower( [1,5] ) );
 // console.log( 'onFlower( [1,6] ):', onFlower( [1,6] ) );
@@ -773,17 +784,17 @@ function onFlower( position ) {
 // console.log( 'onFlower( [3,5] ):', onFlower( [3,5] ) );
 
 
-function onPerimeter( position ) {
-    // true if the position [y,x] is on the perimeter
-    let y = position[0];
-    let x = position[1];
+function onPerimeter( yxCoords ) {
+    // true if the yxCoords [y,x] is on the perimeter
+    let y = yxCoords[0];
+    let x = yxCoords[1];
     
     if ( (y===1 && x===4) || (y===1 && x===5) || (y===1 && x===6) || (y===1 && x===6) || (y===2 && x===6) || (y===3 && x===5) || (y===2 && x===4) ) { // perimeter
         return true;
     } else {
         return false;
     }
-} // onPerimeter( position )
+} // onPerimeter( yxCoords )
 // console.log( 'onPerimeter( [1,4] ):', onPerimeter( [1,4] ) );
 // console.log( 'onPerimeter( [1,5] ):', onPerimeter( [1,5] ) );
 // console.log( 'onPerimeter( [1,6] ):', onPerimeter( [1,6] ) );
@@ -797,8 +808,8 @@ function onPerimeter( position ) {
 
 function addEventListener( piece ) {
     
-console.log( '' );
-console.log( 'addEventListener(', piece, ')', );
+// console.log( '' );
+// console.log( 'addEventListener(', piece, ')', );
     
     let listenerName = 'mouseDownListener' + piece;
     listenerName = function(event) { // define listenerName as a function that captures the startingPosition
@@ -950,6 +961,7 @@ function movePiece( piece, startingPosition, endingPosition ) {
 console.log( '' );
 console.log( 'movePiece(', piece, ',', startingPosition, ',', endingPosition, '):' );
     
+    // move validations to validateMovement()
     const boardPiece = currBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
     
     // If the boardPiece is not empty 
@@ -961,7 +973,7 @@ console.log( 'movePiece(', piece, ',', startingPosition, ',', endingPosition, ')
             return -1;
         }
         // if they play more than one tile on a position during a turn
-        if ( indexOfArray( endingPosition, endingPositions ) !== -1 ) {
+        if ( iOa( endingPosition, endingPositions ) !== -1 ) {
             console.warn( 'You cannot play more than one letter on a space in a turn.' );
             return -1;
         } else {
@@ -973,7 +985,7 @@ console.log( 'movePiece(', piece, ',', startingPosition, ',', endingPosition, ')
             // remove the piece's img from the startingPosition
             const sourceSquare = document.getElementById(`${startingPosition[0] + 1}${startingPosition[1] + 1}${startingPosition[2] + 1}`);
             sourceSquare.removeChild(piece); // remove the sourceSquare's child(piece)
- 		
+         
             // remove the original piece from the DOM, currBoard and the rack
             // removeRack( boardPiece, startingPosition );
         
@@ -1353,8 +1365,8 @@ function testWhiteLetter( startingPosition, endingPosition, piece ) {
     if ( inRack1(startingPosition) && onBoard(endingPosition) ) {
         // if not landing on the same letter or on a bee
         if ( ( getTopTile( endingPosition ).toLowerCase().replace(/\d/g, '') !== piece.toLowerCase().replace(/\d/g, '') ) && 
-	     ( getTopTile( endingPosition ).toLowerCase().replace(/\d/g, '') !== 'b' ) &&
-	     ( getTopTile( endingPosition ).toLowerCase().replace(/\d/g, '') !== 'q' ) ) {
+             ( getTopTile( endingPosition ).toLowerCase().replace(/\d/g, '') !== 'b' ) &&
+             ( getTopTile( endingPosition ).toLowerCase().replace(/\d/g, '') !== 'q' ) ) {
             return true;
         } else { // Error condition
 console.warn( 'testWhiteLetter() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
@@ -1369,8 +1381,8 @@ function testBlackLetter( startingPosition, endingPosition, piece ) {
     if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
         // if not landing on the same letter or on a bee
         if ( ( getTopTile( endingPosition ).toLowerCase().replace(/\d/g, '') !== piece.toLowerCase().replace(/\d/g, '') ) && 
-	     ( getTopTile( endingPosition ).toLowerCase().replace(/\d/g, '') !== 'b' ) &&
-	     ( getTopTile( endingPosition ).toLowerCase().replace(/\d/g, '') !== 'q' ) ) {
+             ( getTopTile( endingPosition ).toLowerCase().replace(/\d/g, '') !== 'b' ) &&
+             ( getTopTile( endingPosition ).toLowerCase().replace(/\d/g, '') !== 'q' ) ) {
             return true;
         } else { // Error condition
 console.warn( 'testBlackLetter() move denied:', 'Cannot stack a letter on top of itself, or on top of a bee.' );
@@ -1398,7 +1410,8 @@ function pickLetter( startingPosition, endingPosition ) {
     
     let yxCoord = y+','+x; // use the yxCoords from the lookup
     let blankLev = getTopLevel( yxCoord ) + 1; // use the yxCoords from the lookup + 1
-console.log( 'blankLev', blankLev );
+    
+// console.log( 'blankLev', blankLev );
     
     // Get blank_tileandtier
     let blank_tileandtier = blank.toUpperCase() + blankLev; // the letter_blanks are UpperCase
@@ -1425,7 +1438,7 @@ console.log( 'blankLev', blankLev );
         // sourceSquare.removeChild(piece); // remove the sourceSquare's child(piece)
     }
     
-console.log( 'loadPiece(', blank_tile, [z+1,y+1,x+1], ')', );
+// console.log( 'loadPiece(', blank_tile, [z+1,y+1,x+1], ')', );
 
     // replace the blank tile with the zero-point letter_blank at the endingPosition
     loadPiece( blank_tile, [z+1,y+1,x+1] );
@@ -1490,8 +1503,10 @@ function calcScore() {
     
     findWords(); // populate the score_words[] array
         
-    // if score_words is empty the player passed - switch player and update the score
-    if ( score_words.length === 0 ) {
+    // if score_words is empty and the rack is full, the player passed - switch player and update the score
+    if ( ( score_words.length === 0 ) &&
+         !( p1rack[0] === '.' || p1rack[1] === '.' || p1rack[2] === '.' || p1rack[3] === '.' || p1rack[4] === '.' || p1rack[5] === '.' ) &&
+         !( p2rack[0] === '.' || p2rack[1] === '.' || p2rack[2] === '.' || p2rack[3] === '.' || p2rack[4] === '.' || p2rack[5] === '.' ) ) {
         
         if ( currPlayer === 'white' ) {
             currPlayer = 'black';
@@ -1513,6 +1528,8 @@ function calcScore() {
         
             console.log( p2scoreDiv.innerHTML );
         
+            // increment the turn_no
+            turn_no++;
         }
     
     } else { // score_words is not empty - find and score the words in score_words
@@ -1612,7 +1629,7 @@ function checkWords() {
 console.log( '' );
 console.log( 'checkWords():' );
 
-    let periflower = 0;
+    let onPerimeterFlower = 0;
     let adjacency = 0;
     
     for ( let index = 0; index < score_words.length; ++index ) {
@@ -1637,20 +1654,19 @@ console.log( 'checkWords():' );
     
 // console.log( 'word_str:', word_str, 'yx_str:', yx_str, 'yx_dir:', yx_dir );
     
-        ////////////////////////////////////////////////////////////////////////////
-        // check that every word is two or more characters or return an error 100 //
-        ////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////
+        // check that every word is two or more characters - if not return 100 //
+        /////////////////////////////////////////////////////////////////////////
         if ( word_str.length < 2 ) {
             console.warn( 'checkWords() returns 100.' );
             console.warn( 'Every word must be two or more characters in length.  Undo the last turn.' );
             return 100;
         }
 
-        ///////////////////////////////////////////////////////////////////////////////
-        // check that the first word is on a perimeter flower or return an error 200 //
-        ///////////////////////////////////////////////////////////////////////////////
-        if ( ( turn_no === 0 ) && ( currPlayer === 'white' ) ) {
-    
+        ////////////////////////////////////////////////////////////////////////////
+        // check that the first word is on a perimeter flower - if not return 200 //
+        ////////////////////////////////////////////////////////////////////////////
+        if ( ( turn_no === 0 ) && ( currPlayer === 'white' ) ) { // first word
             switch ( yx_dir ) {
                 case 'UP': // Upwards Word
     
@@ -1660,19 +1676,16 @@ console.log( 'checkWords():' );
                         new_str = upwd_lookup( yx_str, i ); // lookup new yxCoords, the first one remains the same
                         new_ary = new_str.split(',').map(Number); // new_ary is an array of numbers
     
-// console.log( 'yx_str:', yx_str ); 
-// console.log( 'new_str:', new_str ); 
 console.log( 'new_ary:', new_ary ); 
 console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
-console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) ); 
-console.log( 'onAdjacent( ', new_ary, '):', onAdjacent( new_ary ) ); 
     
                         if ( onFlower( new_ary ) && onPerimeter( new_ary ) ) {
-                            periflower = 1;
+console.log( 'onPerimeterFlower is true' );
+                            onPerimeterFlower = 1;
                         }
                     }
-                    if ( periflower === 0 ) {
-console.log( 'checkWords() returns 200 for an UP word.' );
+                    if ( onPerimeterFlower === 0 ) {
+                        console.warn( 'checkWords() returns 200 for an UP word.' );
                         console.warn( 'The first word must be on a perimeter flower.  Undo the last turn.' );
                         return 200;
                     }
@@ -1685,19 +1698,16 @@ console.log( 'checkWords() returns 200 for an UP word.' );
                         new_str = dnwd_lookup( yx_str, i ); // lookup new yxCoords, the first one remains the same
                         new_ary = new_str.split(',').map(Number); // new_ary is an array of numbers
     
-// console.log( 'yx_str:', yx_str ); 
-// console.log( 'new_str:', new_str ); 
 console.log( 'new_ary:', new_ary ); 
 console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
-console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) ); 
-console.log( 'onAdjacent( ', new_ary, '):', onAdjacent( new_ary ) ); 
     
                         if ( onFlower( new_ary ) && onPerimeter( new_ary ) ) {
-                            periflower = 1;
+console.log( 'onPerimeterFlower is true' );
+                            onPerimeterFlower = 1;
                         }
                     }
-                    if ( periflower === 0 ) {
-console.log( 'checkWords() returns 201 for a DW word.' );
+                    if ( onPerimeterFlower === 0 ) {
+                        console.warn( 'checkWords() returns 201 for a DW word.' );
                         console.warn( 'The first word must be on a perimeter flower.  Undo the last turn.' );
                         return 201;
                     }
@@ -1710,33 +1720,27 @@ console.log( 'checkWords() returns 201 for a DW word.' );
                         new_str = (y + i)+','+x; // calculate the new coords ( add one to y )
                         new_ary = new_str.split(',').map(Number); // new_ary is an array of numbers
     
-// console.log( 'yx_str:', yx_str ); 
-// console.log( 'new_str:', new_str ); 
 console.log( 'new_ary:', new_ary ); 
 console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
-console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) ); 
-console.log( 'onAdjacent( ', new_ary, '):', onAdjacent( new_ary ) ); 
     
                         if ( onFlower( new_ary ) && onPerimeter( new_ary ) ) {
-                            periflower = 1;
+console.log( 'onPerimeterFlower is true' );
+                            onPerimeterFlower = 1;
                         }
                     }
-                    if ( periflower === 0 ) {
-console.log( 'checkWords() returns 202 for a DO word.' );
+                    if ( onPerimeterFlower === 0 ) {
+                        console.warn( 'checkWords() returns 202 for a DO word.' );
                         console.warn( 'The first word must be on a perimeter flower.  Undo the last turn.' );
                         return 202;
                     }
                     break;
             } // switch ( yx_dir )
-    
         } // first word check, returns 200s on error
         else
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // check that every other word is on a perimeter flower or adjacent to a played word or return an error 300 //
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // check that every other word is on a perimeter flower or adjacent to a played word - if not return 300 //
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////
         {
-    
             switch ( yx_dir ) {
                 case 'UP': // Upwards Word
     
@@ -1746,27 +1750,25 @@ console.log( 'checkWords() returns 202 for a DO word.' );
                         new_str = upwd_lookup( yx_str, i ); // lookup new yxCoords, the first one remains the same
                         new_ary = new_str.split(',').map(Number); // new_ary is an array of numbers
     
-// console.log( 'yx_str:', yx_str ); 
-// console.log( 'new_str:', new_str ); 
 console.log( 'new_ary:', new_ary ); 
 console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
-console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) ); 
-console.log( 'onAdjacent( ', new_ary, '):', onAdjacent( new_ary ) ); 
     
                         // if any letter of the word is on a perimeter flower
                         if ( onFlower( new_ary ) && onPerimeter( new_ary ) ) {
-                            periflower = 1;
+console.log( 'onPerimeterFlower is true' );
+                            onPerimeterFlower = 1;
                         }
+console.log( 'onAdjacent( ', new_ary, '):', onAdjacent( new_ary ) ); 
                         // if any letter of the word is adjacent to a played word
                         if ( onAdjacent( new_ary ) ) {
                             adjacency = 1;
                         }
-			    
+                            
                     }
                     // after checking every position in word_str
                     // if not on a perimeter flower AND not on an adjacent square then error 300
-                    if ( ( periflower === 0 ) && ( adjacency === 0 ) ) {
-console.log( 'checkWords() returns 300 for an UP word.' );
+                    if ( ( onPerimeterFlower === 0 ) && ( adjacency === 0 ) ) {
+                        console.warn( 'checkWords() returns 300 for an UP word.' );
                         console.warn( 'Words must be on a perimeter flower.  Undo the last turn.' );
                         return 300;
                     }
@@ -1780,17 +1782,15 @@ console.log( 'checkWords() returns 300 for an UP word.' );
                         new_str = dnwd_lookup( yx_str, i ); // lookup new yxCoords, the first one remains the same
                         new_ary = new_str.split(',').map(Number); // new_ary is an array of numbers
     
-// console.log( 'yx_str:', yx_str ); 
-// console.log( 'new_str:', new_str ); 
 console.log( 'new_ary:', new_ary ); 
 console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
-console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) ); 
-console.log( 'onAdjacent( ', new_ary, '):', onAdjacent( new_ary ) ); 
     
                         // if any letter of the word is on a perimeter flower
                         if ( onFlower( new_ary ) && onPerimeter( new_ary ) ) {
-                            periflower = 1;
+console.log( 'onPerimeterFlower is true' );
+                            onPerimeterFlower = 1;
                         }
+console.log( 'onAdjacent( ', new_ary, '):', onAdjacent( new_ary ) ); 
                         // if any letter of the word is adjacent to a played word
                         if ( onAdjacent( new_ary ) ) {
                             adjacency = 1;
@@ -1798,8 +1798,8 @@ console.log( 'onAdjacent( ', new_ary, '):', onAdjacent( new_ary ) );
                     }
                     // after checking every position in word_str
                     // if not on a perimeter flower AND not on an adjacent square then error 300
-                    if ( ( periflower === 0 ) && ( adjacency === 0 ) ) {
-console.log( 'checkWords() returns 301 for a DW word.' );
+                    if ( ( onPerimeterFlower === 0 ) && ( adjacency === 0 ) ) {
+                        console.warn( 'checkWords() returns 301 for a DW word.' );
                         console.warn( 'Words must be on a perimeter flower.  Undo the last turn.' );
                         return 301;
                     }
@@ -1813,17 +1813,15 @@ console.log( 'checkWords() returns 301 for a DW word.' );
                         new_str = (y + i)+','+x; // calculate the new coords ( add one to y )
                         new_ary = new_str.split(',').map(Number); // new_ary is an array of numbers
     
-// console.log( 'yx_str:', yx_str ); 
-// console.log( 'new_str:', new_str ); 
 console.log( 'new_ary:', new_ary ); 
 console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
-console.log( 'onPerimeter( ', new_ary, '):', onPerimeter( new_ary ) ); 
-console.log( 'onAdjacent( ', new_ary, '):', onAdjacent( new_ary ) ); 
     
                         // if any letter of the word is on a perimeter flower
                         if ( onFlower( new_ary ) && onPerimeter( new_ary ) ) {
-                            periflower = 1;
+console.log( 'onPerimeterFlower is true' );
+                            onPerimeterFlower = 1;
                         }
+console.log( 'onAdjacent( ', new_ary, '):', onAdjacent( new_ary ) ); 
                         // if any letter of the word is adjacent to a played word
                         if ( onAdjacent( new_ary ) ) {
                             adjacency = 1;
@@ -1831,25 +1829,130 @@ console.log( 'onAdjacent( ', new_ary, '):', onAdjacent( new_ary ) );
                     }
                     // after checking every position in word_str
                     // if not on a perimeter flower AND not on an adjacent square then error 300
-                    if ( ( periflower === 0 ) && ( adjacency === 0 ) ) {
-console.log( 'checkWords() returns 302 for a DO word.' );
+                    if ( ( onPerimeterFlower === 0 ) && ( adjacency === 0 ) ) {
+                        console.warn( 'checkWords() returns 302 for a DO word.' );
                         console.warn( 'The first word must be on a perimeter flower.  Undo the last turn.' );
                         return 302;
                     }
                     break;
+    
             } // switch ( yx_dir )
-    
-        }
-
-        // check that every tile is played in a line
-    
-        // check that an existing word is not completely over-written
-    
+        } // all other word checks, returns 300s on error
     }
-    // return success
+
+    //////////////////////////////////////////////////////////////////////////////
+    // check that every tiles was played in a straight line - if not return 400 //
+    //////////////////////////////////////////////////////////////////////////////
+    if ( isInALine( endingPositions ) !== true ) {
+        // not all tiles were played in a straight line
+        console.warn( 'Every tile must be played in a straight line.  Undo the last turn.' );
+console.log( 'checkWords() returns 400' );
+        return 400;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////
+    // check that an existing word is not completely over-written - if not return 500 //
+    ////////////////////////////////////////////////////////////////////////////////////
+    if ( ! isOverwritten( endingPositions ) ) {
+        console.warn( 'A played word may not be completely overwritten.  Undo the last turn.' );
+console.log( 'checkWords() returns 500' );
+        return 500;
+    }
+    
+    ///////////////////////////////
+    // return success - return 0 //
+    ///////////////////////////////
 console.log( 'checkWords() returns 0' );
     return 0;
+    
 } // checkWords()
+
+
+function isInALine( endingPositions ) {
+    // return true if every tile was played in a straight line
+    // currently this is hard-coded for 2 and 3 positions, which works for the 2x2x2 board.
+    
+    let count = endingPositions.length;
+    let match = false;
+    
+    if ( count === 1 ) { // a single tile played
+        match = true;
+    }
+
+    if ( count === 2 ) { // check 2 positions against the arrays of arrays
+console.log( 'check 2 positions...' );
+        
+        // copy endingPositions to cPy
+        let cPy = JSON.parse(JSON.stringify(endingPositions));
+    
+        cPy[0].shift(); // strip off the zCoord
+        cPy[1].shift(); // strip off the zCoord
+        
+        if ( // check the UP arrays
+             ( iOa( cPy[0], UP0 ) !== -1 ) && ( iOa( cPy[1], UP0 ) !== -1 ) ||
+             ( iOa( cPy[0], UP1 ) !== -1 ) && ( iOa( cPy[1], UP1 ) !== -1 ) ||
+             ( iOa( cPy[0], UP2 ) !== -1 ) && ( iOa( cPy[1], UP2 ) !== -1 ) ||
+             // check the DW arrays
+             ( iOa( cPy[0], DW0 ) !== -1 ) && ( iOa( cPy[1], DW0 ) !== -1 ) ||
+             ( iOa( cPy[0], DW1 ) !== -1 ) && ( iOa( cPy[1], DW1 ) !== -1 ) ||
+             ( iOa( cPy[0], DW2 ) !== -1 ) && ( iOa( cPy[1], DW2 ) !== -1 ) ||
+             // check the DO arrays
+             ( iOa( cPy[0], DO0 ) !== -1 ) && ( iOa( cPy[1], DO0 ) !== -1 ) ||
+             ( iOa( cPy[0], DO1 ) !== -1 ) && ( iOa( cPy[1], DO1 ) !== -1 ) ||
+             ( iOa( cPy[0], DO2 ) !== -1 ) && ( iOa( cPy[1], DO2 ) !== -1 )
+           ) {
+console.log( '2 positions in a line Match Found' );
+            match = true; // a match of 2 positions
+        }
+    }
+
+    if ( count === 3 ) { // check 3 positions against the arrays of arrays
+console.log( 'check 3 positions...' );
+        
+        // copy endingPositions to cPy
+        let cPy = JSON.parse(JSON.stringify(endingPositions));
+    
+        cPy[0].shift(); // strip off the zCoord
+        cPy[1].shift(); // strip off the zCoord
+        cPy[2].shift(); // strip off the zCoord
+        
+        if ( // check the UP arrays
+             ( iOa( cPy[0], UP0 ) !== -1 ) && ( iOa( cPy[1], UP0 ) !== -1 ) && ( iOa( cPy[2], UP0 ) !== -1 ) ||
+             ( iOa( cPy[0], UP1 ) !== -1 ) && ( iOa( cPy[1], UP1 ) !== -1 ) && ( iOa( cPy[2], UP1 ) !== -1 ) ||
+             ( iOa( cPy[0], UP2 ) !== -1 ) && ( iOa( cPy[1], UP2 ) !== -1 ) && ( iOa( cPy[2], UP2 ) !== -1 ) ||
+             // check the DW arrays
+             ( iOa( cPy[0], DW0 ) !== -1 ) && ( iOa( cPy[1], DW0 ) !== -1 ) && ( iOa( cPy[2], DW0 ) !== -1 ) ||
+             ( iOa( cPy[0], DW1 ) !== -1 ) && ( iOa( cPy[1], DW1 ) !== -1 ) && ( iOa( cPy[2], DW1 ) !== -1 ) ||
+             ( iOa( cPy[0], DW2 ) !== -1 ) && ( iOa( cPy[1], DW2 ) !== -1 ) && ( iOa( cPy[2], DW2 ) !== -1 ) ||
+             // check the DO arrays
+             ( iOa( cPy[0], DO0 ) !== -1 ) && ( iOa( cPy[1], DO0 ) !== -1 ) && ( iOa( cPy[2], DO0 ) !== -1 ) ||
+             ( iOa( cPy[0], DO1 ) !== -1 ) && ( iOa( cPy[1], DO1 ) !== -1 ) && ( iOa( cPy[2], DO1 ) !== -1 ) ||
+             ( iOa( cPy[0], DO2 ) !== -1 ) && ( iOa( cPy[1], DO2 ) !== -1 ) && ( iOa( cPy[2], DO2 ) !== -1 )
+           ) {
+console.log( '3 positions in a line Match Found' );
+            match = true; // a match of 3 positions
+        }
+    } // 3 position check
+
+    return match;
+    
+} // isInALine( endingPositions )
+
+
+function isOverwritten( endingPositions ) {
+    // return true if any existing word is completely overwritten
+    // currently this is hard-coded for 2 and 3 positions
+    // I can continue the same for 4, 5, 6 positions etc - or -
+    // I can develop a more generic solution
+    
+console.log( 'endingPositions', endingPositions );
+// console.log( 'currBoard', currBoard );
+console.log( 'prevBoard', prevBoard );
+console.log( 'diffBoard', diffBoard );
+    
+    return true;
+
+} // isOverwritten( endingPositions )
 
 
 function scoreWords() {
@@ -1976,7 +2079,9 @@ console.log( 'An Upwards Word Lookup:' );
                     turn_score = turn_score + word_score;
     
                     // push a 4 element score record to the game_record
-                    game_record.push( currPlayer, turn_no, element_str, word_score );
+                    // game_record.push( currPlayer, turn_no, element_str, word_score );
+                    // push a 5 element score record to the game_record
+                    game_record.push( currPlayer, turn_no, element_str, word_score, 'Score' );
                     break;
     
                 case 'DW': // Downwards Word
@@ -2013,7 +2118,9 @@ console.log( 'A Downwards Word Lookup:' );
                     turn_score = turn_score + word_score;
     
                     // push a 4 element score record to the game_record
-                    game_record.push( currPlayer, turn_no, element_str, word_score );
+                    // game_record.push( currPlayer, turn_no, element_str, word_score );
+                    // push a 5 element score record to the game_record
+                    game_record.push( currPlayer, turn_no, element_str, word_score, 'Score' );
                     break;
     
                 case 'DO': // Straight-Down Word
@@ -2050,7 +2157,9 @@ console.log( 'A Down Word Lookup:' );
                     turn_score = turn_score + word_score;
     
                     // push a 4 element score record to the game_record
-                    game_record.push( currPlayer, turn_no, element_str, word_score );
+                    // game_record.push( currPlayer, turn_no, element_str, word_score );
+                    // push a 5 element score record to the game_record
+                    game_record.push( currPlayer, turn_no, element_str, word_score, 'Score' );
                     break;
     
             }
@@ -2090,23 +2199,23 @@ console.log( 'game_record:', game_record );
 } // scoreWords()
 
 
-function wordFinder( position ) { // position = an array of numbers
-                                  // If a word is found, return a record: ['it, [2, 4], UP']
-                                  // [ the word, its position, and its direction ]
-    let z = position[0];
-    let y = position[1];
-    let x = position[2]; 
+function wordFinder( zyxCoords ) { // zyxCoords = an array of numbers
+                                   // If a word is found, return a record: ['it, [2, 4], UP']
+                                   // [ the word, its zyxCoords, and its direction ]
+    let z = zyxCoords[0];
+    let y = zyxCoords[1];
+    let x = zyxCoords[2]; 
     // the [z] coordinate is unused, the source currBoard[][][] is flattened into flatBoard[][]
     
     let str = '';
     
     flattenBoard(); // flattens global currBoard[z][y][x] into the global flatBoard[y][x]
     
-    if ( onBoard( position ) ) { // only process valid board positions
+    if ( onBoard( zyxCoords ) ) { // only process valid board zyxCoords
     
 // console.log( '' );
-// console.log( 'wordFinder( position ):' );
-// console.log( 'position:', position );
+// console.log( 'wordFinder( zyxCoords ):' );
+// console.log( 'zyxCoords:', zyxCoords );
 // console.log( 'y:', y );
 // console.log( 'x:', x );
     
@@ -2155,10 +2264,10 @@ function wordFinder( position ) { // position = an array of numbers
     
         } // end of switch
         
-    } // only process valid board positions
+    } // only process valid board zyxCoords
     
     // a well-formed element in words[]: ['an, [1,4], UP']
-    // an element = the word, the position, and the direction
+    // an element = the word, the zyxCoords, and the direction
     
 // console.log( 'words[]:', words );
     
@@ -2173,7 +2282,7 @@ function wordFinder( position ) { // position = an array of numbers
         words.pop();
     }
     
-}; // wordFinder( position )
+}; // wordFinder( zyxCoords )
 
 
 function undo_turn() {
@@ -2198,7 +2307,8 @@ console.warn( 'game_record:', game_record );
             // get the img element by the unique piece id
             unPiece = document.getElementById( game_record[i].id );
     
-console.log( 'unPiece:', unPiece.id, 'unFrom:', unFrom, 'unTo:', unTo ); 
+// console.log( 'unPiece:', unPiece.id, 'unFrom:', unFrom, 'unTo:', unTo ); 
+console.log( 'unPiece:', game_record[i].id, 'unFrom:', unFrom, 'unTo:', unTo ); 
         
             undoPiece( unPiece, unFrom, unTo );
         
@@ -2346,38 +2456,37 @@ console.log( 'currBoard[0]', currBoard[0], 'adjaBoard', adjaBoard );
 }; // refresh_adjaBoard()
 
 
-function onAdjacent( position ) {
-    // true if the position is on the adjaBoard
+function onAdjacent( yxCoords ) {
+    // true if the yxCoords are on the adjaBoard
     
-    // let z = position[0];
-    let y = position[0];
-    let x = position[1];
+    let y = yxCoords[0];
+    let x = yxCoords[1];
     
 console.log( '' );
-console.log( 'onAdjacent(', position, ')' );
+console.log( 'onAdjacent(', yxCoords, ')' );
     
     if ( adjaBoard[y][x] === '.' ) {
         return false; // a blank tile returns false
     } else {
         return true;
     }
-} // onAdjacent( position )
+} // onAdjacent( yxCoords )
 
 
-function getTopLevel( position ) {
-    // Return the highest occupied level for this position, a yxCoord string 
+function getTopLevel( yxCoords ) {
+    // Return the highest occupied level for this yxCoords, a yxCoord string 
     
 // console.log( 'In getTopLevel:' );
-// console.log( 'position:', position, 'z:', z, 'y:', y, 'x:', x );
+// console.log( 'yxCoords:', yxCoords, 'z:', z, 'y:', y, 'x:', x );
     
-    // convert string position to an array
-    const myArray = position.split(',');
+    // convert string yxCoords to an array
+    const myArray = yxCoords.split(',');
     let y = Number(myArray[0]);
-    let x = Number(myArray[1]); // position [y,x] is the source for finding the top z level in currBoard[][][]
+    let x = Number(myArray[1]); // yxCoords [y,x] is the source for finding the top z level in currBoard[][][]
     
     // use the yxCoords to get the top level from currBoard
     for (let level = 5; level >= 0 ; level--) { // 6 levels
-        // return the highest tiled level for this position
+        // return the highest tiled level for this yxCoords
         if ( currBoard[level][y][x] !== '.' ) {
             return level;
             break;
@@ -2385,18 +2494,18 @@ function getTopLevel( position ) {
     }
     return 0;
     
-} // getTopLevel( position )
+} // getTopLevel( yxCoords )
 
 
-function getTopLetter( position ) {
-    // Return the letter that is on top of the current position
+function getTopLetter( zyxCoords ) {
+    // Return the letter that is on top of the current zyxCoords
     
 // console.log( 'In getTopLetter:' );
-// console.log( 'position:', position, 'z:', z, 'y:', y, 'x:', x );
+// console.log( 'zyxCoords:', zyxCoords, 'z:', z, 'y:', y, 'x:', x );
     
-    let z = position[0]; // this z-coordinate is not accurate
-    let y = position[1]; // use the yxCoords
-    let x = position[2];
+    let z = zyxCoords[0]; // this z-coordinate is not accurate
+    let y = zyxCoords[1]; // use the yxCoords
+    let x = zyxCoords[2];
     let top_letter = '';
     
     // get the top letter from currBoard for yxCoord
@@ -2407,18 +2516,18 @@ function getTopLetter( position ) {
         }
     }
     return top_letter.toLowerCase();
-} // getTopLetter( position )
+} // getTopLetter( zyxCoords )
 
 
-function getTopTile( position ) {
-    // Return the tile that is on top of the current position
+function getTopTile( zyxCoords ) {
+    // Return the tile that is on top of the current zyxCoords
     
 // console.log( '' );
-// console.log( 'getTopTile(', position, '):' );
+// console.log( 'getTopTile(', zyxCoords, '):' );
     
-    let z = position[0]; // this z-coordinate is not accurate
-    let y = position[1]; // use the yxCoords
-    let x = position[2];
+    let z = zyxCoords[0]; // this z-coordinate is not accurate
+    let y = zyxCoords[1]; // use the yxCoords
+    let x = zyxCoords[2];
     let top_tile = '';
     
     // get the top tile from currBoard for yxCoord
@@ -2429,7 +2538,7 @@ function getTopTile( position ) {
         }
     }
     return top_tile;
-} // getTopTile( position )
+} // getTopTile( zyxCoords )
 
 
 function getLetterValue( piece ) {
@@ -2718,14 +2827,14 @@ function dnwd_lookup( position, idx ) { // string and a number, returns yx_str
 } // dnwd_lookup( position, idx )
 
 
-function indexOfArray( val, array ) {
+function iOa( val, array ) {
+    // index of array
     var hash = {};
     for (var i = 0; i < array.length; i++) {
         hash[array[i]] = i;
     }
     return (hash.hasOwnProperty(val)) ? hash[val] : -1;
-}; // indexOfArray( val, array )
-
+}; // iOa( val, array )
 
 
 startGame();

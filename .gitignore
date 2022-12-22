@@ -58,3 +58,6 @@ Undo_testing.txt~
 *.un~
 *.un~
 *.js~
+PostVimCleanup.bat
+.gameController.js.un~
+*.swo
