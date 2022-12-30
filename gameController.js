@@ -4,6 +4,7 @@
 
 let words = [];
 let score_words = [];
+let overwrites = [];
 let game_record = [];
 let endingPositions = [];
 let turn_no = 0;
@@ -15,12 +16,17 @@ let currPlayer;
 let unPiece;
 let unFrom;
 let unTo;
+let unOrig = '.';
+let unTurn;
+let unPlayer;
 
 let currHeldPiece;
 let currHeldPieceStartingPosition;
 
 const wordre = /[A-Za-z]{2,}/; // A word is 2 or more consecutive letters
     
+// 3-D gameBoards
+
 const gameBoard = [ // 6 levels of 5 rows of 11 columns, [Z,Y,X]: [0,0,0] - [5,4,10]
 [ ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
   ['.', '.', '.', '.', '^0', '.', '^1', '.', '.', '.', '.'],
@@ -147,17 +153,11 @@ function startGame() {
         // Player 1 random draw from the remaining tiles.
         let j = Math.floor(Math.random() * tiles.length);
         p1rack[i] = tiles[j]; // Assign the tile to the p1rack.
-            // calculate tileandtier
-            // let tileandtier = p1rack[i].replace(/\d/g, '') + '0'; // level 0
-            // p1rack[i].piece = getPieceImageSource( tileandtier ); // tileandtier yields the proper image for the piece
         tiles.splice(j, 1); // Delete from tiles.
     
         // Player 2 random draw from the remaining tiles.
         j = Math.floor(Math.random() * tiles.length);
         p2rack[i] = tiles[j]; // Assign the tile to the p2rack.
-            // calculate tileandtier
-            // tileandtier = p2rack[i].replace(/\d/g, '') + '0'; // level 0
-            // p2rack[i].piece = getPieceImageSource( tileandtier ); // tileandtier yields the proper image for the piece
         tiles.splice(j, 1); // Delete from tiles.
     
     }
@@ -166,7 +166,7 @@ function startGame() {
     
     updateBoardsFromRacks();
     
-    loadPosition(gameBoard, starterPlayer);
+    loadPosition( gameBoard, starterPlayer );
     
 } // startGame()
 
@@ -282,6 +282,9 @@ function removePiece( piece, zyxCoords ) {
     
     // Remove the piece
     pieceElement.remove();
+
+    // Update the gameBoard
+    gameBoard[`${zyxCoords[0]-1}`][`${zyxCoords[1]-1}`][`${zyxCoords[2]-1}`] = '.';
     
 } // removePiece( piece, zyxCoords )
 
@@ -656,7 +659,7 @@ function rePopRack2() {
 
 
 function inRack1( zyxCoords ) {
-    // true if the zyxCoords is within the p1rack
+    // true if the zyxCoords are within the p1rack
     let z = zyxCoords[0];
     let y = zyxCoords[1];
     let x = zyxCoords[2];
@@ -676,7 +679,7 @@ function inRack1( zyxCoords ) {
 
 
 function inRack2( zyxCoords ) {
-    // true if the zyxCoords [z,y,x] is within the p2rack
+    // true if the zyxCoords [z,y,x] are within the p2rack
     let z = zyxCoords[0];
     let y = zyxCoords[1];
     let x = zyxCoords[2];
@@ -696,7 +699,7 @@ function inRack2( zyxCoords ) {
 
 
 function onBoard( zyxCoords ) {
-    // true if the zyxCoords is on the board
+    // true if the zyxCoords are on the board
     let z = zyxCoords[0];
     let y = zyxCoords[1];
     let x = zyxCoords[2];
@@ -765,7 +768,7 @@ function onBoard( zyxCoords ) {
 
 
 function onFlower( yxCoords ) {
-    // true if the yxCoords[y,x] is on a flower
+    // true if the yxCoords[y,x] are on a flower
     let y = yxCoords[0];
     let x = yxCoords[1];
     
@@ -785,7 +788,7 @@ function onFlower( yxCoords ) {
 
 
 function onPerimeter( yxCoords ) {
-    // true if the yxCoords [y,x] is on the perimeter
+    // true if the yxCoords [y,x] are on the perimeter
     let y = yxCoords[0];
     let x = yxCoords[1];
     
@@ -794,7 +797,7 @@ function onPerimeter( yxCoords ) {
     } else {
         return false;
     }
-} // onPerimeter( yxCoords )
+} // onPerimeter( yxCoords ) // there are 7 perimeter yxCoords
 // console.log( 'onPerimeter( [1,4] ):', onPerimeter( [1,4] ) );
 // console.log( 'onPerimeter( [1,5] ):', onPerimeter( [1,5] ) );
 // console.log( 'onPerimeter( [1,6] ):', onPerimeter( [1,6] ) );
@@ -963,6 +966,7 @@ console.log( 'movePiece(', piece, ',', startingPosition, ',', endingPosition, ')
     
     // move validations to validateMovement()
     const boardPiece = currBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
+    const origPiece = currBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]];
     
     // If the boardPiece is not empty 
     if ( boardPiece !== '.' ) {
@@ -977,18 +981,13 @@ console.log( 'movePiece(', piece, ',', startingPosition, ',', endingPosition, ')
             console.warn( 'You cannot play more than one letter on a space in a turn.' );
             return -1;
         } else {
-
+    
             ////////////////////
             // move the piece //
             ////////////////////
-            currBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]] = '.'; // clear the startingPosition
-            // remove the piece's img from the startingPosition
-            const sourceSquare = document.getElementById(`${startingPosition[0] + 1}${startingPosition[1] + 1}${startingPosition[2] + 1}`);
-            sourceSquare.removeChild(piece); // remove the sourceSquare's child(piece)
-         
-            // remove the original piece from the DOM, currBoard and the rack
-            // removeRack( boardPiece, startingPosition );
-        
+    
+            // clear the piece from currBoard and the rack
+            currBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]] = '.';
             // clear the tile from the p1rack
             if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 0 ) { p1rack[0] = '.'; }
             if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 1 ) { p1rack[1] = '.'; }
@@ -996,7 +995,6 @@ console.log( 'movePiece(', piece, ',', startingPosition, ',', endingPosition, ')
             if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 3 ) { p1rack[3] = '.'; }
             if ( startingPosition[0] === 0 && startingPosition[1] === 1 && startingPosition[2] === 0 ) { p1rack[4] = '.'; }
             if ( startingPosition[0] === 0 && startingPosition[1] === 1 && startingPosition[2] === 1 ) { p1rack[5] = '.'; }
-        
             // clear the tile from the p2rack
             if ( startingPosition[0] === 0 && startingPosition[1] === 3 && startingPosition[2] === 10 ) { p2rack[0] = '.'; }
             if ( startingPosition[0] === 0 && startingPosition[1] === 4 && startingPosition[2] === 9 ) { p2rack[1] = '.'; }
@@ -1004,7 +1002,11 @@ console.log( 'movePiece(', piece, ',', startingPosition, ',', endingPosition, ')
             if ( startingPosition[0] === 0 && startingPosition[1] === 4 && startingPosition[2] === 7 ) { p2rack[3] = '.'; }
             if ( startingPosition[0] === 0 && startingPosition[1] === 2 && startingPosition[2] === 10 ) { p2rack[4] = '.'; }
             if ( startingPosition[0] === 0 && startingPosition[1] === 3 && startingPosition[2] === 9 ) { p2rack[5] = '.'; }
-        
+    
+            // remove the piece's img from the startingPosition
+            const sourceSquare = document.getElementById(`${startingPosition[0] + 1}${startingPosition[1] + 1}${startingPosition[2] + 1}`);
+            sourceSquare.removeChild(piece); // remove the sourceSquare's child(piece)
+         
             if ( !( currBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]].includes(".") ) && !( currBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]].includes("^") ) ) {
                 // level 0 is not empty AND level 0 is not R, check next level
                 if (!( currBoard[endingPosition[0]+1][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
@@ -1021,7 +1023,182 @@ console.log( 'movePiece(', piece, ',', startingPosition, ',', endingPosition, ')
 console.warn("No more levels available.");
         
                                 } else {
+                                    // update the endingPosition and assign the boardPiece to the currBoard
+                                    endingPosition[0] = endingPosition[0] + 1;
                                     currBoard[endingPosition[0]+5][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 5
+        
+                                    // get the Element by Id - the z coord is always 1
+                                    const destinationSquare = document.getElementById(`1${endingPosition[1] + 1}${endingPosition[2] + 1}`);
+                                    destinationSquare.textContent = '';
+        
+                                    // build a new pieceElement and append it to the destinationSquare
+                                    const pieceElement = document.createElement('img');
+                                    pieceElement.classList.add('piece');
+                                    pieceElement.id = boardPiece;
+                                    pieceElement.draggable = true;
+                                    pieceElement.src = getPieceImageSource( boardPiece.replace(/\d/g, '') + '5' );
+        
+                                    // append the pieceElement to the destinationSquare
+                                    destinationSquare.appendChild(pieceElement);
+                                }
+                            } else {
+                                // update the endingPosition and assign the boardPiece to the currBoard
+                                endingPosition[0] = endingPosition[0] + 1;
+                                currBoard[endingPosition[0]+4][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 4
+        
+                                // get the Element by Id - the z coord is always 1
+                                const destinationSquare = document.getElementById(`1${endingPosition[1] + 1}${endingPosition[2] + 1}`);
+                                destinationSquare.textContent = '';
+        
+                                // build a new pieceElement and append it to the destinationSquare
+                                const pieceElement = document.createElement('img');
+                                pieceElement.classList.add('piece');
+                                pieceElement.id = boardPiece;
+                                pieceElement.draggable = true;
+                                pieceElement.src = getPieceImageSource( boardPiece.replace(/\d/g, '') + '4' );
+        
+                                // append the pieceElement to the destinationSquare
+                                destinationSquare.appendChild(pieceElement);
+                            }
+                        } else {
+                            // update the endingPosition and assign the boardPiece to the currBoard
+                            endingPosition[0] = endingPosition[0] + 1;
+                            currBoard[endingPosition[0]+3][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 3
+        
+                            // get the Element by Id - the z coord is always 1
+                            const destinationSquare = document.getElementById(`1${endingPosition[1] + 1}${endingPosition[2] + 1}`);
+                            destinationSquare.textContent = '';
+        
+                            // build a new pieceElement and append it to the destinationSquare
+                            const pieceElement = document.createElement('img');
+                            pieceElement.classList.add('piece');
+                            pieceElement.id = boardPiece;
+                            pieceElement.draggable = true;
+                            pieceElement.src = getPieceImageSource( boardPiece.replace(/\d/g, '') + '3' );
+                    
+                            // append the pieceElement to the destinationSquare
+                            destinationSquare.appendChild(pieceElement);
+                        }
+                    } else {
+                        // update the endingPosition and assign the boardPiece to the currBoard
+                        endingPosition[0] = endingPosition[0] + 1;
+                        currBoard[endingPosition[0]+2][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 2
+        
+                        // get the Element by Id - the z coord is always 1
+                        const destinationSquare = document.getElementById(`1${endingPosition[1] + 1}${endingPosition[2] + 1}`);
+                        destinationSquare.textContent = '';
+        
+                        // build a new pieceElement and append it to the destinationSquare
+                        const pieceElement = document.createElement('img');
+                        pieceElement.classList.add('piece');
+                        pieceElement.id = boardPiece;
+                        pieceElement.draggable = true;
+                        pieceElement.src = getPieceImageSource( boardPiece.replace(/\d/g, '') + '2' );
+        
+                        // append the pieceElement to the destinationSquare
+                        destinationSquare.appendChild(pieceElement);
+                    }
+                } else {
+                    // update the endingPosition and assign the boardPiece to the currBoard
+                    endingPosition[0] = endingPosition[0] + 1;
+                    currBoard[endingPosition[0]+1][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 1
+        
+                    // get the Element by Id - the z coord is always 1
+                    const destinationSquare = document.getElementById(`1${endingPosition[1] + 1}${endingPosition[2] + 1}`);
+                    destinationSquare.textContent = '';
+        
+                    // build a new pieceElement and append it to the destinationSquare
+                    const pieceElement = document.createElement('img');
+                    pieceElement.classList.add('piece');
+                    pieceElement.id = boardPiece;
+                    pieceElement.draggable = true;
+                    pieceElement.src = getPieceImageSource( boardPiece.replace(/\d/g, '') + '1' );
+                 
+                    // append the pieceElement to the destinationSquare
+                    destinationSquare.appendChild(pieceElement);
+                }
+            } else {
+                // assign the boardPiece to the currBoard
+                currBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 0
+        
+                // get the Element by Id - the z coord is always 1
+                const destinationSquare = document.getElementById(`1${endingPosition[1] + 1}${endingPosition[2] + 1}`);
+                destinationSquare.textContent = '';
+        
+                // append the piece (not pieceElement) to the destinationSquare
+                destinationSquare.appendChild( piece );
+            }
+        }
+        endingPositions.push( endingPosition ); // push the zyxCoords to endingPositions
+    }
+    
+    // push a 6 element move record to the game_record
+    game_record.push( currPlayer, turn_no, piece, startingPosition, endingPosition, origPiece );
+    
+// console.log( 'endingPositions after movePiece', endingPositions );
+// console.log( 'currBoard after movePiece', currBoard );
+    	
+} // movePiece( piece, startingPosition, endingPosition )
+
+
+function undoMovePiece( piece, startingPosition, endingPosition, unOrig ) {
+    // undoMovePiece undoes a movePiece( piece, startingPosition, endingPosition, unOrig )
+    // by returning a played piece to the rack, and by redisplaying
+    // the original underlying piece, unOrig, if not empty.
+    
+console.log( '' );
+console.log( 'undoMovePiece(', piece, ',', startingPosition, ',', endingPosition, ',', unOrig, '):' );
+    
+    // if the piece is defined (neither undefined or null)
+    if ( piece ) {
+ 	
+        // get the boardPiece
+        const boardPiece = currBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
+    
+        // If the boardPiece is not empty 
+        if ( boardPiece !== '.' ) {
+    
+            // undo the last move
+            // remove the original piece from the DOM, currBoard and the rack
+    
+            // move the piece from currBoard to the rack
+            // remove the piece from currBoard
+            currBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]] = '.';
+            // return the piece to the p1rack
+            if ( endingPosition[0] === 0 && endingPosition[1] === 0 && endingPosition[2] === 0 ) { p1rack[0] = boardPiece; }
+            if ( endingPosition[0] === 0 && endingPosition[1] === 0 && endingPosition[2] === 1 ) { p1rack[1] = boardPiece; }
+            if ( endingPosition[0] === 0 && endingPosition[1] === 0 && endingPosition[2] === 2 ) { p1rack[2] = boardPiece; }
+            if ( endingPosition[0] === 0 && endingPosition[1] === 0 && endingPosition[2] === 3 ) { p1rack[3] = boardPiece; }
+            if ( endingPosition[0] === 0 && endingPosition[1] === 1 && endingPosition[2] === 0 ) { p1rack[4] = boardPiece; }
+            if ( endingPosition[0] === 0 && endingPosition[1] === 1 && endingPosition[2] === 1 ) { p1rack[5] = boardPiece; }
+            // return the piece to the p2rack
+            if ( endingPosition[0] === 0 && endingPosition[1] === 3 && endingPosition[2] === 10 ) { p2rack[0] = boardPiece; }
+            if ( endingPosition[0] === 0 && endingPosition[1] === 4 && endingPosition[2] === 9 ) { p2rack[1] = boardPiece; }
+            if ( endingPosition[0] === 0 && endingPosition[1] === 3 && endingPosition[2] === 8 ) { p2rack[2] = boardPiece; }
+            if ( endingPosition[0] === 0 && endingPosition[1] === 4 && endingPosition[2] === 7 ) { p2rack[3] = boardPiece; }
+            if ( endingPosition[0] === 0 && endingPosition[1] === 2 && endingPosition[2] === 10 ) { p2rack[4] = boardPiece; }
+            if ( endingPosition[0] === 0 && endingPosition[1] === 3 && endingPosition[2] === 9 ) { p2rack[5] = boardPiece; }
+        
+            if ( !( currBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]].includes(".") ) && !( currBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]].includes("^") ) ) {
+                // level 0 is not empty AND level 0 is not R, check next level
+                if (!( currBoard[endingPosition[0]+1][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
+                    // level 1 is not empty, check next level
+                    if (!( currBoard[endingPosition[0]+2][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
+                        // level 2 is not empty, check next level
+                        if (!( currBoard[endingPosition[0]+3][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
+                            // level 3 is not empty, check next level
+                            if (!( currBoard[endingPosition[0]+4][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
+                                // level 4 is not empty, check next level
+                                if (!( currBoard[endingPosition[0]+5][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
+                                    // level 5 is not empty, no more levels, this needs to be prevented
+    
+console.warn("No more levels available.");
+    
+                                } else {
+                                    // move the boardPiece to the currBoard endingPosition level 5
+                                    currBoard[endingPosition[0]+5][endingPosition[1]][endingPosition[2]] = boardPiece;
+    
+                                    // get the destinationSquare
                                     const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
                                     destinationSquare.textContent = '';
         
@@ -1029,13 +1206,20 @@ console.warn("No more levels available.");
                                     const pieceElement = document.createElement('img');
                                     pieceElement.classList.add('piece');
                                     pieceElement.id = boardPiece;
-                                    pieceElement.draggable = false;
-                                    pieceElement.src = getPieceImageSource( boardPiece.replace(/\d/g, '') + '5' );
+                                    pieceElement.draggable = true;
+                                    pieceElement.src = getPieceImageSource( boardPiece.replace(/\d/g, '') + '0' );
         
+                                    // append the piece to the destinationSquare
                                     destinationSquare.appendChild(pieceElement);
+    
+                                    // Add a new Event Listener to the new piece
+                                    addEventListener( document.getElementById( boardPiece ) );					
                                 }
                             } else {
-                                currBoard[endingPosition[0]+4][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 4
+                                // move the boardPiece to the currBoard endingPosition level 4
+                                currBoard[endingPosition[0]+4][endingPosition[1]][endingPosition[2]] = boardPiece;
+    
+                                // get the destinationSquare
                                 const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
                                 destinationSquare.textContent = '';
         
@@ -1043,13 +1227,20 @@ console.warn("No more levels available.");
                                 const pieceElement = document.createElement('img');
                                 pieceElement.classList.add('piece');
                                 pieceElement.id = boardPiece;
-                                pieceElement.draggable = false;
-                                pieceElement.src = getPieceImageSource( boardPiece.replace(/\d/g, '') + '4' );
+                                pieceElement.draggable = true;
+                                pieceElement.src = getPieceImageSource( boardPiece.replace(/\d/g, '') + '0' );
         
+                                // append the piece to the destinationSquare
                                 destinationSquare.appendChild(pieceElement);
+    
+                                // Add a new Event Listener to the new piece
+                                addEventListener( document.getElementById( boardPiece ) );					
                             }
                         } else {
-                            currBoard[endingPosition[0]+3][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 3
+                            // move the boardPiece to the currBoard endingPosition level 3
+                            currBoard[endingPosition[0]+3][endingPosition[1]][endingPosition[2]] = boardPiece;
+
+                            // get the destinationSquare
                             const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
                             destinationSquare.textContent = '';
         
@@ -1057,13 +1248,20 @@ console.warn("No more levels available.");
                             const pieceElement = document.createElement('img');
                             pieceElement.classList.add('piece');
                             pieceElement.id = boardPiece;
-                            pieceElement.draggable = false;
-                            pieceElement.src = getPieceImageSource( boardPiece.replace(/\d/g, '') + '3' );
+                            pieceElement.draggable = true;
+                            pieceElement.src = getPieceImageSource( boardPiece.replace(/\d/g, '') + '0' );
                     
+                            // append the piece to the destinationSquare
                             destinationSquare.appendChild(pieceElement);
+    
+                            // Add a new Event Listener to the new piece
+                            addEventListener( document.getElementById( boardPiece ) );					
                         }
                     } else {
-                        currBoard[endingPosition[0]+2][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 2
+                        // move the boardPiece to the currBoard endingPosition level 2
+                        currBoard[endingPosition[0]+2][endingPosition[1]][endingPosition[2]] = boardPiece;
+    
+                        // get the destinationSquare
                         const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
                         destinationSquare.textContent = '';
         
@@ -1071,13 +1269,20 @@ console.warn("No more levels available.");
                         const pieceElement = document.createElement('img');
                         pieceElement.classList.add('piece');
                         pieceElement.id = boardPiece;
-                        pieceElement.draggable = false;
-                        pieceElement.src = getPieceImageSource( boardPiece.replace(/\d/g, '') + '2' );
+                        pieceElement.draggable = true;
+                        pieceElement.src = getPieceImageSource( boardPiece.replace(/\d/g, '') + '0' );
         
+                        // append the piece to the destinationSquare
                         destinationSquare.appendChild(pieceElement);
+    
+                        // Add a new Event Listener to the new piece
+                        addEventListener( document.getElementById( boardPiece ) );					
                     }
                 } else {
-                    currBoard[endingPosition[0]+1][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 1
+                    // move the boardPiece to the currBoard endingPosition level 1
+                    currBoard[endingPosition[0]+1][endingPosition[1]][endingPosition[2]] = boardPiece;
+    
+                    // get the destinationSquare
                     const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
                     destinationSquare.textContent = '';
         
@@ -1085,174 +1290,50 @@ console.warn("No more levels available.");
                     const pieceElement = document.createElement('img');
                     pieceElement.classList.add('piece');
                     pieceElement.id = boardPiece;
-                    pieceElement.draggable = false;
-                    pieceElement.src = getPieceImageSource( boardPiece.replace(/\d/g, '') + '1' );
+                    pieceElement.draggable = true;
+                    pieceElement.src = getPieceImageSource( boardPiece.replace(/\d/g, '') + '0' );
                  
+                    // get the destinationSquare
                     destinationSquare.appendChild(pieceElement);
+    
+                    // Add a new Event Listener to the new piece
+                    addEventListener( document.getElementById( boardPiece ) );					
                 }
-            } else {
-                currBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 0
+            } // level 0 not empty
+            else {
+                // move the boardPiece to the currBoard endingPosition level 0
+                currBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]] = boardPiece;
+    
+                // get the destinationSquare
                 const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
                 destinationSquare.textContent = '';
         
+                // get the destinationSquare
                 destinationSquare.appendChild(piece);
+    
+                // A new Event Listener is not required, this is the same piece
             }
         }
-        endingPositions.push( endingPosition );
+        
+        // undoMovePiece() doesn't record to the game_record
+        // game_record.push( currPlayer, turn_no, piece, startingPosition, endingPosition );
+    
     }
     
-    // push a 5 element move record to the game_record
-    game_record.push( currPlayer, turn_no, piece, startingPosition, endingPosition );
+console.log( 'currBoard after undoMovePiece', currBoard );
     
-} // movePiece( piece, startingPosition, endingPosition )
-
-
-function undoPiece( piece, startingPosition, endingPosition ) {
-    
-console.log( '' );
-console.log( 'undoPiece(', piece, ',', startingPosition, ',', endingPosition, '):' );
-    
-    const boardPiece = currBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
-    
-    // If the boardPiece is not empty 
-    if ( boardPiece !== '.' ) {
-    
-        // move the piece
-        // remove the original piece from the DOM, currBoard and the rack
-    
-        // undoPiece() doesn't remove from the rack - instead it adds back to it
-        // removeRack( boardPiece, startingPosition );
-    
-        currBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]] = '.'; // clear the startingPosition 
-    
-        // undoPiece() doesn't remove from the rack - instead it adds back to it
-        // add the tile to the p1rack
-        if ( endingPosition[0] === 0 && endingPosition[1] === 0 && endingPosition[2] === 0 ) { p1rack[0] = boardPiece; }
-        if ( endingPosition[0] === 0 && endingPosition[1] === 0 && endingPosition[2] === 1 ) { p1rack[1] = boardPiece; }
-        if ( endingPosition[0] === 0 && endingPosition[1] === 0 && endingPosition[2] === 2 ) { p1rack[2] = boardPiece; }
-        if ( endingPosition[0] === 0 && endingPosition[1] === 0 && endingPosition[2] === 3 ) { p1rack[3] = boardPiece; }
-        if ( endingPosition[0] === 0 && endingPosition[1] === 1 && endingPosition[2] === 0 ) { p1rack[4] = boardPiece; }
-        if ( endingPosition[0] === 0 && endingPosition[1] === 1 && endingPosition[2] === 1 ) { p1rack[5] = boardPiece; }
-    
-        // add the tile to the p2rack
-        if ( endingPosition[0] === 0 && endingPosition[1] === 3 && endingPosition[2] === 10 ) { p2rack[0] = boardPiece; }
-        if ( endingPosition[0] === 0 && endingPosition[1] === 4 && endingPosition[2] === 9 ) { p2rack[1] = boardPiece; }
-        if ( endingPosition[0] === 0 && endingPosition[1] === 3 && endingPosition[2] === 8 ) { p2rack[2] = boardPiece; }
-        if ( endingPosition[0] === 0 && endingPosition[1] === 4 && endingPosition[2] === 7 ) { p2rack[3] = boardPiece; }
-        if ( endingPosition[0] === 0 && endingPosition[1] === 2 && endingPosition[2] === 10 ) { p2rack[4] = boardPiece; }
-        if ( endingPosition[0] === 0 && endingPosition[1] === 3 && endingPosition[2] === 9 ) { p2rack[5] = boardPiece; }
-    
-        if ( !( currBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]].includes(".") ) && !( currBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]].includes("^") ) ) {
-            // level 0 is not empty AND level 0 is not R, check next level
-            if (!( currBoard[endingPosition[0]+1][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
-                // level 1 is not empty, check next level
-                if (!( currBoard[endingPosition[0]+2][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
-                    // level 2 is not empty, check next level
-                    if (!( currBoard[endingPosition[0]+3][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
-                        // level 3 is not empty, check next level
-                        if (!( currBoard[endingPosition[0]+4][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
-                            // level 4 is not empty, check next level
-                            if (!( currBoard[endingPosition[0]+5][endingPosition[1]][endingPosition[2]].includes(".") ) ) {
-                                // level 5 is not empty, no more levels, this needs to be prevented
-    
-console.warn("No more levels available.");
-    
-                            } else {
-                                currBoard[endingPosition[0]+5][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 5
-                                const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
-                                destinationSquare.textContent = '';
-    
-                                // build a new pieceElement and append it to the destinationSquare
-                                const pieceElement = document.createElement('img');
-                                pieceElement.classList.add('piece');
-                                pieceElement.id = boardPiece;
-                                pieceElement.draggable = false;
-                                pieceElement.src = getPieceImageSource( boardPiece.replace(/\d/g, '') + '5' );
-    
-                                destinationSquare.appendChild(pieceElement);
-                            }
-                        } else {
-                            currBoard[endingPosition[0]+4][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 4
-                            const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
-                            destinationSquare.textContent = '';
-    
-                            // build a new pieceElement and append it to the destinationSquare
-                            const pieceElement = document.createElement('img');
-                            pieceElement.classList.add('piece');
-                            pieceElement.id = boardPiece;
-                            pieceElement.draggable = false;
-                            pieceElement.src = getPieceImageSource( boardPiece.replace(/\d/g, '') + '4' );
-    
-                            destinationSquare.appendChild(pieceElement);
-                        }
-                    } else {
-                        currBoard[endingPosition[0]+3][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 3
-                        const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
-                        destinationSquare.textContent = '';
-    
-                        // build a new pieceElement and append it to the destinationSquare
-                        const pieceElement = document.createElement('img');
-                        pieceElement.classList.add('piece');
-                        pieceElement.id = boardPiece;
-                        pieceElement.draggable = false;
-                        pieceElement.src = getPieceImageSource( boardPiece.replace(/\d/g, '') + '3' );
-                
-                        destinationSquare.appendChild(pieceElement);
-                    }
-                } else {
-                    currBoard[endingPosition[0]+2][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 2
-                    const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
-                    destinationSquare.textContent = '';
-    
-                    // build a new pieceElement and append it to the destinationSquare
-                    const pieceElement = document.createElement('img');
-                    pieceElement.classList.add('piece');
-                    pieceElement.id = boardPiece;
-                    pieceElement.draggable = false;
-                    pieceElement.src = getPieceImageSource( boardPiece.replace(/\d/g, '') + '2' );
-    
-                    destinationSquare.appendChild(pieceElement);
-                }
-            } else {
-                currBoard[endingPosition[0]+1][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 1
-                const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
-                destinationSquare.textContent = '';
-    
-                // build a new pieceElement and append it to the destinationSquare
-                const pieceElement = document.createElement('img');
-                pieceElement.classList.add('piece');
-                pieceElement.id = boardPiece;
-                pieceElement.draggable = false;
-                pieceElement.src = getPieceImageSource( boardPiece.replace(/\d/g, '') + '1' );
-             
-                destinationSquare.appendChild(pieceElement);
-            }
-        } // level 0 not empty
-        else {
-            currBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]] = boardPiece; // move the boardPiece to the endingPosition level 0
-            const destinationSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
-            destinationSquare.textContent = '';
-    
-            destinationSquare.appendChild(piece);
-        }
-    }
-    
-    // undoPiece() doesn't record to the game_record
-    // game_record.push( currPlayer, turn_no, piece, startingPosition, endingPosition );
-    
-} // undoPiece( piece, startingPosition, endingPosition )
+} // undoMovePiece( piece, startingPosition, endingPosition )
 
 
 function validateWhiteMovement( startingPosition, endingPosition ) {
-    // Get the boardPiece
-    const boardPiece = currBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
     
 // console.log( '' );
 // console.log( 'validateWhiteMovement(', startingPosition, ',', endingPosition, '):' );
-// console.log( 'boardPiece', boardPiece );
-// console.log( 'boardLetter', boardPiece.replace(/\d/g, '') );
     
-    switch ( boardPiece.replace(/\d/g, '') ) { // Switch on the letter itself
+    // Get the boardPiece
+    const boardPiece = currBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
+    
+    switch ( boardPiece.toLowerCase().replace(/\d/g, '') ) { // Switch on the letter
         case 'a':
         case 'b':
         case 'c':
@@ -1303,14 +1384,13 @@ console.warn( 'onBoard(endingPosition):', onBoard(endingPosition) );
 
 
 function validateBlackMovement( startingPosition, endingPosition ) {
-    const boardPiece = currBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
         
 // console.log( '' );
 // console.log( 'validateBlackMovement(', startingPosition, ',', endingPosition, '):' );
-// console.log( 'boardPiece', boardPiece );
-// console.log( 'boardLetter', boardPiece.replace(/\d/g, '') );
         
-    switch ( boardPiece.replace(/\d/g, '') ) { // Strip the tile_id from the tile, leaving the letter
+    const boardPiece = currBoard[startingPosition[0]][startingPosition[1]][startingPosition[2]];
+        
+    switch ( boardPiece.toLowerCase().replace(/\d/g, '') ) { // Switch on the letter
         case 'a':
         case 'b':
         case 'c':
@@ -1339,12 +1419,12 @@ function validateBlackMovement( startingPosition, endingPosition ) {
         case 'z':
             return testBlackLetter( startingPosition, endingPosition, boardPiece );
             break;
-        case ' ':
+        case ' ': // If blank call pickLetter
             if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
                 pickLetter( startingPosition, endingPosition );
             }
             break;
-        case '^':
+        case '^': // This should never happen
             if ( inRack2(startingPosition) && onBoard(endingPosition) ) {
                 return true;
             } else {
@@ -1395,11 +1475,11 @@ console.warn( 'testBlackLetter() move denied:', 'Cannot stack a letter on top of
 function pickLetter( startingPosition, endingPosition ) {
     let c = startingPosition[0];
     let b = startingPosition[1];
-    let a = startingPosition[2];
+    let a = startingPosition[2]; // [c,b,a] coords
     
     let z = endingPosition[0];
     let y = endingPosition[1];
-    let x = endingPosition[2];
+    let x = endingPosition[2]; // [z,y,x] coords
     
     // Choose a letter
     let blank = prompt( 'Choose a letter (A - Z):' );
@@ -1411,8 +1491,6 @@ function pickLetter( startingPosition, endingPosition ) {
     let yxCoord = y+','+x; // use the yxCoords from the lookup
     let blankLev = getTopLevel( yxCoord ) + 1; // use the yxCoords from the lookup + 1
     
-// console.log( 'blankLev', blankLev );
-    
     // Get blank_tileandtier
     let blank_tileandtier = blank.toUpperCase() + blankLev; // the letter_blanks are UpperCase
     
@@ -1420,26 +1498,16 @@ function pickLetter( startingPosition, endingPosition ) {
 // console.log( 'pickLetter(', startingPosition, ',', endingPosition, '):' );        
     
     // Remove the Pink Rose img if the endingPosition is on a flower
-    if ( z === 0 && y === 1 && x === 4 ) { 
+    if ( z === 0 && y === 1 && x === 4 && currBoard[0][1][4] === '^0' ) { 
         removePiece( '^0', endingPosition );
     }
-    if ( z === 0 && y === 1 && x === 6 ) { 
+    if ( z === 0 && y === 1 && x === 6 && currBoard[0][1][6] === '^1' ) { 
         removePiece( '^1', endingPosition );
     }
-    if ( z === 0 && y === 3 && x === 5 ) { 
+    if ( z === 0 && y === 3 && x === 5 && currBoard[0][3][5] === '^2' ) { 
         removePiece( '^2', endingPosition );
     }
-
-    // see if there is an img already attached to the endingPosition 
-    if ( currBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]] !== '.' ) { 
-        removePiece( currBoard[endingPosition[0]][endingPosition[1]][endingPosition[2]], endingPosition );
-        // remove any img from the endingPosition
-        // const sourceSquare = document.getElementById(`${endingPosition[0] + 1}${endingPosition[1] + 1}${endingPosition[2] + 1}`);
-        // sourceSquare.removeChild(piece); // remove the sourceSquare's child(piece)
-    }
     
-// console.log( 'loadPiece(', blank_tile, [z+1,y+1,x+1], ')', );
-
     // replace the blank tile with the zero-point letter_blank at the endingPosition
     loadPiece( blank_tile, [z+1,y+1,x+1] );
     
@@ -1456,6 +1524,8 @@ function pickLetter( startingPosition, endingPosition ) {
         if ( p2rack.indexOf( ' 1' ) > -1 ) { removeRack( ' 1', startingPosition ); }
     }
     
+    // remove the piece from currBoard and the rack
+    // clear the currBoard startingPosition
     currBoard[c][b][a] = '.';
     // clear the blank tile from the p1rack
     if ( startingPosition[0] === 0 && startingPosition[1] === 0 && startingPosition[2] === 0 ) { p1rack[0] = '.'; } 
@@ -1479,10 +1549,6 @@ function switchPlayer() {
     // called by the $ onclick button:
     // end turn and calculate the score 
     
-    // empty words and score_words
-    words.length = 0;
-    score_words.length = 0;
-    
     // calculate the score    
     calcScore();
     
@@ -1500,6 +1566,14 @@ console.log( 'switchPlayer():' );
 
 
 function calcScore() {
+    // calculate the score of the words in score_words[]
+    
+console.log( '' );
+console.log( 'calcScore' );
+    
+    // empty words and score_words
+    words.length = 0;
+    score_words.length = 0;
     
     findWords(); // populate the score_words[] array
         
@@ -1542,6 +1616,7 @@ function calcScore() {
                 
             // copy currBoard to prevBoard
             prevBoard = JSON.parse(JSON.stringify(currBoard));
+            // clear out diffBoard
                 
             // redraw tiles and switch player
             if ( currPlayer === 'white' ) {
@@ -1571,39 +1646,39 @@ function findWords() {
     // copy prevBoard to diffBoard
     diffBoard = JSON.parse(JSON.stringify(prevBoard));
     
-    for (let h = 0; h < 6 ; h++) { // 6 levels
-        for (let i = 0; i < 5 ; i++) { // 5 rows
-            for (let j = 0; j < 11; j++) { // 11 columns
-                if ( !onBoard([h,i,j]) ) {
+    for (let z = 0; z < 6 ; z++) { // 6 levels
+        for (let y = 0; y < 5 ; y++) { // 5 rows
+            for (let x = 0; x < 11; x++) { // 11 columns
+                if ( !onBoard([z,y,x]) ) {
                     // If not on the board, clear the prevBoard element
-                    diffBoard[h][i][j] = '.';
+                    diffBoard[z][y][x] = '.';
                 }
-                if ( prevBoard[h][i][j] !== currBoard[h][i][j] && onBoard([h,i,j]) ) {
+                if ( prevBoard[z][y][x] !== currBoard[z][y][x] && onBoard([z,y,x]) ) {
                     // if different, save the difference to diffBoard
-                    diffBoard[h][i][j] = currBoard[h][i][j];
+                    diffBoard[z][y][x] = currBoard[z][y][x];
                 } else {
                     // if the same, clear the element in diffBoard
-                    diffBoard[h][i][j] = '.';
+                    diffBoard[z][y][x] = '.';
                 }
             }
         }
     } // diffBoard now contains only the tile(s) played for the last turn
     
     // 2nd: Use the diffBoard[][][] position(s) to find any new word(s) in currBoard[][][]:
-    for (let h = 0; h < 6 ; h++) { // 6 levels
-        for (let i = 0; i < 5 ; i++) { // 5 rows
-            for (let j = 0; j < 11; j++) { // 11 columns
+    for (let z = 0; z < 6 ; z++) { // 6 levels
+        for (let y = 0; y < 5 ; y++) { // 5 rows
+            for (let x = 0; x < 11; x++) { // 11 columns
     
                 // If the position is on the board
-                if ( onBoard([h,i,j]) ) {
+                if ( onBoard([z,y,x]) ) {
     
                     // If its a new tile on the board, use that position to check for any words
-                    if ( diffBoard[h][i][j] !== '.' ) {
+                    if ( diffBoard[z][y][x] !== '.' ) {
     
-// console.log( 'new tile position:', '[' + h + '][' + i + '][' + j + ']' );
+// console.log( 'new tile position:', '[' + z + '][' + y + '][' + x + ']' );
     
                         // the score_words[] array is reset by switchPlayer() and undo_turn()
-                        score_words = wordFinder([h,i,j]); // e.g. ['it, [2, 4], UP']
+                        score_words = wordFinder([z,y,x]); // e.g. ['it, [2, 4], UP']
     
                         // wordFinder() returns an array of unique words to score
                         // an element = the word, the word position, and the direction
@@ -1652,7 +1727,7 @@ console.log( 'checkWords():' );
         // get the word direction from the element string
         yx_dir = element_str.substring( element_str.length - 2, element_str.length ); 
     
-// console.log( 'word_str:', word_str, 'yx_str:', yx_str, 'yx_dir:', yx_dir );
+console.log( 'word_str:', word_str, 'yx_str:', yx_str, 'yx_dir:', yx_dir );
     
         /////////////////////////////////////////////////////////////////////////
         // check that every word is two or more characters - if not return 100 //
@@ -1676,11 +1751,11 @@ console.log( 'checkWords():' );
                         new_str = upwd_lookup( yx_str, i ); // lookup new yxCoords, the first one remains the same
                         new_ary = new_str.split(',').map(Number); // new_ary is an array of numbers
     
-console.log( 'new_ary:', new_ary ); 
-console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
+// console.log( 'new_ary:', new_ary ); 
+// console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
     
                         if ( onFlower( new_ary ) && onPerimeter( new_ary ) ) {
-console.log( 'onPerimeterFlower is true' );
+// console.log( 'onPerimeterFlower is true' );
                             onPerimeterFlower = 1;
                         }
                     }
@@ -1698,11 +1773,11 @@ console.log( 'onPerimeterFlower is true' );
                         new_str = dnwd_lookup( yx_str, i ); // lookup new yxCoords, the first one remains the same
                         new_ary = new_str.split(',').map(Number); // new_ary is an array of numbers
     
-console.log( 'new_ary:', new_ary ); 
-console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
+// console.log( 'new_ary:', new_ary ); 
+// console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
     
                         if ( onFlower( new_ary ) && onPerimeter( new_ary ) ) {
-console.log( 'onPerimeterFlower is true' );
+// console.log( 'onPerimeterFlower is true' );
                             onPerimeterFlower = 1;
                         }
                     }
@@ -1720,11 +1795,11 @@ console.log( 'onPerimeterFlower is true' );
                         new_str = (y + i)+','+x; // calculate the new coords ( add one to y )
                         new_ary = new_str.split(',').map(Number); // new_ary is an array of numbers
     
-console.log( 'new_ary:', new_ary ); 
-console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
+// console.log( 'new_ary:', new_ary ); 
+// console.log( 'onFlower( ', new_ary, '):', onFlower( new_ary ) ); 
     
                         if ( onFlower( new_ary ) && onPerimeter( new_ary ) ) {
-console.log( 'onPerimeterFlower is true' );
+// console.log( 'onPerimeterFlower is true' );
                             onPerimeterFlower = 1;
                         }
                     }
@@ -1850,10 +1925,10 @@ console.log( 'checkWords() returns 400' );
         return 400;
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////
-    // check that an existing word is not completely over-written - if not return 500 //
-    ////////////////////////////////////////////////////////////////////////////////////
-    if ( ! isOverwritten( endingPositions ) ) {
+    ///////////////////////////////////////////////////////////////////////////////////
+    // check that an existing word is not completely over-written - if so return 500 //
+    ///////////////////////////////////////////////////////////////////////////////////
+    if ( isOverwritten( endingPositions === true ) ) {
         console.warn( 'A played word may not be completely overwritten.  Undo the last turn.' );
 console.log( 'checkWords() returns 500' );
         return 500;
@@ -1877,6 +1952,7 @@ function isInALine( endingPositions ) {
     
     if ( count === 1 ) { // a single tile played
         match = true;
+        return match;
     }
 
     if ( count === 2 ) { // check 2 positions against the arrays of arrays
@@ -1903,6 +1979,7 @@ console.log( 'check 2 positions...' );
            ) {
 console.log( '2 positions in a line Match Found' );
             match = true; // a match of 2 positions
+            return match;
         }
     }
 
@@ -1931,6 +2008,7 @@ console.log( 'check 3 positions...' );
            ) {
 console.log( '3 positions in a line Match Found' );
             match = true; // a match of 3 positions
+            return match;
         }
     } // 3 position check
 
@@ -1941,30 +2019,48 @@ console.log( '3 positions in a line Match Found' );
 
 function isOverwritten( endingPositions ) {
     // return true if any existing word is completely overwritten
-    // currently this is hard-coded for 2 and 3 positions
-    // I can continue the same for 4, 5, 6 positions etc - or -
-    // I can develop a more generic solution
+    // overwords contains the strings that cannot be overwritten
     
-console.log( 'endingPositions', endingPositions );
-// console.log( 'currBoard', currBoard );
-console.log( 'prevBoard', prevBoard );
-console.log( 'diffBoard', diffBoard );
+// console.log( '' );
+// console.log( 'isOverwritten(', endingPositions, '):' );
+
+    let count = 0;
+    for ( let index = 0; index < endingPositions.length; ++index ) {
+
+        // if the endingPosition is in overwrites, increment the count
+        if ( JSON.stringify( overwrites ).includes( JSON.stringify( endingPositions ) ) ) { 
+            count = count + 1;
+        }
+    }
     
-    return true;
+    // if the count equals the number of endingPositions, then completely overwritten
+    if ( count === endingPositions.length ) {
+        // completely overwritten
+        return true;
+    }
+    
+    // not completely overwritten
+    return false;
 
 } // isOverwritten( endingPositions )
 
 
 function scoreWords() {
+    // score the words in score_words
+    
+console.log( '' );
+console.log( 'scoreWords():' );
+	
     let fp_bonus = 0; // Flower Power word bonus
     let po_bonus = 0; // Pollination word bonus
     let st_bonus = 0; // Stacking letter bonus
     
+    // Check for Flower Power and Pollination Bonuses
+    //
     // Check for a Flower Power bonus on currBoard[0][1][4]
     if ( ( prevBoard[0][1][4].charAt(0) === '^' ) && ( prevBoard[0][1][4] !== currBoard[0][1][4] ) ) {
         // set the flower power bonus
 console.log( 'A Flower Power Bonus!' );
-    
         fp_bonus = 1;
         // Check for a Pollination bonus
         if ( ( currBoard[0][1][4].replace(/\d/g, '') === 'b' ) || ( currBoard[0][1][4].replace(/\d/g, '') === 'q' ) ) {
@@ -1973,7 +2069,6 @@ console.log( 'A Pollination Bonus!' );
             po_bonus = 1;
         }
     }
-    
     // Check for a Flower Power bonus on currBoard[0][1][6]
     if ( ( prevBoard[0][1][6].charAt(0) === '^' ) && ( prevBoard[0][1][6] !== currBoard[0][1][6] ) ) {
         // set the flower power bonus
@@ -1986,7 +2081,6 @@ console.log( 'A Pollination Bonus!' );
             po_bonus = 1;
         }
     }
-    
     // Check for a Flower Power bonus on currBoard[0][3][5]
     if ( ( prevBoard[0][3][5].charAt(0) === '^' ) && ( prevBoard[0][3][5] !== currBoard[0][3][5] ) ) {
         // set the flower power bonus
@@ -2012,10 +2106,10 @@ console.log( 'score_words:', score_words );
     let curWord_str = '';
     let turn_ledger = '';
     
-    //////////////////////////////////////////////////////////////////////////////
-    // For every element (word, position, direction) in the score_words[] array, /
-    // calculate the word score                                                  /
-    //////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////
+    // For every element (word, position, direction) in the score_words[] array, //
+    // calculate the word score and update overwrites.                           //
+    ///////////////////////////////////////////////////////////////////////////////
     for ( let index = 0; index < score_words.length; ++index ) {
         const element = score_words[index];
     
@@ -2033,6 +2127,7 @@ console.log( 'score_words:', score_words );
         x = yx_str.substring(yx_str.indexOf(',')+1 );
         y = Number(y); // convert to a number
         x = Number(x); // convert to a number
+    
 // console.log( 'yx_str:', yx_str );
 // console.log( 'y:', y );
 // console.log( 'x:', x );
@@ -2043,10 +2138,12 @@ console.log( 'score_words:', score_words );
     
         if ( curWord_str !== word_str ) { // a new word to score
     
+            let overWord = '';
             switch ( yx_dir ) {
     
                 case 'UP': // Upwards Word
 console.log( 'An Upwards Word Lookup:' );
+                    overWord = '[['; // opening brackets
                     // for every letter in word_str, sum the individual values 
                     for ( let i = 0; i < word_str.length; i++ ) {
                         // get the letter
@@ -2063,8 +2160,20 @@ console.log( 'An Upwards Word Lookup:' );
                         // calculate the Stacking bonus for each letter
                         st_bonus = letterLev + 1;
             
+                        // word_score sums every letter in the word
                         word_score = word_score + st_bonus * letterVal;
+
+                        // build the overWord string record
+                        z = getTopLevel( yx_str ) + 1;
+                        if ( i !== word_str.length - 1 ) {
+                            overWord = overWord + z + ',' + new_str + '],[';
+                        }
+                        if ( i === word_str.length - 1 ) {
+                            overWord = overWord + z + ',' + new_str;
+                        }			    
                     }
+                    overWord = overWord + ']]'; // closing brackets
+                    overwrites.push( overWord );
     
                     // check for a Flower Power bonus 
                     if ( fp_bonus === 1 ) {
@@ -2078,14 +2187,13 @@ console.log( 'An Upwards Word Lookup:' );
                     turn_ledger = turn_ledger + word_str.toLowerCase() + ' ' + word_score + ', ';
                     turn_score = turn_score + word_score;
     
-                    // push a 4 element score record to the game_record
-                    // game_record.push( currPlayer, turn_no, element_str, word_score );
-                    // push a 5 element score record to the game_record
-                    game_record.push( currPlayer, turn_no, element_str, word_score, 'Score' );
+                    // push a 6 element score record to the game_record
+                    game_record.push( currPlayer, turn_no, element_str, word_score, 'score', 'value' );
                     break;
     
                 case 'DW': // Downwards Word
 console.log( 'A Downwards Word Lookup:' );
+                    overWord = '[['; // opening brackets
                     // for every letter in word_str, sum the individual values 
                     for ( let i = 0; i < word_str.length; i++ ) {
                         // get the letter
@@ -2102,8 +2210,20 @@ console.log( 'A Downwards Word Lookup:' );
                         // calculate the Stacking bonus for each letter
                         st_bonus = letterLev + 1;
             
+                        // word_score sums every letter in the word
                         word_score = word_score + st_bonus * letterVal;
+
+                        // build the overWord string record
+                        z = getTopLevel( yx_str ) + 1;
+                        if ( i !== word_str.length - 1 ) {
+                            overWord = overWord + z + ',' + new_str + '],[';
+                        }
+                        if ( i === word_str.length - 1 ) {
+                            overWord = overWord + z + ',' + new_str;
+                        }			    
                     }
+                    overWord = overWord + ']]'; // closing brackets
+                    overwrites.push( overWord );
     
                     // check for a Flower Power bonus 
                     if ( fp_bonus === 1 ) {
@@ -2117,14 +2237,13 @@ console.log( 'A Downwards Word Lookup:' );
                     turn_ledger = turn_ledger + word_str.toLowerCase() + ' ' + word_score + ', ';
                     turn_score = turn_score + word_score;
     
-                    // push a 4 element score record to the game_record
-                    // game_record.push( currPlayer, turn_no, element_str, word_score );
-                    // push a 5 element score record to the game_record
-                    game_record.push( currPlayer, turn_no, element_str, word_score, 'Score' );
+                    // push a 6 element score record to the game_record
+                    game_record.push( currPlayer, turn_no, element_str, word_score, 'score', 'value' );
                     break;
     
                 case 'DO': // Straight-Down Word
 console.log( 'A Down Word Lookup:' );
+                    overWord = '[['; // opening brackets
                     // for every letter in word_str, sum the individual values 
                     for ( let i = 0; i < word_str.length; i++ ) {
                         // get the letter
@@ -2141,8 +2260,20 @@ console.log( 'A Down Word Lookup:' );
                         // calculate the Stacking bonus for each letter
                         st_bonus = letterLev + 1;
             
+                        // word_score sums every letter in the word
                         word_score = word_score + st_bonus * letterVal;
+
+                        // build the overWord string record
+                        z = getTopLevel( yx_str ) + 1;
+                        if ( i !== word_str.length - 1 ) {
+                            overWord = overWord + z + ',' + new_str + '],[';
+                        }
+                        if ( i === word_str.length - 1 ) {
+                            overWord = overWord + z + ',' + new_str;
+                        }			    
                     }
+                    overWord = overWord + ']]'; // closing brackets
+                    overwrites.push( overWord );
     
                     // check for a Flower Power bonus 
                     if ( fp_bonus === 1 ) {
@@ -2156,22 +2287,14 @@ console.log( 'A Down Word Lookup:' );
                     turn_ledger = turn_ledger + word_str.toLowerCase() + ' ' + word_score + ', ';
                     turn_score = turn_score + word_score;
     
-                    // push a 4 element score record to the game_record
-                    // game_record.push( currPlayer, turn_no, element_str, word_score );
-                    // push a 5 element score record to the game_record
-                    game_record.push( currPlayer, turn_no, element_str, word_score, 'Score' );
+                    // push a 6 element score record to the game_record
+                    game_record.push( currPlayer, turn_no, element_str, word_score, 'score', 'value' );
                     break;
     
             }
         }
         curWord_str = word_str;
-    
-// console.log( 'Word:', element, 'Value:', word_score );
-// console.log( 'Turn_Score:', turn_score );
-    
     } // for every word in score_words[]
-    
-console.log( 'game_record:', game_record );
     
     // turn_ledger now has the individual word scores, and
     // turn_score now has the players total for the turn
@@ -2202,6 +2325,10 @@ console.log( 'game_record:', game_record );
 function wordFinder( zyxCoords ) { // zyxCoords = an array of numbers
                                    // If a word is found, return a record: ['it, [2, 4], UP']
                                    // [ the word, its zyxCoords, and its direction ]
+    
+// console.log( '' );
+// console.log( 'wordFinder( zyxCoords ):' );
+    
     let z = zyxCoords[0];
     let y = zyxCoords[1];
     let x = zyxCoords[2]; 
@@ -2213,18 +2340,13 @@ function wordFinder( zyxCoords ) { // zyxCoords = an array of numbers
     
     if ( onBoard( zyxCoords ) ) { // only process valid board zyxCoords
     
-// console.log( '' );
-// console.log( 'wordFinder( zyxCoords ):' );
-// console.log( 'zyxCoords:', zyxCoords );
-// console.log( 'y:', y );
-// console.log( 'x:', x );
-    
         refresh_upwd_strs();
         refresh_dnwd_strs();
         refresh_down_strs();
     
         yandx_str = '' + y + x;
 // console.log( 'yandx_str:', yandx_str );
+    
         switch ( yandx_str ) {
             case '14':
                 check_upwd_str0();
@@ -2269,54 +2391,67 @@ function wordFinder( zyxCoords ) { // zyxCoords = an array of numbers
     // a well-formed element in words[]: ['an, [1,4], UP']
     // an element = the word, the zyxCoords, and the direction
     
-// console.log( 'words[]:', words );
-    
     let unique_words = [... new Set(words)]; // this makes unique_words[] unique
-    
-// console.log( 'unique_words[]:', unique_words );
-    
-    return unique_words; // e.g. ['it, [2, 4]', UP']
     
     // empty words
     while( words.length > 0 ) {
         words.pop();
     }
     
+    return unique_words; // e.g. ['it, [2, 4]', UP']
+    
 }; // wordFinder( zyxCoords )
 
 
 function undo_turn() {
     
-    // use game_record to undo the current turn
+    // use game_record to undo the current turn for the currPlayer
     
 console.warn( '' );
 console.warn( 'undo_turn():' );
 console.warn( 'game_record:', game_record );
     
+    // for every record in game_record[] backward:
     for ( let i=game_record.length; i>=0; i-- ) {
         
-        if ( i%5 === 4 ) { // to position
-            // get the from from the to
+        if ( i%6 === 5 ) { // get the unOrig piece
+            unOrig = game_record[i];
+        }	    
+        if ( i%6 === 4 ) { // get the unFrom (to position)
             unFrom = game_record[i];
         }
-        if ( i%5 === 3 ) { // from position
-            // get the to from the from
+        if ( i%6 === 3 ) { // get the unTo (from position)
             unTo = game_record[i];
         }
-        if ( i%5 === 2 ) { // img element
-            // get the img element by the unique piece id
+        if ( i%6 === 2 ) { // get the img element
             unPiece = document.getElementById( game_record[i].id );
+        }
+        if ( i%6 === 1 ) { // get the unTurn number
+            unTurn = game_record[i];
+        }
+        if ( i%6 === 0 ) { // get the unPlayer
+            unPlayer = game_record[i];
     
-// console.log( 'unPiece:', unPiece.id, 'unFrom:', unFrom, 'unTo:', unTo ); 
-console.log( 'unPiece:', game_record[i].id, 'unFrom:', unFrom, 'unTo:', unTo ); 
-        
-            undoPiece( unPiece, unFrom, unTo );
-        
+            // undo the move for the currPlayer on the turn_no
+            if ( ( unPlayer === currPlayer ) && ( unTurn === turn_no ) ) {
+
+console.log( 'unPiece:', unPiece, 'unFrom:', unFrom, 'unTo:', unTo, 'unOrig', unOrig );
+console.log( 'prevBoard:', prevBoard );
+    
+                // undoMovePiece undoes a move using unPiece, unFrom, unTo and unOrig
+                undoMovePiece( unPiece, unFrom, unTo, unOrig );
+    
+                // clear words and score_words
+                words.pop();
+                score_words.pop();
+
+	    }		
         }
     }
     
-    words.length = 0; // empty words[]
-    score_words.length = 0; // empty score_words[]
+    // clear words and score_words
+    words.length = 0;
+    score_words.length = 0;
     
     for ( let i=game_record.length; i>=0; i-- ) {
         // remove the turn from the game_record
@@ -2359,14 +2494,14 @@ function flattenBoard() {
     ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
     ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'] ];
           
-    // level h, row i and column j
-    for (let h = 0; h < 6 ; h++) { // 6 levels
-        for (let i = 0; i < 5 ; i++) { // 5 rows
-            for (let j = 0; j < 11; j++) { // 11 columns
+    // level z, row y and column x
+    for (let z = 0; z < 6 ; z++) { // 6 levels
+        for (let y = 0; y < 5 ; y++) { // 5 rows
+            for (let x = 0; x < 11; x++) { // 11 columns
                 // Iterate over every currBoard element
-                if ( ( currBoard[h][i][j] !== '.' ) && ( currBoard[h][i][j] !== '^0' ) && ( currBoard[h][i][j] !== '^1' ) && ( currBoard[h][i][j] !== '^2' ) ) {
+                if ( ( currBoard[z][y][x] !== '.' ) && ( currBoard[z][y][x] !== '^0' ) && ( currBoard[z][y][x] !== '^1' ) && ( currBoard[z][y][x] !== '^2' ) ) {
                     // flatBoard will contain the highest letter tile in currBoard
-                    flatBoard[i][j] = currBoard[h][i][j];
+                    flatBoard[y][x] = currBoard[z][y][x];
                 }
             }
         }
@@ -2484,9 +2619,8 @@ function getTopLevel( yxCoords ) {
     let y = Number(myArray[0]);
     let x = Number(myArray[1]); // yxCoords [y,x] is the source for finding the top z level in currBoard[][][]
     
-    // use the yxCoords to get the top level from currBoard
+    // return the highest tiled level for yxCoords
     for (let level = 5; level >= 0 ; level--) { // 6 levels
-        // return the highest tiled level for this yxCoords
         if ( currBoard[level][y][x] !== '.' ) {
             return level;
             break;
@@ -2495,28 +2629,6 @@ function getTopLevel( yxCoords ) {
     return 0;
     
 } // getTopLevel( yxCoords )
-
-
-function getTopLetter( zyxCoords ) {
-    // Return the letter that is on top of the current zyxCoords
-    
-// console.log( 'In getTopLetter:' );
-// console.log( 'zyxCoords:', zyxCoords, 'z:', z, 'y:', y, 'x:', x );
-    
-    let z = zyxCoords[0]; // this z-coordinate is not accurate
-    let y = zyxCoords[1]; // use the yxCoords
-    let x = zyxCoords[2];
-    let top_letter = '';
-    
-    // get the top letter from currBoard for yxCoord
-    for (let level = 5; level >= 0 ; level--) { // 6 levels
-        if ( currBoard[level][y][x] !== '.' ) {
-            top_letter = currBoard[level][y][x].replace(/\d/g, '');
-            break;
-        }
-    }
-    return top_letter.toLowerCase();
-} // getTopLetter( zyxCoords )
 
 
 function getTopTile( zyxCoords ) {
@@ -2545,7 +2657,7 @@ function getLetterValue( piece ) {
     // Return the value of the given piece.
     
 // console.log( '' );
-// console.log( 'getLetterValue(', boardPiece, '):' );
+// console.log( 'getLetterValue(', piece, '):' );
             
     switch (piece) {
         case ' ':
@@ -2617,11 +2729,9 @@ function getLetterValue( piece ) {
     }
 } // getLetterValue( piece )
 
-
-/*********************************/
-/* check upward string functions */
-/*********************************/
-
+/**************************************/
+/* check upward 'UP' string functions */
+/**************************************/
 
 function check_upwd_str0() {
     result = upwd_str0.match( wordre );
@@ -2677,11 +2787,9 @@ function check_upwd_str2() {
     }
 } // check_upwd_str2()
 
-
-/***********************************/
-/* check downward string functions */
-/***********************************/
-
+/****************************************/
+/* check downward 'DW' string functions */
+/****************************************/
 
 function check_dnwd_str0() {
     result = dnwd_str0.match( wordre );
@@ -2737,11 +2845,9 @@ function check_dnwd_str2() {
     }
 } // check_dnwd_str2()
 
-
-/*******************************/
-/* check down string functions */
-/*******************************/
-
+/************************************/
+/* check down 'DO' string functions */
+/************************************/
 
 function check_down_str0() {
     result = down_str0.match( wordre );
